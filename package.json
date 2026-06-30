@@ -1,0 +1,15 @@
+{
+  "name": "tusg-site",
+  "private": true,
+  "version": "1.0.0",
+  "description": "合同会社TUSG コーポレートサイト (Cloudflare Pages)",
+  "scripts": {
+    "dev": "wrangler pages dev public",
+    "deploy": "wrangler pages deploy public --project-name=tusg-site",
+    "deploy:preview": "wrangler pages deploy public --project-name=tusg-site --branch=preview",
+    "tail": "wrangler pages deployment tail --project-name=tusg-site"
+  },
+  "devDependencies": {
+    "wrangler": "^3.90.0"
+  }
+}
