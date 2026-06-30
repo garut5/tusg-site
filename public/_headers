@@ -5,20 +5,28 @@
   Permissions-Policy: geolocation=(), microphone=(), camera=()
   Strict-Transport-Security: max-age=31536000; includeSubDomains
 
+# HTML はキャッシュさせない (CSS パス変更等の反映が遅延するのを防止)
+/*.html
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/
+  Cache-Control: no-cache, no-store, must-revalidate
+
+# 静的アセットは1日キャッシュ (デバッグ容易性を優先)
 /css/*
-  Cache-Control: public, max-age=2592000
+  Cache-Control: public, max-age=86400, must-revalidate
 
 /js/*
-  Cache-Control: public, max-age=2592000
+  Cache-Control: public, max-age=86400, must-revalidate
 
 /*.jpg
-  Cache-Control: public, max-age=2592000
+  Cache-Control: public, max-age=604800
 
 /*.png
-  Cache-Control: public, max-age=2592000
+  Cache-Control: public, max-age=604800
 
 /*.svg
-  Cache-Control: public, max-age=2592000
+  Cache-Control: public, max-age=604800
 
 /*.webp
-  Cache-Control: public, max-age=2592000
+  Cache-Control: public, max-age=604800
