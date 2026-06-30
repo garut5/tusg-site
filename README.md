@@ -1,150 +1,121 @@
 # 合同会社TUSG コーポレートサイト
 
-ロリポップサーバーから **Cloudflare Pages** へ移行したコーポレートサイトのソースコードです。
+合同会社TUSGのコーポレートサイト (https://tusg.site/) のソースコードです。
+**Cloudflare Pages** + **Pages Functions** で運用しています。
 
-```
-.
-├── functions/             # Cloudflare Pages Functions (動的処理)
-│   └── contact.php.js     #   POST /contact.php を受けてメール送信
-├── public/                # 静的サイトのソース (Cloudflare Pages の公開ディレクトリ)
-│   ├── _headers           #   セキュリティヘッダ・キャッシュ設定
-│   ├── _redirects         #   旧URLからのリダイレクト定義
-│   └── (HTML/CSS/JS/画像) #   ★ここにロリポップから持ってきたファイルを配置
-├── wrangler.toml          # Cloudflare 設定
-└── package.json           # wrangler (CLI) 依存
-```
-
----
-
-## 1. ロリポップからファイルを持ってきて配置
-
-ロリポップの FTP でローカルにダウンロードしたあと、**`public/` 配下にそのまま配置**してください。
+## サイト構成
 
 ```
 public/
-├── index.html
-├── about.html
-├── business.html
-├── company.html
-├── contact.html
-├── strengths.html
-├── thanks.html
-├── ceo.jpg
-├── logo.jpg
-├── css/
-├── js/
-├── kuchikomi_html/
-├── tusmy/
-└── tusmy_html/
+├── index.html              トップページ
+├── business.html           事業内容(4本柱)
+├── saas.html               SaaS開発・システム保守
+├── it-support.html         ITツール導入・運用支援
+├── sales.html              営業支援・販売促進支援
+├── partner.html            リード・アポイント提供パートナー制度
+├── compliance.html         取引方針・コンプライアンス
+├── company.html            会社概要
+├── contact.html            お問い合わせフォーム
+├── thanks.html             送信完了
+├── robots.txt
+├── sitemap.xml
+├── _headers                セキュリティヘッダ + キャッシュ
+├── _redirects              旧URLからのリダイレクト
+├── css/style.css           統一スタイル(白/緑/グレー、モバイルファースト)
+├── js/main.js              モバイルメニュー + カレントナビ
+└── logo.jpg
+
+functions/
+└── contact.php.js          POST /contact.php を受け Resend API で送信
 ```
 
-> ⚠ `contact.php` は **public/ に置かないでください**。Cloudflare Pages では PHP は動きません。
-> 代わりに `functions/contact.php.js` が `/contact.php` を受け取り、Resend 経由でメール送信します。
-> `index_html/` のような明らかなバックアップフォルダは持ってこなくて OK です。
+## 技術スタック
 
-### `contact.html` のフォーム送信先
+- 静的 HTML / CSS / JavaScript (フレームワーク非依存)
+- Cloudflare Pages (静的ホスティング)
+- Cloudflare Pages Functions (お問い合わせフォームのバックエンド)
+- Resend (フォーム→メール送信。送信元: `no-reply@mail.tusg.site`)
+- Cloudflare Email Routing (受信: `info@tusg.site` → 担当メール)
 
-フォームの `action="contact.php"` はそのまま使えます。Cloudflare Pages が
-同パス `/contact.php` を Pages Function にルーティングします。
+## ポジショニング
+
+合同会社TUSGは、以下を行う業務支援会社として位置づけています。
+
+- SaaS・業務システムの企画、開発、保守
+- ITツール導入・運用支援
+- 営業支援・販売促進支援
+- リード・アポイント取得支援
+- マーケティング支援、業務改善コンサルティング、証憑管理・業務報告支援
+
+サイトは「単なる営業代行 LP」ではなく、**法人取引に耐えるコーポレートサイト**として、
+透明性のある取引方針(契約書／請求書／業務報告書／銀行振込)を明示しています。
+
+## 改修履歴(2026/06/30 全面刷新)
+
+- 表記を「**合同会社TUSG**」に統一(「TUSG株式会社」「TUSG合同会社」等は使用しない)
+- ポジショニングを SaaS開発・IT導入・営業支援の会社として再定義
+- 4本柱のサービスページを独立ページとして新設
+  (`saas.html` / `it-support.html` / `sales.html` / `partner.html`)
+- 取引方針・コンプライアンスページ (`compliance.html`) を新設
+- 補助金不正・キャッシュバック・自己負担補填等を連想させる表現を全削除
+- リード・アポイント提供パートナー制度を「透明性のある業務委託」として整理
+  (補助金・助成金とは一切連動しないことを明示)
+- デザインを白/緑/グレー基調の SaaS 企業デザインに刷新
+- モバイルファースト、高齢の店舗経営者でも読みやすい大きめの文字
+- グローバル・モバイル両ナビ、カードUI、ポリシーリスト、定義リストを統一
+- SEO: 各ページに固有の title/description/canonical、`sitemap.xml`、`robots.txt`
+- お問い合わせフォームの種別を新事業 4 本柱に再構成
+- 旧 `about.html` / `strengths.html` は `_redirects` で 301 リダイレクト
+- 個別 CSS ファイルは `style.css` に統合(6ファイル削除)
+- フォーム送信は `contact.php` 互換のまま Pages Function で処理(ハニーポット付き)
 
 ---
 
-## 2. メール送信用に Resend を準備
+## 開発
 
-`contact.php` の代替として [Resend](https://resend.com) を利用します(月3,000通まで無料)。
-
-1. Resend に登録し、API キーを発行
-2. 送信元ドメイン (例: `tusg.jp`) を Resend ダッシュボードで検証 (DNS にレコード追加)
-3. **必ず** 後述の `wrangler pages secret put` で API キーを Cloudflare に登録
-
-別サービスを使いたい場合は `functions/contact.php.js` の `sendViaResend` を
-SendGrid / Amazon SES などに差し替えてください。
-
----
-
-## 3. ローカルで動作確認
+### ローカル
 
 ```bash
 npm install
-npx wrangler login              # 初回のみ。ブラウザで Cloudflare にログイン
-npm run dev                     # http://localhost:8788 で確認
+npx wrangler login
+npm run dev        # http://localhost:8788
 ```
 
-Functions のメール送信をローカルでテストしたい場合は `.dev.vars` を作成:
+ローカルでフォーム送信もテストする場合は `.dev.vars` に Resend のキーを記述:
 
 ```
 RESEND_API_KEY=re_xxxxxxxxxxxxxxxx
 ```
 
-(`.dev.vars` は `.gitignore` 済み)
-
----
-
-## 4. Cloudflare へデプロイ
-
-### 初回: プロジェクト作成
-
-```bash
-npx wrangler login
-npx wrangler pages project create tusg-site --production-branch=main
-```
-
-### シークレットを登録
-
-```bash
-npx wrangler pages secret put RESEND_API_KEY --project-name=tusg-site
-# プロンプトに API キーを貼り付け
-```
-
-### 環境変数 (公開しても良い値) を確認
-
-`wrangler.toml` の `[vars]` を編集してください。
-
-```toml
-[vars]
-CONTACT_TO_EMAIL = "info@tusg.jp"          # ★ 実際の受信メールに変更
-CONTACT_FROM_EMAIL = "noreply@tusg.jp"     # ★ Resendで検証済みドメインのアドレス
-CONTACT_FROM_NAME = "TUSGコーポレートサイト"
-```
-
 ### デプロイ
 
 ```bash
-npm run deploy                   # 本番
-npm run deploy:preview           # プレビュー (preview ブランチ)
+npm run deploy     # 本番(main)へデプロイ
+npm run tail       # 直近のログを追従
 ```
 
-デプロイ後、`https://tusg-site.pages.dev` で確認できます。
+GitHub `main` への push と連動した自動デプロイは、Cloudflare Pages ダッシュボードから
+リポジトリを接続することで有効化できます。
 
----
+## 環境変数 / シークレット
 
-## 5. 独自ドメイン (tusg.jp 等) を Cloudflare に向ける
+`wrangler.toml` の `[vars]` に平文で持つもの:
 
-1. Cloudflare ダッシュボード → Pages → `tusg-site` → **Custom domains** → `tusg.jp` を追加
-2. ドメインを Cloudflare で管理していない場合: 案内された CNAME を現行 DNS に追加
-3. ドメイン自体を Cloudflare に移管する場合: ネームサーバ変更 → 既存DNSレコードを移植
-4. 完全に Cloudflare に切り替わったら、ロリポップの契約は停止可能
+| 変数 | 値 |
+|---|---|
+| `CONTACT_TO_EMAIL` | `info@tusg.site` |
+| `CONTACT_FROM_EMAIL` | `no-reply@mail.tusg.site` |
+| `CONTACT_FROM_NAME` | `TUSGコーポレートサイト` |
+| `CONTACT_REDIRECT` | `/thanks.html` |
 
-> 切替前にステージング URL でフォーム送信まで通ることを必ず確認してください。
+Cloudflare のシークレット(`wrangler pages secret put` または Dashboard で設定):
 
----
+| 変数 | 用途 |
+|---|---|
+| `RESEND_API_KEY` | Resend API キー |
 
-## 6. GitHub と連携した自動デプロイ (任意)
+## 取引方針
 
-Cloudflare Pages ダッシュボード → Pages → `tusg-site` → **Settings → Builds & deployments** で
-GitHub リポジトリ `garut5/tusg-site` を接続すれば、`main` への push で自動デプロイされます。
-その場合 `wrangler pages deploy` を手動で叩く必要はなくなります。
-
-- Build command: (空欄)
-- Build output directory: `public`
-- Root directory: `/`
-
----
-
-## トラブルシュート
-
-| 症状 | 対処 |
-| --- | --- |
-| フォーム送信で 500 が返る | `wrangler pages deployment tail --project-name=tusg-site` でログを確認。`RESEND_API_KEY` 未設定が最多。 |
-| メールが届かない | Resend ダッシュボードの「Logs」で配送状態を確認。送信元ドメインのDNS検証が完了しているか。 |
-| 旧URLで 404 | `public/_redirects` にリダイレクト行を追加。 |
+本サイトに掲載している取引方針(契約書・請求書・業務報告書・銀行振込に基づく取引、補助金不正・
+キャッシュバック・実質無料化の禁止 等)は、運用ルールとして実際に遵守してください。
+[詳細はこちら](https://tusg.site/compliance.html)
