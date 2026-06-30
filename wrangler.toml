@@ -2,12 +2,9 @@ name = "tusg-site"
 compatibility_date = "2025-01-01"
 pages_build_output_dir = "public"
 
-# 環境変数 (秘密でない値のみ。秘密はダッシュボードか `wrangler pages secret put` で設定)
+# 環境変数 (秘密でない値のみ。秘密は `wrangler pages secret put` で設定)
 [vars]
-CONTACT_TO_EMAIL = "info@tusg.jp"
-CONTACT_FROM_EMAIL = "noreply@tusg.jp"
+CONTACT_TO_EMAIL = "info@tusg.site"
+CONTACT_FROM_EMAIL = "no-reply@tusg.site"
 CONTACT_FROM_NAME = "TUSGコーポレートサイト"
-
-# 本番デプロイ時の環境変数を上書きしたい場合
-# [env.production.vars]
-# CONTACT_TO_EMAIL = "info@tusg.jp"
+CONTACT_REDIRECT = "/thanks.html"

@@ -1,28 +1,26 @@
-// POST /contact.php  -- contact.php の代替 Cloudflare Pages Function
+// POST /contact.php  -- 旧 contact.php の代替 (Cloudflare Pages Function)
 //
-// 必須シークレット (wrangler pages secret put RESEND_API_KEY などで設定):
-//   RESEND_API_KEY   Resend (https://resend.com) の API キー
+// public/contact.html のフォーム項目に合わせて整形する。元の contact.php と
+// 同じく Gmail などへメール送信 → /thanks.html へリダイレクト。
 //
-// 任意の環境変数 (wrangler.toml の [vars] で設定):
-//   CONTACT_TO_EMAIL    送信先メールアドレス     (例: info@tusg.jp)
-//   CONTACT_FROM_EMAIL  送信元メールアドレス     (例: noreply@tusg.jp / Resendで検証済みドメイン)
-//   CONTACT_FROM_NAME   送信元表示名             (例: TUSGコーポレートサイト)
-//   CONTACT_REDIRECT    送信成功後のリダイレクト先 (デフォルト: /thanks.html)
+// 必須シークレット (wrangler pages secret put RESEND_API_KEY で登録):
+//   RESEND_API_KEY     Resend (https://resend.com) の API キー
+//
+// 環境変数 (wrangler.toml [vars]):
+//   CONTACT_TO_EMAIL   送信先 (例: goandgoing53@gmail.com)
+//   CONTACT_FROM_EMAIL Resend で検証済みドメインの送信元 (例: no-reply@tusg.site)
+//   CONTACT_FROM_NAME  送信元表示名
+//   CONTACT_REDIRECT   送信成功時の遷移先 (デフォルト: /thanks.html)
 
-const FIELD_LABELS = {
-  name: "お名前",
-  company: "会社名",
-  email: "メールアドレス",
-  tel: "電話番号",
-  phone: "電話番号",
-  subject: "件名",
-  message: "お問い合わせ内容",
-  body: "お問い合わせ内容",
-  inquiry: "お問い合わせ内容",
+const INQUIRY_LABELS = {
+  marketing: "マーケティング支援について",
+  sales: "営業代行について",
+  consulting: "コンサルティングについて",
+  other: "その他",
 };
 
 function escapeHtml(value) {
-  return String(value)
+  return String(value ?? "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
@@ -31,30 +29,47 @@ function escapeHtml(value) {
 }
 
 function buildMailBodies(fields) {
-  const entries = Object.entries(fields).filter(
-    ([key]) => !key.startsWith("_") && key !== "g-recaptcha-response"
-  );
+  const inquiryText = INQUIRY_LABELS[fields.inquiryType] || "未選択";
 
-  const text = entries
-    .map(([key, value]) => `■ ${FIELD_LABELS[key] ?? key}\n${value}\n`)
-    .join("\n");
+  const rows = [
+    ["件名", fields.subject || ""],
+    ["お問い合わせ種別", inquiryText],
+    ["会社名", fields.companyName || ""],
+    ["氏名", fields.name || ""],
+    ["メール", fields.email || ""],
+    ["電話番号", fields.phone || ""],
+  ];
+
+  const text =
+    "【TUSG お問い合わせ内容】\n\n" +
+    rows.map(([label, value]) => `${label}：${value}`).join("\n") +
+    "\n\n【お問い合わせ内容】\n" +
+    (fields.message || "") +
+    "\n";
 
   const html =
-    `<table style="border-collapse:collapse;font-family:sans-serif;font-size:14px;">` +
-    entries
+    `<div style="font-family:sans-serif;font-size:14px;line-height:1.7;">` +
+    `<h2 style="margin:0 0 12px;">TUSG お問い合わせ内容</h2>` +
+    `<table style="border-collapse:collapse;">` +
+    rows
       .map(
-        ([key, value]) =>
-          `<tr><th style="text-align:left;padding:8px 16px 8px 0;vertical-align:top;color:#666;">${escapeHtml(
-            FIELD_LABELS[key] ?? key
-          )}</th><td style="padding:8px 0;white-space:pre-wrap;">${escapeHtml(value)}</td></tr>`
+        ([label, value]) =>
+          `<tr><th style="text-align:left;padding:6px 16px 6px 0;color:#666;vertical-align:top;white-space:nowrap;">${escapeHtml(
+            label
+          )}</th><td style="padding:6px 0;">${escapeHtml(value)}</td></tr>`
       )
       .join("") +
-    `</table>`;
+    `</table>` +
+    `<h3 style="margin:20px 0 8px;">お問い合わせ内容</h3>` +
+    `<div style="white-space:pre-wrap;padding:12px;background:#f7f7f7;border-radius:4px;">${escapeHtml(
+      fields.message || ""
+    )}</div>` +
+    `</div>`;
 
-  return { text, html };
+  return { text, html, mailSubject: `【TUSG】${fields.subject || "お問い合わせ"}` };
 }
 
-async function sendViaResend(env, { fromEmail, fromName, toEmail, replyTo, subject, text, html }) {
+async function sendViaResend(env, { fromName, fromEmail, toEmail, replyTo, subject, text, html }) {
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -85,37 +100,9 @@ export async function onRequestPost({ request, env }) {
     );
   }
 
-  const contentType = request.headers.get("content-type") || "";
-  let fields = {};
-
-  try {
-    if (contentType.includes("application/json")) {
-      fields = await request.json();
-    } else if (
-      contentType.includes("application/x-www-form-urlencoded") ||
-      contentType.includes("multipart/form-data")
-    ) {
-      const formData = await request.formData();
-      for (const [key, value] of formData.entries()) {
-        if (typeof value === "string") {
-          fields[key] = value;
-        }
-      }
-    } else {
-      return new Response("Unsupported content-type", { status: 415 });
-    }
-  } catch (err) {
-    return new Response(`Failed to parse request body: ${err.message}`, { status: 400 });
-  }
-
-  // ハニーポット (任意): _gotcha などの hidden 入力に値があれば spam として黙殺
-  if (fields._gotcha || fields.honeypot) {
-    return Response.redirect(new URL(env.CONTACT_REDIRECT || "/thanks.html", request.url), 303);
-  }
-
   const toEmail = env.CONTACT_TO_EMAIL;
   const fromEmail = env.CONTACT_FROM_EMAIL;
-  const fromName = env.CONTACT_FROM_NAME || "TUSG website";
+  const fromName = env.CONTACT_FROM_NAME || "TUSGコーポレートサイト";
   if (!toEmail || !fromEmail) {
     return new Response(
       "CONTACT_TO_EMAIL / CONTACT_FROM_EMAIL is not configured in wrangler.toml [vars].",
@@ -123,12 +110,40 @@ export async function onRequestPost({ request, env }) {
     );
   }
 
-  const { text, html } = buildMailBodies(fields);
-  const subject = `[お問い合わせ] ${fields.subject || fields.name || "新規お問い合わせ"}`;
-  const replyTo = fields.email && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(fields.email) ? fields.email : null;
+  let fields = {};
+  const contentType = request.headers.get("content-type") || "";
+  try {
+    if (contentType.includes("application/json")) {
+      fields = await request.json();
+    } else {
+      const formData = await request.formData();
+      for (const [key, value] of formData.entries()) {
+        if (typeof value === "string") fields[key] = value;
+      }
+    }
+  } catch (err) {
+    return new Response(`Failed to parse request body: ${err.message}`, { status: 400 });
+  }
+
+  // ハニーポット (任意のスパム対策フィールドが入っていれば黙殺)
+  if (fields._gotcha || fields.honeypot) {
+    return Response.redirect(new URL(env.CONTACT_REDIRECT || "/thanks.html", request.url), 303);
+  }
+
+  const { text, html, mailSubject } = buildMailBodies(fields);
+  const replyTo =
+    fields.email && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(fields.email) ? fields.email : null;
 
   try {
-    await sendViaResend(env, { fromEmail, fromName, toEmail, replyTo, subject, text, html });
+    await sendViaResend(env, {
+      fromName,
+      fromEmail,
+      toEmail,
+      replyTo,
+      subject: mailSubject,
+      text,
+      html,
+    });
   } catch (err) {
     console.error(err);
     return new Response(`Failed to send email: ${err.message}`, { status: 502 });
@@ -139,6 +154,5 @@ export async function onRequestPost({ request, env }) {
 }
 
 export async function onRequestGet() {
-  // 旧 contact.php への GET は問い合わせフォームに戻す
   return Response.redirect("/contact.html", 302);
 }
