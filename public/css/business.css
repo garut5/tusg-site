@@ -1,0 +1,567 @@
+/* 事業内容ページ固有のスタイル */
+
+/* ページヒーロー */
+.page-hero {
+    background: linear-gradient(135deg, var(--primary-green) 0%, #1a5c38 100%);
+    color: var(--white);
+    padding: 140px 0 70px;
+    text-align: center;
+    margin-top: 70px;
+    position: relative;
+    overflow: hidden;
+}
+
+.page-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+    opacity: 0.2;
+}
+
+.page-title {
+    font-size: 48px;
+    font-weight: 800;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+}
+
+.page-subtitle {
+    font-size: 20px;
+    font-weight: 300;
+    opacity: 0.95;
+    position: relative;
+    z-index: 1;
+}
+
+/* 事業概要 */
+.business-overview {
+    background: var(--white);
+    padding: 100px 0;
+}
+
+.overview-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 60px;
+    align-items: center;
+}
+
+.overview-text h2 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 30px;
+    color: var(--black);
+    position: relative;
+}
+
+.overview-text h2::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 50px;
+    height: 3px;
+    background: var(--primary-green);
+}
+
+.overview-text p {
+    font-size: 19px;
+    line-height: 1.8;
+    margin-bottom: 20px;
+    color: var(--text-color);
+}
+
+.overview-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.stat-box {
+    background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+    color: var(--white);
+    padding: 35px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(46, 139, 87, 0.3);
+    transition: transform 0.3s ease;
+}
+
+.stat-box:hover {
+    transform: translateY(-5px);
+}
+
+.stat-number {
+    display: block;
+    font-size: 36px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.stat-desc {
+    font-size: 15px;
+    opacity: 0.9;
+}
+
+/* 事業詳細 */
+.business-detail {
+    padding: 100px 0;
+}
+
+.bg-light {
+    background: var(--gray-light);
+}
+
+.detail-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.detail-icon {
+    width: 90px;
+    height: 90px;
+    background: var(--primary-green);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 25px;
+}
+
+.detail-icon i {
+    font-size: 36px;
+    color: var(--white);
+}
+
+.detail-title {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: var(--black);
+}
+
+.detail-badge {
+    display: inline-block;
+    background: var(--primary-green);
+    color: var(--white);
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.detail-content {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.detail-description {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.detail-description h3 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--black);
+}
+
+.detail-description p {
+    font-size: 18px;
+    line-height: 1.8;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+/* 特徴グリッド */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    margin: 50px 0;
+}
+
+.feature-item {
+    background: var(--white);
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.feature-item:hover {
+    transform: translateY(-5px);
+}
+
+.feature-icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.feature-item h5 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: var(--black);
+}
+
+.feature-item p {
+    color: var(--gray-dark);
+    line-height: 1.6;
+}
+
+/* フロー */
+.flow-steps {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 50px 0;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.step {
+    flex: 1;
+    min-width: 200px;
+    text-align: center;
+}
+
+.step-number {
+    width: 60px;
+    height: 60px;
+    background: var(--primary-green);
+    color: var(--white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 auto 20px;
+}
+
+.step h5 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: var(--black);
+}
+
+.step p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--gray-dark);
+}
+
+.step-arrow {
+    font-size: 24px;
+    color: var(--primary-green);
+    font-weight: 700;
+}
+
+/* 料金表 */
+.pricing-table {
+    background: var(--white);
+    border-radius: 15px;
+    padding: 40px;
+    margin: 40px 0;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.pricing-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.pricing-item:last-child {
+    border-bottom: none;
+}
+
+.pricing-label {
+    font-weight: 600;
+    color: var(--black);
+}
+
+.pricing-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--primary-green);
+}
+
+/* サービスリスト */
+.service-items {
+    display: grid;
+    gap: 30px;
+    margin: 40px 0;
+}
+
+.service-item {
+    background: var(--white);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.service-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.service-header i {
+    font-size: 24px;
+    color: var(--primary-green);
+    margin-right: 15px;
+}
+
+.service-header h5 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--black);
+}
+
+.service-item p {
+    margin-bottom: 20px;
+    line-height: 1.7;
+}
+
+.service-item ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.service-item li {
+    padding-left: 20px;
+    position: relative;
+    margin-bottom: 8px;
+    color: var(--gray-dark);
+}
+
+.service-item li::before {
+    content: '•';
+    color: var(--primary-green);
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+}
+
+/* アプローチ方法 */
+.approach-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    margin: 40px 0;
+}
+
+.approach-item {
+    background: var(--white);
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.approach-icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.approach-item h5 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: var(--black);
+}
+
+.approach-item p {
+    color: var(--gray-dark);
+    line-height: 1.6;
+}
+
+/* メリット */
+.benefits-list {
+    display: grid;
+    gap: 25px;
+    margin: 40px 0;
+}
+
+.benefit-item {
+    display: flex;
+    align-items: flex-start;
+    background: var(--white);
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.benefit-item i {
+    font-size: 24px;
+    color: var(--primary-green);
+    margin-right: 20px;
+    margin-top: 5px;
+}
+
+.benefit-item h5 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--black);
+}
+
+.benefit-item p {
+    color: var(--gray-dark);
+    line-height: 1.6;
+}
+
+/* CTAセクション */
+.cta-section {
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
+    color: var(--white);
+    padding: 80px 0;
+    text-align: center;
+}
+
+.cta-content h2 {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.cta-content p {
+    font-size: 18px;
+    margin-bottom: 40px;
+    opacity: 0.9;
+}
+
+.cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.cta-buttons .btn-secondary {
+    background: transparent;
+    color: var(--white);
+    border: 2px solid var(--white);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cta-buttons .btn-secondary:hover {
+    background: var(--white);
+    color: var(--primary-green);
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+    .page-title {
+        font-size: 32px;
+    }
+    
+    .page-subtitle {
+        font-size: 16px;
+    }
+    
+    .overview-content {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+    
+    .detail-title {
+        font-size: 28px;
+    }
+    
+    .detail-description h3 {
+        font-size: 20px;
+    }
+    
+    .detail-description p {
+        font-size: 16px;
+    }
+    
+    .flow-steps {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .step-arrow {
+        transform: rotate(90deg);
+        margin: 20px 0;
+    }
+    
+    .pricing-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+    
+    .service-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .service-header i {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+    
+    .benefit-item {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .benefit-item i {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+    
+    .cta-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .cta-buttons .btn {
+        width: 100%;
+        max-width: 280px;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-hero {
+        padding: 100px 0 50px;
+    }
+    
+    .page-title {
+        font-size: 28px;
+    }
+    
+    .overview-text h2 {
+        font-size: 24px;
+    }
+    
+    .detail-title {
+        font-size: 24px;
+    }
+    
+    .cta-content h2 {
+        font-size: 28px;
+    }
+    
+    .features-grid,
+    .approach-grid {
+        grid-template-columns: 1fr;
+    }
+}

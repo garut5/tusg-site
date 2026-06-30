@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>お問い合わせ | TUSG - 営業代行・マーケティング支援のご相談</title>
+    <meta name="description" content="TUSGへのお問い合わせフォーム。営業代行、マーケティング支援についてお気軽にご相談ください。24時間以内にご返信いたします。">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/business.css">
+    <link rel="stylesheet" href="css/contact.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- ヘッダー -->
+    <header class="header">
+        <div class="container">
+            <div class="header-inner">
+                <div class="logo">
+                    <div class="logo-main">
+                        <h1><img src="../logo.jpg" width="230" height="180" alt=""/></h1>
+                    </div>
+                </div>
+                <nav class="nav">
+                    <ul class="nav-list">
+                        <li class="nav-item"><a href="index.html" class="nav-link">ホーム</a></li>
+                        <li class="nav-item"><a href="business.html" class="nav-link">事業内容</a></li>
+                        <li class="nav-item"><a href="strengths.html" class="nav-link">強み</a></li>
+                        <li class="nav-item"><a href="about.html" class="nav-link">代表挨拶</a></li>
+                        <li class="nav-item"><a href="company.html" class="nav-link">会社概要</a></li>
+                        <li class="nav-item"><a href="contact.html" class="nav-link contact-btn">お問い合わせ</a></li>
+                    </ul>
+                </nav>
+                <button class="mobile-menu-btn">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ページタイトル -->
+    <section class="page-hero">
+        <div class="container">
+            <h1 class="page-title">お問い合わせ</h1>
+            <p class="page-subtitle">営業代行・マーケティング支援のご相談</p>
+        </div>
+    </section>
+
+    <!-- お問い合わせセクション -->
+    <section class="contact-main">
+        <div class="container">
+            <div class="contact-content">
+                <div class="contact-info">
+                    <h2>ご相談・お見積もりはお気軽に</h2>
+                    <p>
+                        営業代行、マーケティング支援についてご相談ください。<br>
+                        お客様の課題解決に向けて最適な提案をさせていただきます。
+                    </p>
+                    
+                    <div class="contact-features">
+                        <div class="feature-item">
+                            <i class="fas fa-clock"></i>
+                            <div>
+                                <h4>24時間以内にご返信</h4>
+                                <p>お問い合わせいただいた内容について、24時間以内にご返信いたします。</p>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <i class="fas fa-shield-alt"></i>
+                            <div>
+                                <h4>個人情報の保護</h4>
+                                <p>お預かりした個人情報は、お問い合わせ対応のみに使用し、厳重に管理いたします。</p>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <i class="fas fa-comments"></i>
+                            <div>
+                                <h4>無料相談</h4>
+                                <p>初回の相談は無料で承っております。まずはお気軽にご連絡ください。</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-note">
+                        <i class="fas fa-info-circle"></i>
+                        <span>営業目的の連絡はご遠慮ください</span>
+                    </div><br>
+					
+					<a href="tel:09094535357" class="btn btn-primary btn-large">
+                        <i class="fas fa-phone"></i>
+                        お電話での相談<br>
+						（平日10:00〜18:00）
+                    </a>
+                </div>
+                
+                <div class="contact-form-wrapper">
+                    <form class="contact-form" action="contact.php" method="post">
+						<div class="form-group">
+                        <label for="subject">件名 <span class="required">*</span></label>
+                        <input type="text" id="subject" name="subject" required>
+                    </div>
+                        <div class="form-group">
+                            <label for="companyName">会社名 <span class="required">*</span></label>
+                            <input type="text" id="companyName" name="companyName" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="name">氏名 <span class="required">*</span></label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">メールアドレス <span class="required">*</span></label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">電話番号（任意）</label>
+                            <input type="tel" id="phone" name="phone">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="inquiryType">お問い合わせ種別 <span class="required">*</span></label>
+                            <select id="inquiryType" name="inquiryType" required>
+                                <option value="">選択してください</option>
+                                <option value="marketing">マーケティング支援について</option>
+								<option value="sales">営業代行について</option>
+                                <option value="consulting">コンサルティングについて</option>
+                                <option value="other">その他</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="message">お問い合わせ内容 <span class="required">*</span></label>
+                            <textarea id="message" name="message" rows="6" required placeholder="具体的な内容をご記入ください。例：営業代行を検討しています。現在の課題は..."></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-large">
+                            <i class="fas fa-paper-plane"></i>
+                            送信する
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- フッター -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <h3 class="footer-logo"><img src="../logo.jpg" width="232" height="180" alt=""/></h3>
+                    <p class="footer-company">合同会社TUSG</p>
+                    <p class="footer-address">
+                        〒542-0081<br>
+                        大阪府大阪市中央区南船場3丁目2番22号<br>
+                        おおきに南船場ビル205
+                    </p>
+                </div>
+                <nav class="footer-nav">
+                    <ul class="footer-nav-list">
+                        <li><a href="index.html">ホーム</a></li>
+                        <li><a href="business.html">事業内容</a></li>
+                        <li><a href="strengths.html">強み</a></li>
+                        <li><a href="about.html">代表挨拶</a></li>
+                        <li><a href="company.html">会社概要</a></li>
+                        <li><a href="contact.html">お問い合わせ</a></li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 合同会社TUSG. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
