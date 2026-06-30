@@ -49,6 +49,27 @@ body {
   color: var(--ink-700);
   background: var(--bg-white);
   -webkit-font-smoothing: antialiased;
+  /* 日本語: カタカナ語の中断・不自然な文節境界の分割を防ぐ */
+  line-break: strict;
+  word-break: normal;
+  overflow-wrap: anywhere;
+}
+
+/* 見出し・リード文・カード本文は文節単位で折り返す (Chrome 119+ / Safari 17.4+) */
+h1, h2, h3,
+.hero__title, .hero__lead,
+.page-hero p,
+.section-title, .section-lead,
+.feature__lead, .feature h2,
+.card h3, .card p,
+.callout h3, .callout p,
+.notice,
+.policy-list li,
+.cta-band h2, .cta-band p,
+.info-card h3,
+.thanks h1, .thanks p {
+  word-break: auto-phrase;
+  line-break: strict;
 }
 img { max-width: 100%; height: auto; display: block; }
 a { color: var(--green-700); text-decoration: none; transition: color .15s ease; }
