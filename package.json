@@ -10,6 +10,6 @@
     "tail": "wrangler pages deployment tail --project-name=tusg-site"
   },
   "devDependencies": {
-    "wrangler": "^3.90.0"
+    "wrangler": "^4.105.0"
   }
 }
