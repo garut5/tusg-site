@@ -5,6 +5,6 @@ pages_build_output_dir = "public"
 # 環境変数 (秘密でない値のみ。秘密は `wrangler pages secret put` で設定)
 [vars]
 CONTACT_TO_EMAIL = "info@tusg.site"
-CONTACT_FROM_EMAIL = "no-reply@tusg.site"
+CONTACT_FROM_EMAIL = "no-reply@mail.tusg.site"
 CONTACT_FROM_NAME = "TUSGコーポレートサイト"
 CONTACT_REDIRECT = "/thanks.html"
