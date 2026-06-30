@@ -1,2 +1,8 @@
-# 旧URLからのリダイレクト等、必要に応じて追記してください
-# 例: /old-page  /new-page  301
+# 旧ページから新構成へのリダイレクト
+/about.html      /company.html     301
+/strengths.html  /business.html    301
+
+# ロリポップ時代のサブパスを想定
+/public_html/*   /:splat           301
+
+# robots-friendly な拡張子付きアクセスを正規化(必要に応じて)

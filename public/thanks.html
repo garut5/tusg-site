@@ -1,81 +1,113 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <title>送信完了｜TUSG</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- 共通CSS（indexと同じもの） -->
-    <link rel="stylesheet" href="css/style.css">
-
-    <!-- フォント -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
-
-    <style>
-        body {
-            font-family: 'Noto Sans JP', sans-serif;
-            background: #F5F5F5;
-        }
-        .thanks-wrapper {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 40px 20px;
-        }
-        .thanks-box {
-            background: #FFFFFF;
-            max-width: 600px;
-            width: 100%;
-            padding: 50px 40px;
-            text-align: center;
-            border-radius: 10px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-        }
-        .thanks-box h1 {
-            color: #2E8B57;
-            font-size: 28px;
-            margin-bottom: 20px;
-        }
-        .thanks-box p {
-            color: #444;
-            line-height: 1.8;
-            margin-bottom: 30px;
-        }
-        .thanks-box .btn {
-            display: inline-block;
-            padding: 14px 32px;
-            background: #2E8B57;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: 500;
-            transition: opacity .3s;
-        }
-        .thanks-box .btn:hover {
-            opacity: 0.85;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>お問い合わせ送信完了｜合同会社TUSG</title>
+<meta name="description" content="お問い合わせを受け付けました。内容を確認の上、担当者よりご連絡いたします。">
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
 
-<div class="thanks-wrapper">
-    <div class="thanks-box">
-        <h1>お問い合わせありがとうございます</h1>
-        <p>
-            この度は、合同会社TUSGへお問い合わせいただき誠にありがとうございます。<br>
-            内容を確認の上、<strong>1〜2営業日以内</strong>にご連絡させていただきます。
-        </p>
-        <p>
-            万が一、数日経っても返信がない場合は、<br>
-            お手数ですが再度ご連絡いただけますと幸いです。
-        </p>
-        <a href="index.html" class="btn">トップページへ戻る</a>
-    </div>
-</div>
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a href="index.html" class="site-logo">
+      <img src="logo.jpg" alt="合同会社TUSG">
+      <span>合同会社TUSG</span>
+    </a>
+    <nav class="site-nav" aria-label="グローバルナビゲーション">
+      <ul class="site-nav__list">
+        <li><a href="business.html">事業内容</a></li>
+        <li><a href="saas.html">SaaS開発</a></li>
+        <li><a href="it-support.html">IT導入支援</a></li>
+        <li><a href="sales.html">営業支援</a></li>
+        <li><a href="partner.html">パートナー制度</a></li>
+        <li><a href="company.html">会社概要</a></li>
+        <li><a href="contact.html" class="btn btn--primary">お問い合わせ</a></li>
+      </ul>
+    </nav>
+    <button class="menu-btn" type="button" aria-label="メニューを開く" aria-controls="mobileNav" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="mobile-nav" id="mobileNav" data-open="false">
+    <ul>
+      <li><a href="business.html">事業内容</a></li>
+      <li><a href="saas.html">SaaS開発・システム保守</a></li>
+      <li><a href="it-support.html">ITツール導入・運用支援</a></li>
+      <li><a href="sales.html">営業支援・販売促進支援</a></li>
+      <li><a href="partner.html">リード・アポイント提供パートナー制度</a></li>
+      <li><a href="compliance.html">取引方針・コンプライアンス</a></li>
+      <li><a href="company.html">会社概要</a></li>
+    </ul>
+    <a href="contact.html" class="btn btn--primary">お問い合わせ</a>
+  </div>
+</header>
 
+<main>
+<section class="thanks">
+  <div class="container">
+    <div class="thanks__icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+        <path d="M5 12l5 5L20 7"/>
+      </svg>
+    </div>
+    <h1>お問い合わせありがとうございます</h1>
+    <p>この度は、合同会社TUSGへお問い合わせいただき誠にありがとうございます。</p>
+    <p>内容を確認の上、<strong>1〜2営業日以内</strong>にご連絡させていただきます。</p>
+    <p class="muted small">万が一、数日経っても返信がない場合は、お手数ですが再度ご連絡いただけますと幸いです。</p>
+    <a href="index.html" class="btn btn--primary btn--lg">トップページへ戻る</a>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__grid">
+      <div>
+        <div class="site-footer__brand">合同会社TUSG</div>
+        <div class="site-footer__address">
+          〒542-0081<br>
+          大阪府大阪市中央区南船場3丁目2番22号<br>
+          おおきに南船場ビル205
+        </div>
+      </div>
+      <div>
+        <h4>サービス</h4>
+        <ul>
+          <li><a href="saas.html">SaaS開発・システム保守</a></li>
+          <li><a href="it-support.html">ITツール導入・運用支援</a></li>
+          <li><a href="sales.html">営業支援・販売促進支援</a></li>
+          <li><a href="partner.html">パートナー制度</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>会社情報</h4>
+        <ul>
+          <li><a href="company.html">会社概要</a></li>
+          <li><a href="compliance.html">取引方針・コンプライアンス</a></li>
+          <li><a href="business.html">事業内容</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>コンタクト</h4>
+        <ul>
+          <li><a href="contact.html">お問い合わせフォーム</a></li>
+          <li><a href="mailto:info@tusg.site">info@tusg.site</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="site-footer__bottom">
+      <span>&copy; 2026 合同会社TUSG All Rights Reserved.</span>
+      <span>合同会社TUSG</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
 </body>
 </html>

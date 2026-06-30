@@ -13,10 +13,15 @@
 //   CONTACT_REDIRECT   送信成功時の遷移先 (デフォルト: /thanks.html)
 
 const INQUIRY_LABELS = {
-  marketing: "マーケティング支援について",
-  sales: "営業代行について",
-  consulting: "コンサルティングについて",
+  saas: "SaaS開発・システム保守について",
+  "it-support": "ITツール導入・運用支援について",
+  sales: "営業支援・販売促進支援について",
+  partner: "リード・アポイント提供パートナー制度について",
+  compliance: "取引方針・コンプライアンスについて",
   other: "その他",
+  // 旧フォームからの送信にも対応
+  marketing: "マーケティング支援について",
+  consulting: "コンサルティングについて",
 };
 
 function escapeHtml(value) {

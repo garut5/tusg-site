@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /contact.html
+Disallow: /thanks.html
+Disallow: /contact.php
+
+Sitemap: https://tusg.site/sitemap.xml
