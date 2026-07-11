@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f2f8f4"/>
+      <stop offset="1" stop-color="#e8f3ec"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <g transform="translate(96,120)">
+    <rect width="80" height="80" rx="18" fill="#1f6b3a"/>
+    <text x="40" y="55" font-family="Arial, sans-serif" font-size="46" font-weight="700" fill="#fff" text-anchor="middle">T</text>
+    <text x="112" y="52" font-family="'Noto Sans JP', sans-serif" font-size="30" font-weight="700" fill="#0f1623">合同会社TUSG</text>
+  </g>
+  <g transform="translate(96,270)">
+    <text font-family="'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif" font-weight="700" fill="#0f1623" font-size="70">
+      <tspan x="0" y="0">事業に、仕組みを足す。</tspan>
+      <tspan x="0" y="90" fill="#1f6b3a">営業に、確かな導線を足す。</tspan>
+    </text>
+  </g>
+  <text x="96" y="530" font-family="'Noto Sans JP', sans-serif" font-size="24" fill="#4b5563">
+    SaaS開発  ×  ITツール導入支援  ×  営業支援
+  </text>
+  <text x="1104" y="580" font-family="Arial, sans-serif" font-size="18" fill="#6b7280" text-anchor="end">tusg.site</text>
+</svg>
