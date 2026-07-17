@@ -617,3 +617,93 @@ details.card > p { color: var(--ink-500); }
 
 /* Section eyebrow — larger for hero */
 .hero-rich .eyebrow { font-size: 12.5px; }
+
+/* ==========================================================
+   画像リッチ / 文字削減リデザイン
+   ========================================================== */
+
+/* ページヒーローに写真を敷く (サービス各ページ) */
+.page-hero--image {
+  position: relative;
+  min-height: 320px;
+  padding: 0;
+  background: #0f1623;
+  color: #fff;
+  overflow: hidden;
+}
+.page-hero--image .page-hero__bg {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  filter: brightness(.55) saturate(1.1);
+}
+.page-hero--image .container {
+  position: relative; z-index: 2;
+  padding-top: 72px; padding-bottom: 72px;
+  min-height: inherit;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.page-hero--image h1 { color: #fff; font-size: 30px; margin-bottom: 12px; }
+.page-hero--image p { color: rgba(255,255,255,.85); }
+.page-hero--image .breadcrumb { color: rgba(255,255,255,.7); }
+.page-hero--image .breadcrumb a { color: rgba(255,255,255,.85); }
+.page-hero--image .eyebrow { background: rgba(255,255,255,.15); color: #fff; }
+@media (min-width: 768px) {
+  .page-hero--image { min-height: 400px; }
+  .page-hero--image h1 { font-size: 44px; }
+}
+
+/* Big visual card (少ないが大きい) */
+.big-card {
+  background: #fff; border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow .15s, transform .15s;
+  display: flex; flex-direction: column; height: 100%;
+}
+.big-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+.big-card__media {
+  aspect-ratio: 16/10;
+  background: linear-gradient(135deg, var(--green-050), var(--green-100));
+  display: flex; align-items: center; justify-content: center;
+  color: var(--green-700);
+  overflow: hidden;
+}
+.big-card__media svg { width: 60%; height: auto; }
+.big-card__media img { width: 100%; height: 100%; object-fit: cover; }
+.big-card__body { padding: 24px 24px 20px; flex: 1; display: flex; flex-direction: column; }
+.big-card__body h3 { font-size: 20px; margin-bottom: 8px; }
+.big-card__body p { color: var(--ink-500); margin: 0 0 16px; font-size: 15px; }
+.big-card__body .card__link { margin-top: auto; }
+
+/* Feature with big image (image left/right, text opposite) */
+.feature-visual {
+  display: grid; gap: 24px; grid-template-columns: 1fr; align-items: center;
+}
+@media (min-width: 900px) {
+  .feature-visual { grid-template-columns: 1fr 1fr; gap: 64px; }
+  .feature-visual--reverse > .feature-visual__media { order: 2; }
+}
+.feature-visual__media {
+  aspect-ratio: 4/3;
+  border-radius: var(--radius-lg); overflow: hidden;
+  background: linear-gradient(135deg, var(--green-050), var(--green-100));
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--shadow-md);
+}
+.feature-visual__media img { width: 100%; height: 100%; object-fit: cover; }
+.feature-visual__media svg { width: 70%; height: auto; color: var(--green-700); }
+.feature-visual h2 { font-size: 24px; margin-bottom: 12px; }
+.feature-visual p { color: var(--ink-500); font-size: 16px; margin: 0 0 16px; }
+@media (min-width: 900px) { .feature-visual h2 { font-size: 30px; } }
+
+/* Stat / metric row */
+.metrics { display: grid; gap: 16px; grid-template-columns: repeat(2, 1fr); }
+@media (min-width: 720px) { .metrics { grid-template-columns: repeat(4, 1fr); gap: 24px; } }
+.metric { text-align: center; padding: 24px 12px; background: #fff; border: 1px solid var(--line); border-radius: var(--radius-md); }
+.metric__value {
+  font-family: "Inter", "Helvetica Neue", sans-serif;
+  font-weight: 700; font-size: 32px; color: var(--green-700); line-height: 1;
+}
+.metric__label { display: block; margin-top: 8px; color: var(--ink-500); font-size: 13px; }
+@media (min-width: 720px) { .metric__value { font-size: 40px; } }
