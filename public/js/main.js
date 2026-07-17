@@ -16,18 +16,32 @@
     const btn = document.querySelector(".menu-btn");
     const nav = document.querySelector(".mobile-nav");
     if (!btn || !nav) return;
+
+    // 背景暗幕を差し込む (無ければ)
+    let backdrop = document.querySelector(".mobile-nav-backdrop");
+    if (!backdrop) {
+      backdrop = document.createElement("div");
+      backdrop.className = "mobile-nav-backdrop";
+      document.body.appendChild(backdrop);
+    }
+
+    function setOpen(open) {
+      nav.setAttribute("data-open", String(open));
+      btn.setAttribute("aria-expanded", String(open));
+      document.body.classList.toggle("nav-open", open);
+      document.body.style.overflow = open ? "hidden" : "";
+    }
+
     btn.addEventListener("click", function () {
       const open = nav.getAttribute("data-open") === "true";
-      nav.setAttribute("data-open", String(!open));
-      btn.setAttribute("aria-expanded", String(!open));
-      document.body.style.overflow = !open ? "hidden" : "";
+      setOpen(!open);
     });
+    backdrop.addEventListener("click", function () { setOpen(false); });
     nav.querySelectorAll("a").forEach(function (a) {
-      a.addEventListener("click", function () {
-        nav.setAttribute("data-open", "false");
-        btn.setAttribute("aria-expanded", "false");
-        document.body.style.overflow = "";
-      });
+      a.addEventListener("click", function () { setOpen(false); });
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") setOpen(false);
     });
   }
 
