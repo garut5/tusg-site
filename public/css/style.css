@@ -1151,6 +1151,17 @@ body.scrolled .site-logo img { height: 30px; transition: height .35s ease; }
   transform: scale(1.08);
   transition: transform 1.2s cubic-bezier(.2,.7,.2,1);
   will-change: transform, clip-path;
+  /* 色調統一: 軽く暖色寄せ + 彩度を落として editorial 調に揃える */
+  filter: saturate(.88) brightness(1.02) contrast(1.02) sepia(.06) hue-rotate(-4deg);
+}
+/* 微細な暖色オーバーレイでさらに写真集のような統一感 */
+.storytell__media::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(250,247,242,.03), rgba(14,61,33,.06));
+  pointer-events: none;
+  z-index: 1;
+  mix-blend-mode: multiply;
 }
 .storytell.is-visible .storytell__media-inner { transform: scale(1); }
 @media (prefers-reduced-motion: reduce) {
