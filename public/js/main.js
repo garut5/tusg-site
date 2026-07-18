@@ -1,8 +1,7 @@
-// 合同会社TUSG コーポレートサイト 共通スクリプト (v4 - cinematic motion)
+// 合同会社TUSG コーポレートサイト 共通スクリプト (v5 - completion)
 
 (function () {
-  // Prevent flash before hydration
-  document.documentElement.classList.add("js-loading");
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   document.addEventListener("DOMContentLoaded", function () {
     initMobileMenu();
@@ -17,16 +16,20 @@
     initPageEnter();
 
     requestAnimationFrame(function () {
-      document.documentElement.classList.remove("js-loading");
       document.body.classList.add("ready");
     });
   });
 
-  // ---------- Mobile menu ----------
+  // ---------- Mobile menu with focus trap + inert ----------
   function initMobileMenu() {
     const btn = document.querySelector(".menu-btn");
     const nav = document.querySelector(".mobile-nav");
     if (!btn || !nav) return;
+
+    // Initial state: closed
+    nav.setAttribute("aria-hidden", "true");
+    if ("inert" in nav) nav.inert = true;
+    else nav.setAttribute("inert", "");
 
     let backdrop = document.querySelector(".mobile-nav-backdrop");
     if (!backdrop) {
@@ -35,11 +38,26 @@
       document.body.appendChild(backdrop);
     }
 
+    function focusables() {
+      return nav.querySelectorAll("a[href], button:not([disabled]), input:not([disabled])");
+    }
+
     function setOpen(open) {
       nav.setAttribute("data-open", String(open));
       btn.setAttribute("aria-expanded", String(open));
+      btn.setAttribute("aria-label", open ? "メニューを閉じる" : "メニューを開く");
       document.body.classList.toggle("nav-open", open);
       document.body.style.overflow = open ? "hidden" : "";
+      nav.setAttribute("aria-hidden", String(!open));
+      if ("inert" in nav) nav.inert = !open;
+      else if (open) nav.removeAttribute("inert"); else nav.setAttribute("inert", "");
+
+      if (open) {
+        const f = focusables();
+        if (f.length) setTimeout(function () { f[0].focus(); }, 50);
+      } else {
+        btn.focus();
+      }
     }
 
     btn.addEventListener("click", function () {
@@ -51,7 +69,15 @@
       a.addEventListener("click", function () { setOpen(false); });
     });
     document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") setOpen(false);
+      if (nav.getAttribute("data-open") !== "true") return;
+      if (e.key === "Escape") { setOpen(false); return; }
+      if (e.key === "Tab") {
+        const f = focusables();
+        if (!f.length) return;
+        const first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
     });
   }
 
@@ -151,11 +177,12 @@
     els.forEach(function (el) { io.observe(el); });
   }
 
-  // ---------- Parallax ----------
+  // ---------- Parallax (no initial-tick to avoid ken-burns jitter) ----------
   function initParallax() {
     const items = document.querySelectorAll("[data-parallax]");
     if (!items.length) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (reduceMotion) return;
+    if (window.matchMedia("(max-width: 767px)").matches) return;
 
     let ticking = false;
 
@@ -166,7 +193,6 @@
         const speed = parseFloat(el.getAttribute("data-parallax")) || 0.15;
         const center = rect.top + rect.height / 2 - wh / 2;
         const offset = center * -speed;
-        // Use CSS `translate` property so it composes with existing transform (e.g. ken-burns scale)
         el.style.translate = "0 " + offset.toFixed(1) + "px";
       });
       ticking = false;
@@ -180,7 +206,7 @@
     }
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll, { passive: true });
-    update();
+    // No initial update() — first scroll drives the first paint offset.
   }
 
   // ---------- Header shrink ----------
@@ -201,6 +227,7 @@
 
   // ---------- Scroll progress bar ----------
   function initScrollProgress() {
+    if (reduceMotion) return;
     const wrap = document.createElement("div");
     wrap.className = "scroll-progress";
     const bar = document.createElement("div");
@@ -223,6 +250,7 @@
 
   // ---------- Magnetic hover on buttons (mouse position glow) ----------
   function initMagneticButtons() {
+    if (reduceMotion) return;
     if (!window.matchMedia("(hover: hover)").matches) return;
     document.querySelectorAll(".btn").forEach(function (btn) {
       btn.addEventListener("mousemove", function (e) {
@@ -255,17 +283,17 @@
     }, 1600);
   }
 
-  // ---------- Hide sticky CTA while inside hero ----------
+  // ---------- Hide sticky CTA while inside any hero-ish area ----------
   function initHeroStickyToggle() {
-    const hero = document.querySelector(".editorial-hero, .ehero");
-    if (!hero) return;
+    const heroes = document.querySelectorAll(".editorial-hero, .ehero, .page-hero");
+    if (!heroes.length) return;
     if (!("IntersectionObserver" in window)) return;
     const io = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
         document.body.classList.toggle("in-hero", e.isIntersecting);
       });
     }, { threshold: 0.15 });
-    io.observe(hero);
+    heroes.forEach(function (h) { io.observe(h); });
   }
 
   document.addEventListener("DOMContentLoaded", initHeroStickyToggle);

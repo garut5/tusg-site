@@ -24,7 +24,7 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="theme-color" content="#0e3d21">
-<link rel="stylesheet" href="/css/style.css?v=1783900000">
+<link rel="stylesheet" href="/css/style.css?v=1784000000">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -97,7 +97,7 @@
   </div>
 </header>
 
-<div class="mobile-nav" id="mobileNav" data-open="false">
+<div class="mobile-nav" id="mobileNav" data-open="false" aria-hidden="true" inert>
   <h3 class="mobile-nav__heading">サービス</h3>
   <ul>
     <li><a href="/business.html">事業内容</a></li>
@@ -126,31 +126,37 @@
   <div class="editorial-hero__bg" data-parallax="0.08" style="background-image:url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=2000&h=1200&fit=crop&q=85');" aria-hidden="true"></div>
   <div class="container editorial-hero__inner">
     <h1 class="editorial-hero__title">
-      情シスがいない<br>
-      大阪の中小企業へ。<br>
-      業務システムと営業の<em>仕組み</em>を。
+      情シスがいない大阪の中小企業に、<br>
+      業務システムと営業の<em>仕組み</em>をつくります。
     </h1>
+    <p class="editorial-hero__sub">
+      現場ヒアリングから設計・運用まで。小さく作って改善しながら育てる伴走型。<br>
+      1社に月8〜40時間、必要な分だけ。
+    </p>
     <div class="hero-badges">
       <span>初回30分 無料相談</span>
       <span>大阪・南船場拠点</span>
       <span>最短2週間で着手</span>
     </div>
     <div class="editorial-hero__cta">
-      <a href="/contact.html" class="btn btn--primary btn--lg">無料で相談する →</a>
+      <div>
+        <a href="/contact.html" class="btn btn--primary btn--lg">無料で相談する →</a>
+        <span class="cta-note">30分オンライン・売り込みなし・準備物なし</span>
+      </div>
       <a href="/business.html" class="btn btn--inverse">事業内容を見る</a>
     </div>
   </div>
 </section>
 
-<!-- Trust strip -->
+<!-- Trust strip: concrete offers, not repeated nav labels -->
 <div class="trust-strip">
   <div class="container">
     <div class="trust-strip__inner">
-      <span class="trust-strip__item"><strong>SaaS開発</strong></span>
-      <span class="trust-strip__item"><strong>IT導入支援</strong></span>
-      <span class="trust-strip__item"><strong>営業支援</strong></span>
-      <span class="trust-strip__item">大阪府・関西全域・オンライン全国</span>
-      <span class="trust-strip__item">平日 10:00–18:00 最短当日返信</span>
+      <span class="trust-strip__item"><strong>初回30分無料</strong>売り込みなし</span>
+      <span class="trust-strip__item"><strong>見積・要件整理まで無料</strong></span>
+      <span class="trust-strip__item"><strong>最短2週間</strong>で着手</span>
+      <span class="trust-strip__item"><strong>月8h〜</strong>3ヶ月単位契約</span>
+      <span class="trust-strip__item">大阪拠点／全国オンライン対応</span>
     </div>
   </div>
 </div>
@@ -285,6 +291,7 @@
       <div>
         <h4>会社情報</h4>
         <ul>
+          <li><a href="/business.html">事業内容</a></li>
           <li><a href="/company.html">会社概要</a></li>
           <li><a href="/compliance.html">取引方針・コンプライアンス</a></li>
           <li><a href="/privacy.html">プライバシーポリシー</a></li>
@@ -320,6 +327,6 @@
   <a href="/contact.html" class="btn btn--primary btn--lg btn--block">無料で相談する</a>
 </div>
 
-<script src="/js/main.js?v=1783900000" defer></script>
+<script src="/js/main.js?v=1784000000" defer></script>
 </body>
 </html>
