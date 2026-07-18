@@ -1141,6 +1141,8 @@ body.scrolled .site-logo img { height: 30px; transition: height .35s ease; }
   position: relative;
   overflow: hidden;
   transform: translateZ(0);
+  /* fallback color if inner image fails to load */
+  background-color: var(--paper);
   background-image: none !important;
 }
 .storytell__media-inner {
