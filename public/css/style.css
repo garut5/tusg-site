@@ -1501,6 +1501,11 @@ textarea:focus-visible {
     gap: 16px 32px;
   }
 }
+.trust-bar__note {
+  font-size: 11.5px; color: #6b7885; letter-spacing: .02em;
+  margin: 16px 0 0; padding-top: 12px;
+  border-top: 1px solid #1a2028;
+}
 
 /* Service detail: spec table (料金/期間) */
 .spec-table {
