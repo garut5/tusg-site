@@ -24,7 +24,7 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="theme-color" content="#0e3d21">
-<link rel="stylesheet" href="/css/style.css?v=1783700000">
+<link rel="stylesheet" href="/css/style.css?v=1783800000">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -86,7 +86,7 @@
 
 <!-- Editorial HERO: full-bleed photo, minimal typography -->
 <section class="editorial-hero">
-  <div class="editorial-hero__bg" style="background-image:url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=2000&h=1200&fit=crop&q=85');" aria-hidden="true"></div>
+  <div class="editorial-hero__bg" data-parallax="0.12" style="background-image:url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=2000&h=1200&fit=crop&q=85');" aria-hidden="true"></div>
   <div class="container editorial-hero__inner">
     <span class="editorial-hero__label">TUSG — Ver. 2026</span>
     <h1 class="editorial-hero__title">
@@ -104,14 +104,32 @@
   </div>
 </section>
 
+<!-- Editorial marquee: brand rhythm -->
+<div class="marquee" aria-hidden="true">
+  <div class="marquee__track">
+    <span>SaaS DEVELOPMENT</span>
+    <span>IT ENABLEMENT</span>
+    <span>SALES ENABLEMENT</span>
+    <span>PARTNER PROGRAM</span>
+    <span>OSAKA / SINCE 2026</span>
+    <span>SaaS DEVELOPMENT</span>
+    <span>IT ENABLEMENT</span>
+    <span>SALES ENABLEMENT</span>
+    <span>PARTNER PROGRAM</span>
+    <span>OSAKA / SINCE 2026</span>
+  </div>
+</div>
+
 <!-- 語り: 私たちのアプローチ -->
 <section class="section--edit">
   <div class="container">
     <div class="storytell" data-reveal>
-      <div class="storytell__media" style="background-image:url('https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=900&h=1100&fit=crop&q=85');"></div>
+      <div class="storytell__media">
+        <div class="storytell__media-inner" data-mask style="background-image:url('https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=900&h=1100&fit=crop&q=85');"></div>
+      </div>
       <div>
         <span class="storytell__num">01</span>
-        <h2>使われる仕組みだけを、<br>作り、届ける。</h2>
+        <h2 data-split>使われる仕組みだけを、作り、届ける。</h2>
         <p>
           単なる開発でも、単なる営業代行でもありません。<br>
           お客様の業務フローを起点に、
@@ -139,9 +157,9 @@
   <div class="container">
     <div class="section-head" data-reveal>
       <span class="eyebrow">SERVICES</span>
-      <h2 class="section-title">4つの事業</h2>
+      <h2 class="section-title" data-split>4つの事業</h2>
     </div>
-    <div class="services-list" data-reveal>
+    <div class="services-list" data-stagger>
       <a href="/saas.html">
         <div>
           <span class="services-list__num">— 01 / SaaS DEVELOPMENT</span>
@@ -182,10 +200,12 @@
 <section class="section--edit">
   <div class="container">
     <div class="storytell storytell--reverse" data-reveal>
-      <div class="storytell__media" style="background-image:url('https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=900&h=1100&fit=crop&q=85');"></div>
+      <div class="storytell__media">
+        <div class="storytell__media-inner" data-mask style="background-image:url('https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=900&h=1100&fit=crop&q=85');"></div>
+      </div>
       <div>
         <span class="storytell__num">02</span>
-        <h2>店舗と中小企業の、<br>実務のそばに立つ。</h2>
+        <h2 data-split>店舗と中小企業の、実務のそばに立つ。</h2>
         <p>
           専任の情シスや営業企画がいない事業者様に、
           スマホで完結する現場向けの導線と、
@@ -257,6 +277,6 @@
   <a href="/contact.html" class="btn btn--primary btn--lg btn--block">無料で相談する</a>
 </div>
 
-<script src="/js/main.js?v=1783700000"></script>
+<script src="/js/main.js?v=1783800000"></script>
 </body>
 </html>
