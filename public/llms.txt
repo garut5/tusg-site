@@ -1,0 +1,35 @@
+# 合同会社TUSG
+
+大阪・南船場を拠点に、SaaS開発 / ITツール導入支援 / 営業支援を中小企業・店舗向けに提供する業務支援会社です。
+
+## 会社情報
+- 商号: 合同会社TUSG (TUSG LLC)
+- 代表: 坂本 豪
+- 設立: 2026年2月11日
+- 会社法人等番号: 1200-03-031923
+- 所在地: 〒542-0081 大阪府大阪市中央区南船場3丁目2番22号 おおきに南船場ビル205
+- メール: info@tusg.site
+- 対応地域: 大阪府・関西全域、オンライン日本全国
+- 受付時間: 平日 10:00-18:00
+
+## 事業内容
+1. SaaS開発・システム保守: 業務システム・管理画面・SaaS の企画〜運用、既存システムの引き継ぎ
+2. ITツール導入・運用支援: kintone/Notion/Slack 等の選定・導入・教育・定着支援
+3. 営業支援・販売促進支援: 営業資料・CRM/SFA・レポーティングの仕組み化
+4. リード・アポイント提供パートナー制度: 業務委託契約に基づく透明な紹介制度
+
+## 主要URL
+- トップ: https://tusg.site/
+- 事業内容: https://tusg.site/business.html
+- SaaS開発: https://tusg.site/saas.html
+- IT導入支援: https://tusg.site/it-support.html
+- 営業支援: https://tusg.site/sales.html
+- パートナー制度: https://tusg.site/partner.html
+- 会社概要: https://tusg.site/company.html
+- 取引方針・コンプライアンス: https://tusg.site/compliance.html
+- プライバシーポリシー: https://tusg.site/privacy.html
+- よくあるご質問: https://tusg.site/faq.html
+- お問い合わせ: https://tusg.site/contact.html
+
+## 詳細
+詳細な平文コンテンツは /llms-full.txt を参照してください。
