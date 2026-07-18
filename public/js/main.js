@@ -239,16 +239,34 @@
     });
   }
 
-  // ---------- Page enter curtain ----------
+  // ---------- Page enter curtain (session-scoped, first visit only) ----------
   function initPageEnter() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    try {
+      if (sessionStorage.getItem("tusg-curtain-shown") === "1") return;
+      sessionStorage.setItem("tusg-curtain-shown", "1");
+    } catch (e) { /* private mode: still show once */ }
     if (document.querySelector(".page-curtain")) return;
     const curtain = document.createElement("div");
     curtain.className = "page-curtain";
     document.body.appendChild(curtain);
-    // Auto-remove after animation to avoid layering
     setTimeout(function () {
       if (curtain.parentNode) curtain.parentNode.removeChild(curtain);
     }, 1600);
   }
+
+  // ---------- Hide sticky CTA while inside hero ----------
+  function initHeroStickyToggle() {
+    const hero = document.querySelector(".editorial-hero, .ehero");
+    if (!hero) return;
+    if (!("IntersectionObserver" in window)) return;
+    const io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        document.body.classList.toggle("in-hero", e.isIntersecting);
+      });
+    }, { threshold: 0.15 });
+    io.observe(hero);
+  }
+
+  document.addEventListener("DOMContentLoaded", initHeroStickyToggle);
 })();

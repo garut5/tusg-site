@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>合同会社TUSG｜SaaS開発・IT導入支援・営業支援</title>
-<meta name="description" content="合同会社TUSGは、SaaS開発・ITツール導入支援・営業支援を通じて、企業と店舗の事業成長を支援する会社です。">
+<title>合同会社TUSG｜大阪のSaaS開発・IT導入支援・営業支援</title>
+<meta name="description" content="情シスや営業企画が不在の大阪の中小企業・店舗向けに、業務システムと営業の仕組みを整えます。SaaS開発・IT導入支援・営業支援を大阪から。初回30分無料。">
 <meta name="robots" content="index,follow">
 <meta property="og:type" content="website">
-<meta property="og:title" content="合同会社TUSG｜SaaS開発・IT導入支援・営業支援">
-<meta property="og:description" content="事業に、仕組みを足す。SaaS開発・IT導入・営業支援を大阪から全国へ。">
+<meta property="og:title" content="合同会社TUSG｜大阪のSaaS開発・IT導入支援・営業支援">
+<meta property="og:description" content="情シス不在の中小企業・店舗へ、業務システムと営業の仕組みを。大阪・南船場のSaaS開発会社。">
 <meta property="og:url" content="https://tusg.site/">
 <meta property="og:site_name" content="合同会社TUSG">
 <meta name="twitter:card" content="summary_large_image">
@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=Noto+Serif+JP:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600&family=Noto+Serif+JP:wght@700&display=swap" rel="stylesheet">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="apple-touch-icon" href="/logo.jpg">
 <meta property="og:image" content="https://tusg.site/og-image.svg">
@@ -24,27 +24,64 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="theme-color" content="#0e3d21">
-<link rel="stylesheet" href="/css/style.css?v=1783800000">
+<link rel="stylesheet" href="/css/style.css?v=1783900000">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "合同会社TUSG",
-  "url": "https://tusg.site/",
-  "logo": "https://tusg.site/logo.jpg",
-  "email": "info@tusg.site",
-  "foundingDate": "2026-02-11",
-  "identifier": "1200-03-031923",
-  "address": { "@type": "PostalAddress", "streetAddress": "南船場3丁目2番22号 おおきに南船場ビル205", "addressLocality": "大阪市中央区", "addressRegion": "大阪府", "postalCode": "542-0081", "addressCountry": "JP" },
-  "founder": { "@type": "Person", "name": "坂本 豪" }
+  "@graph": [
+    {
+      "@type": ["Organization", "ProfessionalService"],
+      "@id": "https://tusg.site/#org",
+      "name": "合同会社TUSG",
+      "alternateName": "TUSG LLC",
+      "url": "https://tusg.site/",
+      "logo": "https://tusg.site/logo.jpg",
+      "image": "https://tusg.site/og-image.svg",
+      "email": "info@tusg.site",
+      "foundingDate": "2026-02-11",
+      "priceRange": "¥¥",
+      "identifier": [
+        { "@type": "PropertyValue", "propertyID": "corporateNumber", "value": "1200-03-031923" }
+      ],
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "中央区南船場3丁目2番22号 おおきに南船場ビル205",
+        "addressLocality": "大阪市",
+        "addressRegion": "大阪府",
+        "postalCode": "542-0081",
+        "addressCountry": "JP"
+      },
+      "geo": { "@type": "GeoCoordinates", "latitude": 34.6759, "longitude": 135.5028 },
+      "openingHoursSpecification": [{
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],
+        "opens": "10:00", "closes": "18:00"
+      }],
+      "areaServed": [
+        { "@type": "AdministrativeArea", "name": "大阪府" },
+        { "@type": "AdministrativeArea", "name": "近畿地方" },
+        { "@type": "Country", "name": "日本 (オンライン対応)" }
+      ],
+      "founder": { "@type": "Person", "name": "坂本 豪" }
+    },
+    {
+      "@type": "WebSite",
+      "url": "https://tusg.site/",
+      "name": "合同会社TUSG",
+      "publisher": { "@id": "https://tusg.site/#org" },
+      "inLanguage": "ja-JP"
+    }
+  ]
 }
 </script>
 </head>
 <body>
 
+<a href="#main" class="skip-link">メインコンテンツへスキップ</a>
+
 <header class="site-header">
   <div class="container site-header__inner">
-    <a href="/index.html" class="site-logo"><img src="/logo.jpg" alt="合同会社TUSG"><span>合同会社TUSG</span></a>
+    <a href="/index.html" class="site-logo"><img src="/logo.jpg" alt=""><span>合同会社TUSG</span></a>
     <nav class="site-nav" aria-label="グローバルナビゲーション">
       <ul class="site-nav__list">
         <li><a href="/business.html">事業内容</a></li>
@@ -53,7 +90,7 @@
         <li><a href="/sales.html">営業支援</a></li>
         <li><a href="/partner.html">パートナー制度</a></li>
         <li><a href="/company.html">会社概要</a></li>
-        <li><a href="/contact.html" class="btn btn--primary">お問い合わせ</a></li>
+        <li><a href="/contact.html" class="btn btn--primary">無料相談</a></li>
       </ul>
     </nav>
     <button class="menu-btn" type="button" aria-label="メニューを開く" aria-controls="mobileNav" aria-expanded="false"><span></span><span></span><span></span></button>
@@ -82,45 +119,50 @@
   </div>
 </div>
 
-<main>
+<main id="main" tabindex="-1">
 
-<!-- Editorial HERO: full-bleed photo, minimal typography -->
+<!-- HERO -->
 <section class="editorial-hero">
-  <div class="editorial-hero__bg" data-parallax="0.12" style="background-image:url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=2000&h=1200&fit=crop&q=85');" aria-hidden="true"></div>
+  <div class="editorial-hero__bg" data-parallax="0.08" style="background-image:url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=2000&h=1200&fit=crop&q=85');" aria-hidden="true"></div>
   <div class="container editorial-hero__inner">
-    <span class="editorial-hero__label">TUSG — Ver. 2026</span>
     <h1 class="editorial-hero__title">
-      事業に、仕組みを足す。<br>
-      営業に、確かな<em>導線</em>を足す。
+      情シスがいない<br>
+      大阪の中小企業へ。<br>
+      業務システムと営業の<em>仕組み</em>を。
     </h1>
-    <p class="editorial-hero__sub">
-      SaaS開発 / IT導入支援 / 営業支援。<br>
-      大阪から、現場で使える仕組みを届けます。
-    </p>
+    <div class="hero-badges">
+      <span>初回30分 無料相談</span>
+      <span>大阪・南船場拠点</span>
+      <span>最短2週間で着手</span>
+    </div>
     <div class="editorial-hero__cta">
-      <a href="/contact.html" class="btn btn--primary">無料で相談する</a>
+      <a href="/contact.html" class="btn btn--primary btn--lg">無料で相談する →</a>
       <a href="/business.html" class="btn btn--inverse">事業内容を見る</a>
     </div>
   </div>
 </section>
 
-<!-- Editorial marquee: brand rhythm -->
-<div class="marquee" aria-hidden="true">
-  <div class="marquee__track">
-    <span>SaaS DEVELOPMENT</span>
-    <span>IT ENABLEMENT</span>
-    <span>SALES ENABLEMENT</span>
-    <span>PARTNER PROGRAM</span>
-    <span>OSAKA / SINCE 2026</span>
-    <span>SaaS DEVELOPMENT</span>
-    <span>IT ENABLEMENT</span>
-    <span>SALES ENABLEMENT</span>
-    <span>PARTNER PROGRAM</span>
-    <span>OSAKA / SINCE 2026</span>
+<!-- Trust strip -->
+<div class="trust-strip">
+  <div class="container">
+    <div class="trust-strip__inner">
+      <span class="trust-strip__item"><strong>SaaS開発</strong></span>
+      <span class="trust-strip__item"><strong>IT導入支援</strong></span>
+      <span class="trust-strip__item"><strong>営業支援</strong></span>
+      <span class="trust-strip__item">大阪府・関西全域・オンライン全国</span>
+      <span class="trust-strip__item">平日 10:00–18:00 最短当日返信</span>
+    </div>
   </div>
 </div>
 
-<!-- 語り: 私たちのアプローチ -->
+<!-- AIO-friendly plain lede -->
+<div class="site-lede">
+  <div class="container">
+    <p>合同会社TUSG（大阪市中央区南船場）は、業務システム・SaaS開発、ITツール導入支援、営業支援の3事業を、情シスや営業企画が不在の中小企業・店舗向けに提供する業務支援会社です。</p>
+  </div>
+</div>
+
+<!-- 語り 01 -->
 <section class="section--edit">
   <div class="container">
     <div class="storytell" data-reveal>
@@ -129,13 +171,8 @@
       </div>
       <div>
         <span class="storytell__num">01</span>
-        <h2 data-split>使われる仕組みだけを、作り、届ける。</h2>
-        <p>
-          単なる開発でも、単なる営業代行でもありません。<br>
-          お客様の業務フローを起点に、
-          本当に使われるシステムと、成果につながる営業の流れを、
-          小さく作って改善しながら育てていきます。
-        </p>
+        <h2 data-split>使われる仕組みだけを、作る。</h2>
+        <p>お客様の業務フローを起点に、本当に使われるシステムと、成果につながる営業の流れを、小さく作って改善しながら育てます。「作って終わり」ではなく「使い続けられる」までを設計範囲とします。</p>
         <a href="/business.html" class="btn btn--ghost">事業内容を見る →</a>
       </div>
     </div>
@@ -146,13 +183,15 @@
 <section class="section--edit" style="padding-top:0;">
   <div class="container">
     <blockquote class="pull-quote" data-reveal>
-      「情シスがいない」「営業が属人化している」「システムの保守が止まった」<br>
+      「情シスがいない」<br>
+      「営業が属人化している」<br>
+      「システムの保守が止まった」<br>
       —— そんな一言から、TUSGの仕事は始まります。
     </blockquote>
   </div>
 </section>
 
-<!-- Services (editorial list style) -->
+<!-- Services -->
 <section class="section--edit" style="background:var(--paper);">
   <div class="container">
     <div class="section-head" data-reveal>
@@ -164,7 +203,7 @@
         <div>
           <span class="services-list__num">— 01 / SaaS DEVELOPMENT</span>
           <h3>SaaS開発・システム保守</h3>
-          <p>業務システム・管理画面・SaaSの企画から保守まで。</p>
+          <p>業務システム・管理画面・SaaSの企画から運用まで。</p>
         </div>
         <span class="services-list__arrow">→</span>
       </a>
@@ -188,7 +227,7 @@
         <div>
           <span class="services-list__num">— 04 / PARTNER PROGRAM</span>
           <h3>リード・アポイント提供制度</h3>
-          <p>営業協力に基づく透明性のある業務委託制度。</p>
+          <p>営業協力に基づく透明な業務委託。</p>
         </div>
         <span class="services-list__arrow">→</span>
       </a>
@@ -196,34 +235,28 @@
   </div>
 </section>
 
-<!-- 語り 02: 現場に寄り添う -->
-<section class="section--edit">
-  <div class="container">
-    <div class="storytell storytell--reverse" data-reveal>
-      <div class="storytell__media">
-        <div class="storytell__media-inner" data-mask style="background-image:url('https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=900&h=1100&fit=crop&q=85');"></div>
-      </div>
-      <div>
-        <span class="storytell__num">02</span>
-        <h2 data-split>店舗と中小企業の、実務のそばに立つ。</h2>
-        <p>
-          専任の情シスや営業企画がいない事業者様に、
-          スマホで完結する現場向けの導線と、
-          運用負荷の低いITスタックを設計します。<br>
-          「使い続けられる」までを支援範囲としています。
-        </p>
-        <a href="/company.html" class="btn btn--ghost">TUSGについて →</a>
-      </div>
-    </div>
+<!-- Brand marquee -->
+<div class="marquee" aria-hidden="true">
+  <div class="marquee__track">
+    <span>SaaS DEVELOPMENT</span>
+    <span>IT ENABLEMENT</span>
+    <span>SALES ENABLEMENT</span>
+    <span>PARTNER PROGRAM</span>
+    <span>OSAKA / SINCE 2026</span>
+    <span>SaaS DEVELOPMENT</span>
+    <span>IT ENABLEMENT</span>
+    <span>SALES ENABLEMENT</span>
+    <span>PARTNER PROGRAM</span>
+    <span>OSAKA / SINCE 2026</span>
   </div>
-</section>
+</div>
 
-<!-- CTA (editorial) -->
+<!-- CTA -->
 <section class="cta-band--edit">
   <div class="container">
     <h2>まずは30分、話してみませんか。</h2>
     <p>初回のヒアリングは無料です。「何をどうすればいいか」から一緒に整理します。</p>
-    <a href="/contact.html" class="btn btn--inverse btn--lg">お問い合わせ →</a>
+    <a href="/contact.html" class="btn btn--inverse btn--lg">無料相談を申し込む →</a>
   </div>
 </section>
 
@@ -266,6 +299,16 @@
         </ul>
       </div>
     </div>
+
+    <div class="trust-bar">
+      <dl class="trust-bar__grid">
+        <div><dt>商号</dt><dd>合同会社TUSG</dd></div>
+        <div><dt>代表</dt><dd>坂本 豪</dd></div>
+        <div><dt>設立</dt><dd>2026年2月11日</dd></div>
+        <div><dt>会社法人等番号</dt><dd>1200-03-031923</dd></div>
+      </dl>
+    </div>
+
     <div class="site-footer__bottom">
       <span>&copy; 2026 合同会社TUSG All Rights Reserved.</span>
       <span>合同会社TUSG</span>
@@ -277,6 +320,6 @@
   <a href="/contact.html" class="btn btn--primary btn--lg btn--block">無料で相談する</a>
 </div>
 
-<script src="/js/main.js?v=1783800000"></script>
+<script src="/js/main.js?v=1783900000" defer></script>
 </body>
 </html>
