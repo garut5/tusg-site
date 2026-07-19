@@ -1,6 +1,6 @@
 // POST /api/consultations
 //
-// お悩み・ご希望かんたん整理の最終送信を受け付ける Pages Function。
+// 30秒無料診断の最終送信を受け付ける Pages Function。
 // - サーバー側バリデーション
 // - 二重送信対策 (Idempotency-Key ヘッダの短期メモリキャッシュ、Cloudflare 単一 isolate 前提の best-effort)
 // - Content-Type / Origin 検証
@@ -200,15 +200,15 @@ function buildCustomerMail(payload, ref, env) {
 
   const text = `${c.contactName || "ご担当者"} 様
 
-このたびは、合同会社TUSGの「お悩み・ご希望かんたん整理」をご利用いただき、ありがとうございます。
+このたびは、合同会社TUSGの「30秒無料診断」をご利用いただき、ありがとうございます。
 
 以下の内容でご相談を受け付けました。
 
 受付番号: ${ref}
 優先したい内容: ${primaryLabel}
-整理結果: ${resultTitle}
+診断結果: ${resultTitle}
 
-今回の整理結果は、回答内容をもとにした参考情報です。
+今回の診断結果は、回答内容をもとにした参考情報です。
 正式なご提案、対応可否、費用、納期などは、現在の運用状況を確認したうえでご案内いたします。
 
 入力内容を確認後、必要に応じて担当者よりご連絡いたします。
@@ -224,14 +224,14 @@ function buildCustomerMail(payload, ref, env) {
 
   const html = `<div style="font-family:sans-serif;font-size:14px;line-height:1.75;color:#1a1f22;">
 <p>${escapeHtml(c.contactName || "ご担当者")} 様</p>
-<p>このたびは、合同会社TUSGの「お悩み・ご希望かんたん整理」をご利用いただき、ありがとうございます。</p>
+<p>このたびは、合同会社TUSGの「30秒無料診断」をご利用いただき、ありがとうございます。</p>
 <p>以下の内容でご相談を受け付けました。</p>
 <table style="border-collapse:collapse;margin:12px 0;">
 <tr><th style="text-align:left;padding:6px 16px 6px 0;color:#666;">受付番号</th><td style="padding:6px 0;font-family:monospace;font-weight:700;">${escapeHtml(ref)}</td></tr>
 <tr><th style="text-align:left;padding:6px 16px 6px 0;color:#666;">優先したい内容</th><td style="padding:6px 0;">${escapeHtml(primaryLabel)}</td></tr>
-<tr><th style="text-align:left;padding:6px 16px 6px 0;color:#666;">整理結果</th><td style="padding:6px 0;">${escapeHtml(resultTitle)}</td></tr>
+<tr><th style="text-align:left;padding:6px 16px 6px 0;color:#666;">診断結果</th><td style="padding:6px 0;">${escapeHtml(resultTitle)}</td></tr>
 </table>
-<p>今回の整理結果は、回答内容をもとにした参考情報です。正式なご提案、対応可否、費用、納期などは、現在の運用状況を確認したうえでご案内いたします。</p>
+<p>今回の診断結果は、回答内容をもとにした参考情報です。正式なご提案、対応可否、費用、納期などは、現在の運用状況を確認したうえでご案内いたします。</p>
 <p>入力内容を確認後、必要に応じて担当者よりご連絡いたします。</p>
 <p>なお、このメールに心当たりがない場合は、下記窓口までご連絡ください。</p>
 <hr>

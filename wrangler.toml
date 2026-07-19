@@ -10,7 +10,7 @@ CONTACT_FROM_EMAIL = "no-reply@mail.tusg.site"
 CONTACT_FROM_NAME = "TUSGコーポレートサイト"
 CONTACT_REDIRECT = "/thanks.html"
 
-# お悩み・ご希望かんたん整理 (functions/api/consultations.js)
+# 30秒無料診断 (functions/api/consultations.js)
 RESEND_FROM_EMAIL = "no-reply@mail.tusg.site"
 RESEND_FROM_NAME = "TUSGコーポレートサイト"
 CONSULTATION_NOTIFICATION_TO = "info@tusg.site"
