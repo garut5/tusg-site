@@ -4,7 +4,18 @@ pages_build_output_dir = "public"
 
 # 環境変数 (秘密でない値のみ。秘密は `wrangler pages secret put` で設定)
 [vars]
+# 既存のお問い合わせフォーム (contact.php.js)
 CONTACT_TO_EMAIL = "info@tusg.site"
 CONTACT_FROM_EMAIL = "no-reply@mail.tusg.site"
 CONTACT_FROM_NAME = "TUSGコーポレートサイト"
 CONTACT_REDIRECT = "/thanks.html"
+
+# お悩み・ご希望かんたん整理 (functions/api/consultations.js)
+RESEND_FROM_EMAIL = "no-reply@mail.tusg.site"
+RESEND_FROM_NAME = "TUSGコーポレートサイト"
+CONSULTATION_NOTIFICATION_TO = "info@tusg.site"
+# CONSULTATION_NOTIFICATION_CC = ""  # 必要時のみ設定
+SITE_URL = "https://tusg.site"
+
+# 秘密情報 (Cloudflare Dashboard または wrangler pages secret put で設定):
+#   RESEND_API_KEY
