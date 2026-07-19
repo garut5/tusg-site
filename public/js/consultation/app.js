@@ -51,10 +51,13 @@ const initialState = {
   errors: {},
 };
 
-let state = load() || structuredClone(initialState);
+let state = load() || deepClone(initialState);
 if (!sessionStorage.getItem(START_TIMESTAMP_KEY)) {
   sessionStorage.setItem(START_TIMESTAMP_KEY, String(Date.now()));
 }
+
+// deepClone: 古い iOS Safari (15.4未満) では structuredClone が無いので JSON round-trip で代替
+function deepClone(v) { return JSON.parse(JSON.stringify(v)); }
 
 function save() {
   try {
@@ -68,7 +71,7 @@ function load() {
   } catch { return null; }
 }
 function reset() {
-  state = structuredClone(initialState);
+  state = deepClone(initialState);
   sessionStorage.removeItem(SESSION_KEY);
   sessionStorage.setItem(START_TIMESTAMP_KEY, String(Date.now()));
   render();
@@ -628,5 +631,22 @@ function render() {
   root.appendChild(wrapper);
 }
 
-// 初回描画
-render();
+// 初回描画 — 失敗しても真っ白にならないようフォールバック
+try {
+  render();
+} catch (err) {
+  console.error("[consultation] init failed:", err);
+  if (root) {
+    root.innerHTML = "";
+    const fallback = document.createElement("div");
+    fallback.className = "wiz-card";
+    fallback.innerHTML =
+      '<h2 class="wiz-h">画面の読み込みに問題が発生しました。</h2>' +
+      '<p class="wiz-lede">お手数ですが、以下のいずれかでお問い合わせください。</p>' +
+      '<div class="wiz-actions">' +
+      '<a class="btn btn--primary" href="/contact.html">通常のお問い合わせフォームへ</a>' +
+      '<a class="btn btn--ghost" href="mailto:info@tusg.site">info@tusg.siteへメール</a>' +
+      '</div>';
+    root.appendChild(fallback);
+  }
+}
