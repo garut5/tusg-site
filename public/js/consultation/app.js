@@ -1,4 +1,4 @@
-// お悩み・ご希望かんたん整理 — メインアプリ
+// 30秒無料診断 — メインアプリ
 // State machine + Renderer。sessionStorage で回答保持。
 
 import {
@@ -136,9 +136,9 @@ function renderProgress(currentStep) {
 // ---- STEP: 開始画面 ----
 function renderStart() {
   return el("section", { class: "wiz-card wiz-start" },
-    el("h2", { class: "wiz-h" }, "お悩み・ご希望かんたん整理"),
+    el("h2", { class: "wiz-h" }, "まず整理する ─ 30秒無料診断"),
     el("p", { class: "wiz-lede" },
-      "業務上のお困りごとや、これから実現したいことについて、簡単な質問にお答えください。回答内容をもとに、TUSGでお手伝いできる可能性のある内容を整理してご案内します。"
+      "業務上のお困りごとや、これから実現したいことについて、簡単な質問にお答えください。約30秒で、TUSGでお手伝いできる可能性のある内容を整理してご案内します。"
     ),
     el("ul", { class: "wiz-bullets" },
       el("li", null, "自分が何に困っているかを整理できます"),
@@ -146,10 +146,10 @@ function renderStart() {
       el("li", null, "そのままご相談することもできます"),
     ),
     el("p", { class: "wiz-fineprint" },
-      "回答内容は最終送信するまでサーバーに保存されません。整理結果は確定的な見積もりや契約内容ではありません。正式なご提案には、現在の運用状況などを確認させていただきます。"
+      "回答内容は最終送信するまでサーバーに保存されません。診断結果は確定的な見積もりや契約内容ではありません。正式なご提案には、現在の運用状況などを確認させていただきます。"
     ),
     el("div", { class: "wiz-actions" },
-      el("button", { type: "button", class: "btn btn--primary btn--lg", onClick: () => setStep("issue") }, "整理を始める →"),
+      el("button", { type: "button", class: "btn btn--primary btn--lg", onClick: () => setStep("issue") }, "診断を始める →"),
       el("button", { type: "button", class: "btn btn--ghost", onClick: () => (location.href = "/contact.html") }, "通常のお問い合わせへ")
     ),
   );
