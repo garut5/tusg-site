@@ -7,7 +7,8 @@
     "dev": "wrangler pages dev public",
     "deploy": "wrangler pages deploy public --project-name=tusg-site",
     "deploy:preview": "wrangler pages deploy public --project-name=tusg-site --branch=preview",
-    "tail": "wrangler pages deployment tail --project-name=tusg-site"
+    "tail": "wrangler pages deployment tail --project-name=tusg-site",
+    "test": "node tests/consultation.test.mjs"
   },
   "devDependencies": {
     "wrangler": "^3.90.0"
