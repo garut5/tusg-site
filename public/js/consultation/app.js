@@ -93,14 +93,17 @@ if (!root) {
   console.warn("[consultation] #consultation-root not found");
 }
 
-function el(tag, attrs = {}, ...children) {
+function el(tag, attrs, ...children) {
   const e = document.createElement(tag);
-  for (const [k, v] of Object.entries(attrs)) {
-    if (v == null || v === false) continue;
-    if (k === "class") e.className = v;
-    else if (k === "html") e.innerHTML = v;
-    else if (k.startsWith("on") && typeof v === "function") e.addEventListener(k.slice(2).toLowerCase(), v);
-    else e.setAttribute(k, v === true ? "" : v);
+  // attrs は null / undefined を許容 (el("li", null, "text") のような呼び方に対応)
+  if (attrs) {
+    for (const [k, v] of Object.entries(attrs)) {
+      if (v == null || v === false) continue;
+      if (k === "class") e.className = v;
+      else if (k === "html") e.innerHTML = v;
+      else if (k.startsWith("on") && typeof v === "function") e.addEventListener(k.slice(2).toLowerCase(), v);
+      else e.setAttribute(k, v === true ? "" : v);
+    }
   }
   for (const c of children.flat()) {
     if (c == null || c === false) continue;
