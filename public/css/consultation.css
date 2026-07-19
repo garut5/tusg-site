@@ -1,23 +1,32 @@
-/* お悩み・ご希望かんたん整理 — Wizard 専用スタイル
-   (既存 style.css を継承・変数を再利用) */
+/* お悩み・ご希望かんたん整理 — Wizard 専用スタイル (v2 mobile-first)
+   既存 style.css を継承・変数を再利用 */
 
-.consultation-main { padding: 40px 0 96px; background: var(--cream); }
+.consultation-main {
+  padding: 32px 0 96px;
+  background: var(--cream);
+  overflow-x: hidden; /* 予期しない横スクロール防止のセーフティネット */
+}
+.consultation-main .container { max-width: 820px; }
 
-.wiz-shell { display: grid; gap: 20px; }
+.wiz-shell { display: grid; gap: 16px; min-width: 0; }
 
-/* Progress bar */
+/* ==========================================================
+   Progress bar — 常に画面幅に収まるように fluid layout
+   ========================================================== */
 .wiz-progress { margin: 0 0 8px; }
 .wiz-progress__list {
-  display: flex; align-items: center; gap: 4px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); /* 均等5分割で必ず画面幅に収まる */
+  gap: 4px;
   list-style: none; padding: 0; margin: 0;
-  overflow-x: auto; scroll-snap-type: x proximity;
 }
 .wiz-progress__item {
-  flex: 1 1 auto; min-width: 84px;
-  display: flex; align-items: center; gap: 8px;
-  padding: 6px 4px; font-size: 12px; color: var(--stone);
-  scroll-snap-align: start;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 4px; padding: 6px 2px;
+  font-size: 10.5px; color: var(--stone);
   border-bottom: 2px solid var(--line-2);
+  text-align: center;
+  min-width: 0; /* grid内で縮小許可 */
 }
 .wiz-progress__item.is-current { color: var(--forest); border-bottom-color: var(--forest); }
 .wiz-progress__item.is-done { color: var(--forest-soft); border-bottom-color: var(--forest-soft); }
@@ -26,90 +35,159 @@
   width: 22px; height: 22px; border-radius: 50%;
   background: var(--paper); color: var(--stone);
   font-family: "Inter", monospace; font-size: 11px; font-weight: 700;
+  flex-shrink: 0;
 }
 .wiz-progress__item.is-current .wiz-progress__num { background: var(--forest); color: #fff; }
 .wiz-progress__item.is-done .wiz-progress__num { background: var(--forest-soft); color: #fff; }
-.wiz-progress__label { white-space: nowrap; }
+.wiz-progress__label {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-width: 100%;
+  font-weight: 500;
+}
+@media (min-width: 600px) {
+  .wiz-progress__item { flex-direction: row; gap: 8px; font-size: 12px; }
+  .wiz-progress__label { font-weight: 500; }
+}
 
-/* Card */
+/* ==========================================================
+   Card
+   ========================================================== */
 .wiz-card {
   background: #fff;
   border: 1px solid var(--line-2);
-  border-radius: 4px;
-  padding: 28px 20px;
+  border-radius: 6px;
+  padding: 20px 16px;
+  min-width: 0;
+  overflow-wrap: anywhere; /* 万一の長単語で親をはみ出さない */
 }
-@media (min-width: 720px) { .wiz-card { padding: 40px 40px; } }
+@media (min-width: 480px) { .wiz-card { padding: 24px 20px; } }
+@media (min-width: 720px) { .wiz-card { padding: 36px 40px; } }
+
+/* ==========================================================
+   Typography — 日本語折返し最適化
+   ========================================================== */
+.wiz-h,
+.wiz-h3,
+.wiz-lede,
+.wiz-hint,
+.wiz-review__row dd,
+.wiz-review__free p,
+.wiz-consent span,
+.wiz-choice,
+.wiz-note p,
+.wiz-field__label,
+.wiz-bullets li {
+  /* Chrome 119+ / Safari 17.4+ で文節単位改行、旧環境も自然に折返す */
+  word-break: auto-phrase;
+  line-break: strict;
+  overflow-wrap: anywhere;
+}
 
 .wiz-h {
-  font-family: var(--serif); font-size: 22px; font-weight: 700;
-  letter-spacing: .03em; line-height: 1.55; margin: 0 0 12px;
+  font-family: var(--serif); font-size: 20px; font-weight: 700;
+  letter-spacing: .02em; line-height: 1.6; margin: 0 0 12px;
   color: var(--charcoal);
 }
+@media (min-width: 480px) { .wiz-h { font-size: 22px; } }
 @media (min-width: 720px) { .wiz-h { font-size: 26px; } }
 .wiz-h--serif { font-family: var(--serif); }
-.wiz-h3 { font-family: var(--sans); font-size: 15px; font-weight: 700; letter-spacing: .04em; margin: 28px 0 12px; color: var(--charcoal); }
+.wiz-h3 {
+  font-family: var(--sans); font-size: 14.5px; font-weight: 700;
+  letter-spacing: .04em; margin: 24px 0 10px;
+  color: var(--charcoal);
+}
 
-.wiz-lede { font-size: 15px; color: var(--graphite); line-height: 1.9; margin: 0 0 16px; }
-.wiz-hint { font-size: 13px; color: var(--stone); margin: 0 0 16px; line-height: 1.7; }
-.wiz-hint--warn { color: #7a5e08; background: var(--warn-bg); border: 1px solid var(--warn-line); border-radius: 4px; padding: 10px 12px; }
+.wiz-lede { font-size: 14.5px; color: var(--graphite); line-height: 1.85; margin: 0 0 14px; }
+.wiz-hint { font-size: 13px; color: var(--stone); margin: 0 0 14px; line-height: 1.7; }
+.wiz-hint--warn {
+  color: #7a5e08; background: var(--warn-bg); border: 1px solid var(--warn-line);
+  border-radius: 4px; padding: 10px 12px; margin: 8px 0 16px;
+}
 .wiz-fineprint { font-size: 12.5px; color: var(--stone); margin: 16px 0 0; line-height: 1.8; }
 
 .wiz-bullets { list-style: none; padding: 0; margin: 0 0 16px; display: grid; gap: 8px; }
-.wiz-bullets li { position: relative; padding-left: 20px; font-size: 14.5px; color: var(--graphite); line-height: 1.8; }
+.wiz-bullets li {
+  position: relative; padding-left: 20px;
+  font-size: 14px; color: var(--graphite); line-height: 1.75;
+}
 .wiz-bullets li::before {
-  content: ""; position: absolute; left: 0; top: 10px;
+  content: ""; position: absolute; left: 0; top: 9px;
   width: 8px; height: 8px; border-radius: 50%;
   background: var(--forest);
+  flex-shrink: 0;
 }
 
 .wiz-signature {
   display: inline-block; padding-left: 32px; position: relative;
   font-family: var(--serif); color: var(--forest);
-  font-size: 12px; letter-spacing: .3em; text-transform: uppercase;
-  margin-bottom: 12px;
+  font-size: 11px; letter-spacing: .3em; text-transform: uppercase;
+  margin-bottom: 10px;
 }
 .wiz-signature::before {
   content: ""; position: absolute; left: 0; top: 50%;
   width: 20px; height: 1px; background: var(--forest);
 }
 
-/* Choice buttons */
-.wiz-choice-grid { display: grid; grid-template-columns: 1fr; gap: 8px; margin: 0 0 20px; }
-@media (min-width: 720px) { .wiz-choice-grid { grid-template-columns: 1fr 1fr; } }
-.wiz-choice-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 8px; }
+/* ==========================================================
+   Choice buttons
+   ========================================================== */
+.wiz-choice-grid {
+  display: grid; grid-template-columns: 1fr; gap: 8px;
+  margin: 0 0 16px;
+}
+@media (min-width: 640px) { .wiz-choice-grid { grid-template-columns: 1fr 1fr; } }
+
+.wiz-choice-row {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin: 0 0 8px;
+}
 
 .wiz-choice {
   appearance: none; background: #fff;
   border: 1px solid var(--line-2);
   border-radius: 4px;
-  padding: 14px 16px;
-  font-family: inherit; font-size: 14.5px; text-align: left;
+  padding: 12px 14px;
+  font-family: inherit; font-size: 14px; text-align: left;
   color: var(--charcoal); cursor: pointer;
   min-height: 48px;
   transition: border-color .15s, background .15s, color .15s;
   line-height: 1.5;
+  width: 100%; /* choice-grid 内で 100% 幅 */
+  max-width: 100%;
+  box-sizing: border-box;
 }
+.wiz-choice-row .wiz-choice { width: auto; } /* row 内は inline サイズ */
+
 .wiz-choice:hover { border-color: var(--forest); }
-.wiz-choice:focus-visible { outline: 2px solid var(--forest); outline-offset: 2px; box-shadow: 0 0 0 4px rgba(232,184,74,.55); }
+.wiz-choice:focus-visible {
+  outline: 2px solid var(--forest); outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(232,184,74,.55);
+}
 .wiz-choice.is-selected {
   background: var(--forest); color: #fff; border-color: var(--forest);
   font-weight: 600;
 }
-.wiz-choice--sm { padding: 10px 14px; min-height: 40px; font-size: 13.5px; }
+.wiz-choice--sm { padding: 10px 14px; min-height: 40px; font-size: 13px; }
 
-/* Field */
-.wiz-field { margin: 0 0 20px; }
+/* ==========================================================
+   Field / Input
+   ========================================================== */
+.wiz-field { margin: 0 0 18px; min-width: 0; }
 .wiz-field__label {
   display: block; font-size: 13.5px; font-weight: 600;
   color: var(--charcoal); margin: 0 0 8px; line-height: 1.5;
 }
 
 .wiz-input {
-  width: 100%;
+  width: 100%; max-width: 100%; box-sizing: border-box;
   padding: 12px 14px;
   border: 1px solid var(--line-strong);
   border-radius: 4px;
-  font-size: 16px; font-family: inherit;
+  font-size: 16px; /* iOSズーム防止 */
+  font-family: inherit;
   background: #fff; color: var(--charcoal);
   min-height: 48px;
   transition: border-color .15s, box-shadow .15s;
@@ -118,94 +196,153 @@
   outline: none; border-color: var(--forest);
   box-shadow: 0 0 0 3px rgba(14,61,33,.15);
 }
-.wiz-input--text { min-height: 100px; resize: vertical; line-height: 1.7; }
+.wiz-input--text { min-height: 96px; resize: vertical; line-height: 1.7; }
 
 .wiz-error {
-  color: #c0392b; font-size: 13px;
+  color: #c0392b; font-size: 12.5px;
   margin: 6px 0 0; line-height: 1.5;
 }
 
-/* Optional details */
-.wiz-optional { margin: 0 0 20px; border: 1px dashed var(--line-2); border-radius: 4px; padding: 8px 14px; }
+/* ==========================================================
+   Optional details
+   ========================================================== */
+.wiz-optional {
+  margin: 0 0 18px; border: 1px dashed var(--line-2); border-radius: 4px;
+  padding: 6px 14px;
+}
 .wiz-optional summary {
-  cursor: pointer; font-size: 13.5px; color: var(--forest); font-weight: 600;
+  cursor: pointer; font-size: 13px; color: var(--forest); font-weight: 600;
   padding: 6px 0; list-style: none;
 }
 .wiz-optional summary::-webkit-details-marker { display: none; }
 .wiz-optional summary::before { content: "＋ "; color: var(--forest); font-weight: 700; }
 .wiz-optional[open] summary::before { content: "− "; }
-.wiz-optional__inner { margin: 12px 0 4px; display: grid; gap: 16px; }
+.wiz-optional__inner { margin: 10px 0 4px; display: grid; gap: 14px; }
 
-/* Consent */
+/* ==========================================================
+   Consent
+   ========================================================== */
 .wiz-consent {
   display: flex; align-items: flex-start; gap: 10px;
-  padding: 10px 0; font-size: 13.5px; color: var(--graphite); line-height: 1.7;
+  padding: 10px 0; font-size: 13px; color: var(--graphite); line-height: 1.7;
+  cursor: pointer;
 }
-.wiz-consent input { margin-top: 4px; flex-shrink: 0; width: 18px; height: 18px; }
+.wiz-consent input {
+  margin-top: 4px; flex-shrink: 0;
+  width: 18px; height: 18px;
+  accent-color: var(--forest);
+}
 .wiz-consent a { color: var(--forest); text-decoration: underline; text-underline-offset: 2px; }
 
 /* Honeypot */
 .wiz-honeypot { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 
-/* Actions */
+/* ==========================================================
+   Actions
+   ========================================================== */
 .wiz-actions {
-  display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
-  margin: 28px 0 0;
+  display: flex; flex-direction: column-reverse; gap: 10px;
+  margin: 24px 0 0;
 }
-.wiz-actions .btn--primary { min-width: 220px; }
-@media (max-width: 599px) {
-  .wiz-actions { flex-direction: column-reverse; align-items: stretch; }
-  .wiz-actions .btn { width: 100%; }
+.wiz-actions .btn { width: 100%; min-height: 48px; }
+@media (min-width: 480px) {
+  .wiz-actions { flex-direction: row; flex-wrap: wrap; align-items: center; }
+  .wiz-actions .btn { width: auto; }
+  .wiz-actions .btn--primary { min-width: 200px; }
 }
 
-.wiz-divider { border: none; border-top: 1px solid var(--line-2); margin: 24px 0; }
+.wiz-divider { border: none; border-top: 1px solid var(--line-2); margin: 20px 0; }
+
+/* ==========================================================
+   Note
+   ========================================================== */
 .wiz-note {
   background: var(--paper);
   border-left: 3px solid var(--forest);
-  padding: 12px 16px; margin: 16px 0;
+  padding: 12px 14px; margin: 14px 0;
   border-radius: 0 4px 4px 0;
 }
-.wiz-note strong { display: block; font-size: 13px; color: var(--forest); letter-spacing: .04em; margin: 0 0 6px; }
-.wiz-note p { margin: 0; font-size: 13.5px; color: var(--graphite); line-height: 1.8; }
+.wiz-note strong {
+  display: block; font-size: 12.5px; color: var(--forest);
+  letter-spacing: .04em; margin: 0 0 6px;
+}
+.wiz-note p { margin: 0; font-size: 13px; color: var(--graphite); line-height: 1.8; }
 .wiz-note--warn { border-left-color: #b8891b; }
 .wiz-note--warn strong { color: #7a5e08; }
 
-/* Review (confirm) */
-.wiz-review { margin: 0 0 24px; }
-.wiz-review__dl { margin: 0; display: grid; gap: 0; border-top: 1px solid var(--line-2); }
+/* ==========================================================
+   Review (confirm)
+   ========================================================== */
+.wiz-review { margin: 0 0 20px; min-width: 0; }
+.wiz-review__dl {
+  margin: 0; display: grid; gap: 0;
+  border-top: 1px solid var(--line-2);
+}
 .wiz-review__row {
   display: grid; grid-template-columns: 1fr;
   gap: 4px; padding: 12px 4px;
   border-bottom: 1px solid var(--line-2);
+  min-width: 0;
 }
-.wiz-review__row dt { font-size: 12px; color: var(--stone); letter-spacing: .1em; }
-.wiz-review__row dd { margin: 0; font-size: 14.5px; color: var(--charcoal); font-weight: 500; }
+.wiz-review__row dt { font-size: 11.5px; color: var(--stone); letter-spacing: .1em; }
+.wiz-review__row dd {
+  margin: 0; font-size: 14px; color: var(--charcoal); font-weight: 500;
+  word-break: break-word;
+}
 @media (min-width: 600px) {
-  .wiz-review__row { grid-template-columns: 160px 1fr; gap: 16px; align-items: baseline; }
+  .wiz-review__row { grid-template-columns: 140px 1fr; gap: 16px; align-items: baseline; }
 }
-.wiz-review__free { margin-top: 16px; padding: 12px 16px; background: var(--paper); border-radius: 4px; }
-.wiz-review__free h4 { font-size: 12px; color: var(--stone); letter-spacing: .1em; margin: 0 0 6px; }
-.wiz-preline { white-space: pre-wrap; font-size: 14px; margin: 0; color: var(--graphite); }
+.wiz-review__free {
+  margin-top: 14px; padding: 12px 14px;
+  background: var(--paper); border-radius: 4px;
+}
+.wiz-review__free h4 {
+  font-size: 11.5px; color: var(--stone); letter-spacing: .1em; margin: 0 0 6px;
+}
+.wiz-preline {
+  white-space: pre-wrap; font-size: 13.5px; margin: 0;
+  color: var(--graphite);
+  word-break: break-word;
+}
 
-/* Complete */
+/* ==========================================================
+   Complete
+   ========================================================== */
 .wiz-complete { text-align: left; }
 .wiz-reference {
-  display: inline-flex; align-items: baseline; gap: 12px;
-  padding: 14px 20px; border: 1px dashed var(--forest);
-  border-radius: 4px; margin: 8px 0 20px;
+  display: inline-flex; flex-wrap: wrap;
+  align-items: baseline; gap: 8px 12px;
+  padding: 12px 16px; border: 1px dashed var(--forest);
+  border-radius: 4px; margin: 8px 0 18px;
   background: var(--paper);
+  max-width: 100%;
 }
-.wiz-reference span { font-size: 12px; letter-spacing: .1em; color: var(--forest); }
-.wiz-reference strong { font-family: "Inter", monospace; font-size: 18px; color: var(--charcoal); letter-spacing: .06em; }
+.wiz-reference span {
+  font-size: 11.5px; letter-spacing: .1em; color: var(--forest);
+}
+.wiz-reference strong {
+  font-family: "Inter", monospace; font-size: 15px;
+  color: var(--charcoal); letter-spacing: .06em;
+  word-break: break-all;
+}
+@media (min-width: 480px) { .wiz-reference strong { font-size: 17px; } }
 
 .wiz-textbtn {
   appearance: none; background: transparent; border: 0;
   color: var(--stone); font-size: 13px; margin: 16px 0 0;
-  cursor: pointer; padding: 8px 0; text-decoration: underline; text-underline-offset: 3px;
+  cursor: pointer; padding: 8px 0;
+  text-decoration: underline; text-underline-offset: 3px;
 }
 .wiz-textbtn:hover { color: var(--forest); }
 
-/* Reduced motion */
+/* ==========================================================
+   Reduced motion
+   ========================================================== */
 @media (prefers-reduced-motion: reduce) {
   .wiz-choice, .wiz-input { transition: none !important; }
 }
+
+/* ==========================================================
+   Global safety: page horizontal overflow prevention
+   ========================================================== */
+body { overflow-x: hidden; } /* 全ページの横スクロール完全防止 */
