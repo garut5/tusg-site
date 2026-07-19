@@ -115,10 +115,22 @@ hr { border: none; border-top: 1px solid var(--line); margin: 40px 0; }
   border-bottom: 1px solid var(--line);
 }
 .site-header__inner {
-  display: flex; align-items: center; justify-content: space-between; height: 64px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 68px;
 }
-.site-logo { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--ink-900); font-size: 17px; }
-.site-logo img { height: 36px; width: auto; }
+@media (min-width: 768px) { .site-header__inner { height: 76px; } }
+.site-logo {
+  display: flex; align-items: center; gap: 12px;
+  font-weight: 700; color: var(--charcoal, #1a1f22);
+  font-size: 18px; letter-spacing: .02em;
+  text-decoration: none;
+  min-width: 0;
+}
+.site-logo img { height: 40px; width: auto; flex-shrink: 0; }
+@media (min-width: 768px) {
+  .site-logo { font-size: 20px; gap: 14px; }
+  .site-logo img { height: 44px; }
+}
 .site-nav { display: none; }
 .site-nav__list { list-style: none; padding: 0; margin: 0; display: flex; gap: 28px; align-items: center; }
 .site-nav a { color: var(--ink-700); font-weight: 500; font-size: 15px; }
@@ -127,13 +139,20 @@ hr { border: none; border-top: 1px solid var(--line); margin: 40px 0; }
 
 .menu-btn {
   appearance: none; background: transparent; border: 0;
-  padding: 12px;
-  min-width: 44px; min-height: 44px;
-  margin-right: -8px;
+  padding: 10px;
+  min-width: 48px; min-height: 48px;
+  margin-right: -10px;
   display: inline-flex; flex-direction: column; gap: 5px; cursor: pointer;
   align-items: center; justify-content: center;
+  border-radius: 2px;
 }
-.menu-btn span { width: 22px; height: 2px; background: var(--ink-900); transition: transform .2s, opacity .2s; }
+.menu-btn:hover { background: rgba(14,61,33,.05); }
+.menu-btn span {
+  width: 24px; height: 2px;
+  background: var(--charcoal, #1a1f22);
+  transition: transform .2s, opacity .2s;
+  border-radius: 1px;
+}
 .menu-btn[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
 .menu-btn[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
 .menu-btn[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
@@ -141,7 +160,7 @@ hr { border: none; border-top: 1px solid var(--line); margin: 40px 0; }
 /* Backdrop (裏の暗幕): メニュー開いたときにサイト側を暗く */
 .mobile-nav-backdrop {
   display: none;
-  position: fixed; inset: 64px 0 0 0;
+  position: fixed; inset: 68px 0 0 0;
   background: rgba(15,22,35,.35);
   z-index: 48;
   opacity: 0; transition: opacity .2s ease;
@@ -150,7 +169,7 @@ body.nav-open .mobile-nav-backdrop { display: block; opacity: 1; }
 body.nav-open .sticky-cta { display: none; }
 
 .mobile-nav {
-  position: fixed; inset: 64px 0 0 0; background: #fff;
+  position: fixed; inset: 68px 0 0 0; background: #fff;
   padding: 24px 20px calc(32px + env(safe-area-inset-bottom, 0));
   overflow-y: auto;
   transform: translateX(100%); transition: transform .25s ease;
@@ -913,10 +932,17 @@ body { background: var(--cream); color: var(--charcoal); font-size: 16px; letter
 .btn--inverse:hover { background: var(--cream); color: var(--forest); }
 
 /* 上書き: page-hero を editorial に */
-.page-hero { background: var(--paper); padding: 96px 0 72px; border-bottom: 1px solid var(--line-2); }
-.page-hero h1 { font-family: var(--serif); font-size: 34px; letter-spacing: .05em; line-height: 1.5; }
-@media (min-width: 768px) { .page-hero h1 { font-size: 46px; } }
-.page-hero p { color: var(--graphite); font-size: 15px; }
+.page-hero { background: var(--paper); padding: 72px 0 56px; border-bottom: 1px solid var(--line-2); }
+@media (min-width: 768px) { .page-hero { padding: 96px 0 72px; } }
+.page-hero h1 {
+  font-family: var(--serif); font-size: 26px;
+  letter-spacing: .04em; line-height: 1.55; margin-bottom: 12px;
+  word-break: auto-phrase; overflow-wrap: anywhere;
+}
+@media (min-width: 480px) { .page-hero h1 { font-size: 30px; } }
+@media (min-width: 768px) { .page-hero h1 { font-size: 40px; letter-spacing: .05em; } }
+.page-hero p { color: var(--graphite); font-size: 14.5px; line-height: 1.8; }
+@media (min-width: 768px) { .page-hero p { font-size: 15px; } }
 .page-hero .eyebrow {
   background: transparent; color: var(--forest);
   border: 1px solid var(--forest); border-radius: 0;
@@ -1056,8 +1082,8 @@ body.scrolled .site-header {
   box-shadow: 0 1px 24px rgba(15,22,35,.06);
   border-bottom-color: rgba(222,215,201,.6);
 }
-body.scrolled .site-header__inner { height: 56px; }
-body.scrolled .site-logo img { height: 30px; transition: height .35s ease; }
+body.scrolled .site-header__inner { height: 58px; }
+body.scrolled .site-logo img { height: 34px; transition: height .35s ease; }
 .site-logo img { transition: height .35s ease; }
 
 /* ---- Ken Burns effect on hero backgrounds (subtle) ---- */
