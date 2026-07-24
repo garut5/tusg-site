@@ -175,6 +175,22 @@
       });
     }, { rootMargin: "0px 0px -10% 0px", threshold: 0.08 });
     els.forEach(function (el) { io.observe(el); });
+
+    // セーフティネット: observer が発火しない (viewport 外に留まる、
+    // rootMargin の閾値ぎりぎり等) 場合でも [data-mask] を持つ画像が
+    // 永久に隠れないよう、初回スクロール時に viewport 内のものを強制表示。
+    function revealVisibleMasks() {
+      const wh = window.innerHeight;
+      document.querySelectorAll("[data-mask]:not(.is-visible)").forEach(function (el) {
+        const r = el.getBoundingClientRect();
+        if (r.bottom > 0 && r.top < wh) {
+          el.classList.add("is-visible");
+        }
+      });
+    }
+    window.addEventListener("scroll", revealVisibleMasks, { passive: true, once: true });
+    // 加えて 500ms 後にも一度チェック (画像読み込み完了後の layout 変動対策)
+    setTimeout(revealVisibleMasks, 500);
   }
 
   // ---------- Parallax (no initial-tick to avoid ken-burns jitter) ----------
