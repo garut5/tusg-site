@@ -185,6 +185,7 @@ body.nav-open .sticky-cta { display: none; }
 }
 .mobile-nav > .mobile-nav__heading:first-child { margin-top: 0; }
 
+.mobile-nav:focus, .mobile-nav:focus-visible { outline: none; }
 .mobile-nav ul { list-style: none; padding: 0; margin: 0; }
 .mobile-nav li { border-bottom: 1px solid var(--line); }
 .mobile-nav a {
@@ -217,10 +218,15 @@ body.nav-open .sticky-cta { display: none; }
   background: linear-gradient(180deg, rgba(255,255,255,0), #fff 30%);
 }
 .mobile-nav__cta .btn { width: 100%; padding: 18px 24px; font-size: 16px; }
+/* .mobile-nav a の色/擬似要素が .btn を上書きするので明示的に打ち消す */
+.mobile-nav__cta .btn--primary { color: #fff; }
+.mobile-nav__cta .btn--primary:hover { color: #fff; }
+.mobile-nav__cta .btn::after { content: none; display: none; }
 .mobile-nav__cta .mobile-nav__mail {
   display: block; text-align: center; margin-top: 10px;
   color: var(--ink-500); font-size: 13.5px;
 }
+.mobile-nav__cta .mobile-nav__mail::after { content: none; display: none; }
 
 @media (min-width: 960px) {
   .site-nav { display: block; }

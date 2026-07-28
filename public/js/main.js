@@ -53,8 +53,10 @@
       else if (open) nav.removeAttribute("inert"); else nav.setAttribute("inert", "");
 
       if (open) {
-        const f = focusables();
-        if (f.length) setTimeout(function () { f[0].focus(); }, 50);
+        // コンテナ自体にフォーカスを移す (a11y は保ちつつ、リンクに focus ring が
+        // 残って選択されているように見える問題を回避)。tabindex=-1 が無ければ付与。
+        if (!nav.hasAttribute("tabindex")) nav.setAttribute("tabindex", "-1");
+        setTimeout(function () { nav.focus({ preventScroll: true }); }, 50);
       } else {
         btn.focus();
       }
