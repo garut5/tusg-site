@@ -969,6 +969,12 @@ body { background: var(--cream); color: var(--charcoal); font-size: 16px; letter
 .site-header { background: rgba(250,247,242,.92); }
 .site-header .btn--primary { border-radius: 2px; }
 
+/* .site-nav a の color (0,1,1) が .btn--primary (0,1,0) に勝ってしまい、
+   濃緑背景に濃いグレー文字が乗って読めなくなるため明示的に打ち消す。
+   モバイル側 (.mobile-nav__cta) には既に同等の対処あり。 */
+.site-nav a.btn--primary,
+.site-nav a.btn--primary:hover { color: #fff; }
+
 /* ==========================================================
    細部の品格改善 (v3.1)
    ========================================================== */
