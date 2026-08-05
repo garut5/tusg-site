@@ -22,26 +22,6 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
-    {
-      "@type": "ListItem",
-      "position": 1,
-      "name": "トップ",
-      "item": "https://tusg.site/"
-    },
-    {
-      "@type": "ListItem",
-      "position": 2,
-      "name": "ストアコネクト 利用規約",
-      "item": "https://tusg.site/store-connect-terms"
-    }
-  ]
-}
-</script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
   "@type": "WebPage",
   "url": "https://tusg.site/store-connect-terms",
   "name": "ストアコネクト 利用規約",
@@ -57,6 +37,28 @@
   .sc-table th{background:#f6f8fa;font-weight:600;white-space:nowrap}
   .sc-wrap{overflow-x:auto}
   @media (max-width:620px){.sc-table th{white-space:normal}}
+
+  /* ストアコネクト専用フッター。
+     コーポレートのフッター（TUSG のサービス一覧・会社情報・30秒無料診断）は載せない。
+     このページはアプリ自身のページであり、運営会社のサイトではないため。
+     OAuth の同意画面と名前・ロゴを一致させる観点でも、識別情報を1つに絞る。 */
+  .sc-footer .sc-footer__top{display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between;align-items:center}
+  .sc-footer__brand{display:flex;align-items:center;gap:12px}
+  .sc-footer__brand img{display:block;border-radius:6px}
+  .sc-footer__name{color:#fff;font-weight:700;font-size:17px;letter-spacing:.02em}
+  .sc-footer__sub{color:#94a3b8;font-size:12.5px;margin-top:2px}
+  .sc-footer__links{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:8px 24px}
+  .sc-footer__links a{display:inline-block;padding:8px 0;font-size:14px}
+  .sc-footer__ops{margin-top:28px;padding-top:22px;border-top:1px solid #1f2937}
+  .sc-footer__opslabel{color:#94a3b8;font-size:12px;letter-spacing:.1em;margin-bottom:10px}
+  .sc-footer__opsgrid{display:grid;gap:10px 40px;grid-template-columns:1fr}
+  .sc-footer__opsgrid>div{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:baseline}
+  .sc-footer__opsgrid span{color:#fff;font-weight:600;font-size:14px}
+  .sc-footer__opsgrid a{color:#94a3b8;font-size:13px}
+  .sc-footer__bottom{margin-top:28px;padding-top:20px;border-top:1px solid #1f2937}
+  .sc-footer__tm{color:#94a3b8;font-size:12px;line-height:1.7;margin:0 0 10px}
+  .sc-footer__copy{color:#94a3b8;font-size:12.5px;margin:0}
+  @media (min-width:768px){ .sc-footer__opsgrid{grid-template-columns:1fr 1fr} }
 </style>
 </head>
 <body>
@@ -74,7 +76,7 @@
         <li><a href="/store-connect">ストアコネクトとは</a></li>
         <li><a href="/store-connect-privacy">プライバシーポリシー</a></li>
         <li><a href="/store-connect-terms">利用規約</a></li>
-        <li><a href="/index.html">運営会社</a></li>
+        <li><a href="/store-connect#operators">提供事業者</a></li>
       </ul>
     </nav>
     <button class="menu-btn" type="button" aria-label="メニューを開く" aria-controls="mobileNav" aria-expanded="false">
@@ -89,21 +91,13 @@
       <li><a href="/store-connect">ストアコネクトとは</a></li>
       <li><a href="/store-connect-privacy">プライバシーポリシー</a></li>
       <li><a href="/store-connect-terms">利用規約</a></li>
+      <li><a href="/store-connect#operators">提供事業者</a></li>
     </ul>
-    <h3 class="mobile-nav__heading">運営会社</h3>
-    <ul>
-      <li><a href="/index.html">合同会社TUSG</a></li>
-      <li><a href="/company.html">会社概要</a></li>
-    </ul>
-    <div class="mobile-nav__cta">
-      <a href="mailto:info@tusg.site" class="mobile-nav__mail">info@tusg.site</a>
-    </div>
   </div>
 
 
 <section class="page-hero">
   <div class="container">
-    <div class="breadcrumb"><a href="/store-connect">ストアコネクト</a><span>›</span>利用規約</div>
     <span class="eyebrow">TERMS OF SERVICE</span>
     <h1>ストアコネクト 利用規約</h1>
     <p>Google ビジネスプロフィール連携基盤「ストアコネクト」の利用条件を定めます。</p>
@@ -213,64 +207,35 @@
 
 </main>
 
-<footer class="site-footer">
+<footer class="site-footer sc-footer">
   <div class="container">
-    <div class="site-footer__grid">
-      <div>
-        <div class="site-footer__brand">合同会社TUSG</div>
-        <div class="site-footer__address">
-          〒542-0081<br>
-          大阪府大阪市中央区南船場3丁目2番22号<br>
-          おおきに南船場ビル205
+    <div class="sc-footer__top">
+      <div class="sc-footer__brand">
+        <img src="/store-connect-logo.png" alt="ストアコネクト" width="36" height="36">
+        <div>
+          <div class="sc-footer__name">ストアコネクト</div>
+          <div class="sc-footer__sub">Google ビジネスプロフィール連携基盤</div>
         </div>
       </div>
-      <div>
-        <h4>サービス</h4>
-        <ul>
-          <li><a href="/saas.html">SaaS開発・システム保守</a></li>
-          <li><a href="/it-support.html">ITツール導入・運用支援</a></li>
-          <li><a href="/sales.html">営業支援・販売促進支援</a></li>
-          <li><a href="/partner.html">パートナー制度</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>会社情報</h4>
-        <ul>
-          <li><a href="/business.html">事業内容</a></li>
-          <li><a href="/company.html">会社概要</a></li>
-          <li><a href="/compliance.html">取引方針・コンプライアンス</a></li>
-          <li><a href="/privacy.html">プライバシーポリシー</a></li>
-          <li><a href="/faq.html">よくあるご質問</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>コンタクト</h4>
-        <ul>
-          <li><a href="/hearing.html">30秒無料診断</a></li><li><a href="/contact.html">お問い合わせフォーム</a></li>
-          <li><a href="mailto:info@tusg.site">info@tusg.site</a></li>
-        </ul>
+      <ul class="sc-footer__links">
+        <li><a href="/store-connect">ストアコネクトとは</a></li>
+        <li><a href="/store-connect-privacy">プライバシーポリシー</a></li>
+        <li><a href="/store-connect-terms">利用規約</a></li>
+      </ul>
+    </div>
+    <div class="sc-footer__ops">
+      <div class="sc-footer__opslabel">提供事業者</div>
+      <div class="sc-footer__opsgrid">
+        <div><span>株式会社camomile</span><a href="mailto:info@camomile.co.jp">info@camomile.co.jp</a></div>
+        <div><span>合同会社TUSG</span><a href="mailto:info@tusg.site">info@tusg.site</a></div>
       </div>
     </div>
-    <div class="trust-bar">
-      <dl class="trust-bar__grid">
-        <div><dt>商号</dt><dd>合同会社TUSG</dd></div>
-        <div><dt>代表</dt><dd>坂本 豪</dd></div>
-        <div><dt>設立</dt><dd>2026年2月11日</dd></div>
-        <div><dt>会社法人等番号</dt><dd>1200-03-031923</dd></div>
-      </dl>
-          <p class="trust-bar__note">※本サイトに掲載されている人物写真はすべてイメージ画像です。実在のスタッフ・顧客ではありません。</p>
-    </div>
-    <div class="site-footer__bottom">
-      <span>&copy; 2026 合同会社TUSG All Rights Reserved.</span>
-      <span><a href="/store-connect" style="color:inherit;opacity:.7;">ストアコネクト</a>　合同会社TUSG</span>
+    <div class="sc-footer__bottom">
+      <p class="sc-footer__tm">Google、Google マップ、Google ビジネスプロフィールは Google LLC の商標です。本サービスは Google LLC が提供・承認するものではありません。</p>
+      <p class="sc-footer__copy">&copy; 2026 株式会社camomile・合同会社TUSG</p>
     </div>
   </div>
 </footer>
-
-<div class="sticky-cta" aria-hidden="false">
-  <a href="/contact.html" class="btn btn--primary btn--lg btn--block">無料で相談する</a>
-</div>
-
 <script src="/js/main.js?v=1785300000" defer></script>
 </body>
 </html>
