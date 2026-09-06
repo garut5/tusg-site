@@ -21,6 +21,8 @@
 const ALLOWED_ORIGINS = new Set([
   "https://tusg.site",
   "https://www.tusg.site",
+  "https://tusg.co.jp",
+  "https://www.tusg.co.jp",
   "https://tusg-site.pages.dev",
 ]);
 const MAX_BODY_BYTES = 32 * 1024; // 32KB
