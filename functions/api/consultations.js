@@ -199,23 +199,53 @@ function buildCustomerMail(payload, ref, env) {
   const primaryLabel = PRIMARY_LABELS[payload.primary_issue] || "参考情報";
   const resultTitle = payload.result?.category_title || "参考情報 (未分類)";
   const siteUrl = env.SITE_URL || "https://tusg.site";
+  const industry = payload.common?.industry;
+  const timing = payload.common?.desired_timing;
+  const budget = payload.common?.budget;
+  const method = { email: "メール", phone: "電話", any: "どちらでもよい" }[c.preferredContactMethod];
+  const freeText = typeof payload.free_text === "string" ? payload.free_text.trim() : "";
+
+  // 出したい順に (ラベル, 値) を並べ、値があるものだけ表示する
+  const rows = [
+    ["受付番号", ref],
+    ["優先したい内容", primaryLabel],
+    ["診断結果", resultTitle],
+    ["会社名", c.companyName],
+    ["担当者名", c.contactName],
+    ["メール", c.email],
+    ["電話", c.phone],
+    ["業種", industry],
+    ["希望時期", timing],
+    ["予算感", budget],
+    ["希望連絡方法", method],
+    ["ご希望連絡時間帯", c.preferredContactTime],
+    ["都道府県", c.prefecture],
+    ["Webサイト", c.websiteUrl],
+  ].filter(([, v]) => typeof v === "string" && v.trim().length > 0);
+
+  const textRows = rows.map(([k, v]) => `${k}: ${v}`).join("\n");
+  const freeBlockText = freeText
+    ? `\n\n【ご入力いただいた自由記述】\n${freeText}\n`
+    : "";
 
   const text = `${c.contactName || "ご担当者"} 様
 
 このたびは、合同会社TUSGの「30秒無料診断」をご利用いただき、ありがとうございます。
 
 以下の内容でご相談を受け付けました。
+入力内容にお間違いがないかご確認ください。
 
-受付番号: ${ref}
-優先したい内容: ${primaryLabel}
-診断結果: ${resultTitle}
+────────────────────────────
+${textRows}
+────────────────────────────${freeBlockText}
 
 今回の診断結果は、回答内容をもとにした参考情報です。
 正式なご提案、対応可否、費用、納期などは、現在の運用状況を確認したうえでご案内いたします。
 
 入力内容を確認後、必要に応じて担当者よりご連絡いたします。
 
-なお、このメールに心当たりがない場合は、下記窓口までご連絡ください。
+なお、このメールに心当たりがない場合、または入力内容に誤りがある場合は、
+お手数ですが下記窓口までご連絡ください。
 
 合同会社TUSG
 公式サイト: ${siteUrl}
@@ -224,18 +254,39 @@ function buildCustomerMail(payload, ref, env) {
 このメールは自動送信されています。
 `;
 
+  const htmlRows = rows.map(([k, v]) => {
+    const isEmail = k === "メール";
+    const isUrl = k === "Webサイト";
+    const isMono = k === "受付番号";
+    let cell;
+    if (isEmail) {
+      cell = `<a href="mailto:${escapeHtml(v)}">${escapeHtml(v)}</a>`;
+    } else if (isUrl) {
+      cell = `<a href="${escapeHtml(v)}">${escapeHtml(v)}</a>`;
+    } else if (isMono) {
+      cell = `<span style="font-family:monospace;font-weight:700;">${escapeHtml(v)}</span>`;
+    } else {
+      cell = escapeHtml(v);
+    }
+    return `<tr><th style="text-align:left;padding:6px 16px 6px 0;color:#666;vertical-align:top;white-space:nowrap;">${escapeHtml(k)}</th><td style="padding:6px 0;">${cell}</td></tr>`;
+  }).join("");
+
+  const freeBlockHtml = freeText
+    ? `<p style="margin:16px 0 6px;color:#666;">【ご入力いただいた自由記述】</p>
+<div style="white-space:pre-wrap;background:#f7f7f7;border-radius:6px;padding:12px 14px;font-size:13px;line-height:1.7;">${escapeHtml(freeText)}</div>`
+    : "";
+
   const html = `<div style="font-family:sans-serif;font-size:14px;line-height:1.75;color:#1a1f22;">
 <p>${escapeHtml(c.contactName || "ご担当者")} 様</p>
 <p>このたびは、合同会社TUSGの「30秒無料診断」をご利用いただき、ありがとうございます。</p>
-<p>以下の内容でご相談を受け付けました。</p>
+<p>以下の内容でご相談を受け付けました。<br>入力内容にお間違いがないかご確認ください。</p>
 <table style="border-collapse:collapse;margin:12px 0;">
-<tr><th style="text-align:left;padding:6px 16px 6px 0;color:#666;">受付番号</th><td style="padding:6px 0;font-family:monospace;font-weight:700;">${escapeHtml(ref)}</td></tr>
-<tr><th style="text-align:left;padding:6px 16px 6px 0;color:#666;">優先したい内容</th><td style="padding:6px 0;">${escapeHtml(primaryLabel)}</td></tr>
-<tr><th style="text-align:left;padding:6px 16px 6px 0;color:#666;">診断結果</th><td style="padding:6px 0;">${escapeHtml(resultTitle)}</td></tr>
+${htmlRows}
 </table>
+${freeBlockHtml}
 <p>今回の診断結果は、回答内容をもとにした参考情報です。正式なご提案、対応可否、費用、納期などは、現在の運用状況を確認したうえでご案内いたします。</p>
 <p>入力内容を確認後、必要に応じて担当者よりご連絡いたします。</p>
-<p>なお、このメールに心当たりがない場合は、下記窓口までご連絡ください。</p>
+<p>なお、このメールに心当たりがない場合、または入力内容に誤りがある場合は、お手数ですが下記窓口までご連絡ください。</p>
 <hr>
 <p><strong>合同会社TUSG</strong><br>
 公式サイト: <a href="${escapeHtml(siteUrl)}">${escapeHtml(siteUrl)}</a><br>
