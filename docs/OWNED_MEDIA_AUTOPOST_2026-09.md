@@ -1,6 +1,6 @@
 # TUSG 自社メディア自動投稿 計画メモ
 
-作成: 2026-09-09 / 更新: 2026-09-09 (v1 / 坂本さんの回答反映)
+作成: 2026-09-09 / 更新: 2026-09-09 (v2 / Meta アプリ・既存投稿の扱いを追加確定)
 起票者: 坂本 (合同会社TUSG)
 記録: セッション中の口頭依頼 (「camomile が LOCOREACH でやっている毎日自動投稿を、TUSG でもやりたい」)
 
@@ -69,6 +69,42 @@ TUSG (合同会社TUSG) でも同等の仕組みを、TUSG のアカウントで
 - YouTube: **一旦保留**。SNS 稼働が安定してから Phase 3 で検討
 - HP ブログ: **v1 では判断保留**。Phase 2 で改めて検討 (SNS の反応が集まり、コンテンツ資産が溜まった段階で判断)
 
+### E. Meta アプリ (2026-09-09 追加確定)
+
+**方針**: **新規で 2 アプリを立てる** (camomile 側のパターンに倣う)
+
+現状の Meta アプリ (`developers.facebook.com/apps/`):
+
+| アプリ名 | オーナー Business | モード | 用途 |
+|---|---|---|---|
+| LocoFlow | 株式会社camomile | ライブ | LocoFlow product (審査中) |
+| camomile-autopost | 株式会社camomile | 開発中 | camomile 自社 Instagram 自動投稿 |
+| camomile-threads-autopost | 株式会社camomile | 開発中 | camomile 自社 Threads 自動投稿 |
+| TUSGREACH Threads | TUSG OFFICIAL | 開発中 | TUSGREACH product 用 (店舗代理投稿) |
+| FanMap | TUSG OFFICIAL | ライブ | FanMap product |
+| TUSGREACH Connect | TUSG OFFICIAL | 開発中 | TUSGREACH product 用 |
+
+**新規作成する 2 アプリ** (TUSG OFFICIAL business 配下):
+
+| 新アプリ名 (案) | API | 対象アカウント | 参考 |
+|---|---|---|---|
+| **tusg-autopost** | Instagram Graph API (Business Account) | @tusg_official | camomile-autopost |
+| **tusg-threads-autopost** | Threads API | @tusg_official | camomile-threads-autopost |
+
+**分離する理由**:
+1. Instagram Graph API と Threads API は Meta 側で別 product 扱い。1 アプリに纏めると審査時に相互影響が出ることがある
+2. TUSGREACH product 系 (代理投稿) と owned media 系 (自社発信) は権限スコープが違う。混ぜると審査で「なぜ両方必要か」の説明が複雑化
+3. camomile 側で既にこの構成で運用実績あり → 同じ構成なら trouble shooting も同じ知見が使える
+
+### F. 既存 Instagram 投稿 13 件 (2026-09-09 追加確定)
+
+**方針**: **いずれ削除する** (自動投稿開始と同時期にアーカイブ or 削除)
+
+タイミング:
+- Phase 1 の dry-run 中に既存 13 件を「アーカイブ」 (削除ではなくアーカイブ → 後から復元可)
+- 本番稼働開始と同時に、統一デザインの新投稿だけが表示される状態にする
+- フォロワー 17 人には事前告知 (ストーリーズ 1 本) 「リブランドします」
+
 ---
 
 ## 実装アプローチ (提案)
@@ -103,12 +139,21 @@ tusg-site/
 ### Phase 分割
 
 **Phase 0: 準備 (今週〜来週)**
-- [ ] Meta アプリ判断: 別立て vs LocoFlow アプリ拡張
+- [x] Meta アプリ方針決定: **新規 2 アプリ** (tusg-autopost / tusg-threads-autopost)
+- [x] 既存 IG 投稿 13 件の扱い: **アーカイブ後、リブランド告知 → 削除**
+- [ ] Meta アプリ「tusg-autopost」新規作成 (TUSG OFFICIAL business)
+  - Product: Instagram Graph API
+  - Instagram Business Account: @tusg_official 紐付け
+- [ ] Meta アプリ「tusg-threads-autopost」新規作成 (TUSG OFFICIAL business)
+  - Product: Threads API
 - [ ] @tusg_official Instagram をビジネスアカウント化 (未対応の場合)
 - [ ] Facebook ページを @tusg_official と紐付け (Instagram Business 化に必須)
 - [ ] Instagram bio の URL を `https://tusg.site/hearing` に固定
 - [ ] TUSG ブランドガイド (色 / フォント / ロゴ配置) を明文化
+  - ベース: 現行 HP のダークグリーン系 (#0F3D2E 系)
+  - ロゴ: 既存の TUSG (T+G の緑色ロゴ) を使用
 - [ ] ジャンル別テンプレの初稿 7 枚 (Canva で作成)
+- [ ] Cloudflare Pages に Meta App 用 secrets 追加 (`META_APP_ID`, `META_APP_SECRET`, `META_ACCESS_TOKEN`, `THREADS_APP_ID`, `THREADS_APP_SECRET`, `THREADS_ACCESS_TOKEN`)
 
 **Phase 1: MVP 稼働 (2〜3 週間)**
 - [ ] Cloudflare Worker `tusg-autopost-cron` を実装 (毎日 20:00 JST 起動)
@@ -147,12 +192,10 @@ tusg-site/
 
 ## 決めていただきたい残り事項
 
-上記 A/B/C/D は決着。以下だけ残っています。
+上記 A/B/C/D/E/F は決着。残り 2 点:
 
-1. **Meta アプリの立て方**: 別アプリ新設 (推奨) / LocoFlow アプリに追加権限で通す
-2. **既存 IG 投稿 13 件の扱い**: アーカイブしてリセット / そのまま残して下から新デザイン追加
-3. **本メモの docs/ を box に自動 sync するか**: box 側の `sources/tusg-site.json` を更新すべきか
-4. **Phase 1 の着手時期**: 今週から / SMBC 案件が落ち着いてから / etc
+1. **本メモの docs/ を box に自動 sync するか**: box 側の `sources/tusg-site.json` を更新すべきか
+2. **Phase 1 (実装) の着手時期**: 今週から / SMBC / PayPay 移行が落ち着いてから / etc
 
 ---
 
