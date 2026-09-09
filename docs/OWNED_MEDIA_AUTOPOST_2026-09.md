@@ -1,151 +1,168 @@
 # TUSG 自社メディア自動投稿 計画メモ
 
-作成: 2026-09-09
+作成: 2026-09-09 / 更新: 2026-09-09 (v1 / 坂本さんの回答反映)
 起票者: 坂本 (合同会社TUSG)
-記録: セッション中の口頭依頼 (「カモミールが LOCOREACH でやっている毎日自動投稿を、TUSG でもやりたい」)
+記録: セッション中の口頭依頼 (「camomile が LOCOREACH でやっている毎日自動投稿を、TUSG でもやりたい」)
 
 ---
 
 ## 背景
 
-camomile 側の Claude Code に、`locoreach-daily-autopost` (別名 "Owned-Media locoreach-autopost") という**プラグイン (skill)** が enable されている。box (`garut5/box`) に skill 本体の実装コードは無いが、marketplace 経由でロードされる skill として camomile アカウントで稼働している。
+camomile 側の Claude Code に、`locoreach-daily-autopost` (別名 "Owned-Media locoreach-autopost") という**プラグイン (skill)** が enable されている。box (`garut5/box`) には skill 本体の実装は無いが、marketplace 経由でロードされる skill として camomile アカウントで稼働中。
 
-その skill の要旨 (skill listing の記載):
-
-- **対象**: LOCOREACH (店舗集客 AI ツール) の公式 Instagram `@locoreach_ai`
-- **カルーセル生成 (7 ジャンル 曜日ローテ)**:
-  - 月: MEO
-  - 火: Instagram 集客
-  - 水: 店舗 × AI
-  - 木: AIO (AI 最適化)
-  - 金: HP 集客
-  - 土: 口コミ
-  - 日: 店舗経営
+skill の要旨:
+- **対象**: LOCOREACH の公式 Instagram `@locoreach_ai`
+- **7 ジャンル 曜日ローテ**: 月MEO / 火Instagram集客 / 水店舗×AI / 木AIO / 金HP集客 / 土口コミ / 日店舗経営
 - **統一デザイン**: ネイビー基調 + ジャンル別アクセント / グリッド安全設計
 - **投稿先**: Instagram フィード + ストーリーズ + Threads
 - **時刻**: 毎日 20:00 JST
-- **リール動画**の自動生成も含む
+- リール動画も自動生成
 
-TUSG (合同会社TUSG) でも、これと同等の「自社メディア毎日自動投稿」を回したい。投稿先は:
-1. **Instagram** (フィード + ストーリーズ)
-2. **Threads**
-3. **YouTube Short**
-4. **ホームページのブログ** (tusg.site / tusg.co.jp)
+TUSG (合同会社TUSG) でも同等の仕組みを、TUSG のアカウントで回したい。
 
 ---
 
-## LOCOREACH 版と TUSG 版の対比 (仮)
+## 決まったこと (2026-09-09 坂本さん回答)
 
-| 項目 | LOCOREACH 版 | TUSG 版 (案) |
+### A. アカウント
+
+| 媒体 | アカウント | 状態 |
 |---|---|---|
-| ターゲット読者 | 店舗経営者・集客担当 | 中小事業者・店舗経営者 (TUSG が支援したい層) |
-| ブランド色 | ネイビー基調 | TUSG のダークグリーン系 (現行 HP: #0F3D2E 系) |
-| Instagram | @locoreach_ai | **未確定** (@tusg_official など要決定) |
-| Threads | 連携済 | **未確定** |
-| YouTube Short | (対象外) | **要検討** (LOCOREACH 版に無い枠) |
-| HP ブログ | (対象外) | **要検討** (LOCOREACH 版に無い枠) |
-| 曜日ローテ | 月〜日 7 ジャンル | 案: 月DX事例/火SaaS紹介/水店舗×AI/木システム開発の考え方/金HP集客/土販売代理・OEM/日経営マインド |
-| 時刻 | 毎日 20:00 JST | 20:00 JST (同じで OK か、TUSG 独自時刻か) |
-| リール | あり | Short と統合して扱う想定 |
+| Instagram | **@tusg_official** (TUSG OFFICIAL) | ✅ 稼働中 (投稿 13 件 / フォロワー 17 人 / フォロー中 299 人) |
+| Threads | **@tusg_official** (TUSG OFFICIAL) | ✅ 開設済 (フォロワー 0、投稿 0 = ブランクスレート) |
+| YouTube Short | — | ⏸ 一旦ステイ (Phase 3 以降で検討) |
+| HP ブログ | tusg.site 側 | Phase 2 で検討 (現状無し) |
 
----
+### B. 目的とコンテンツ方向性
 
-## 決めていただきたいこと (優先順)
+**目的**: ブランド認知 + **30秒無料診断 (`tusg.site/hearing`) への導線**
 
-### A. TUSG 側の SNS アカウント (最重要)
+**コンテンツテーマ** (坂本さん指定):
+- ホームページ開発
+- MEO (Google マップ集客)
+- AIO (AI Optimization / AI 時代の店舗最適化)
+- WEB 開発
+- 店舗運営
 
-1. **Instagram**: TUSG 用の公式アカウント名・URL はありますか?
-   - なければ新規作成が必要 (ビジネスアカウント化 & Meta 開発者連携必要)
-2. **Threads**: Instagram とセットで自動作成可能。運用意思の確認だけ
-3. **YouTube チャンネル**: TUSG の YouTube チャンネルは存在しますか? (Short 投稿には必須)
-4. **HP ブログ**: tusg.site 側にブログ機能は現状無し。作るなら公開先を tusg.site にするか tusg.co.jp にするか
+**7 ジャンル曜日ローテ案** (上記 5 テーマ + 補完):
 
-### B. コンテンツの方向性
-
-1. **7 ジャンル案**の上記の割り当ては合っていますか? (下書き案なので大幅変更 OK)
-2. **投稿の目的**は何か:
-   - (a) TUSG のブランド認知向上
-   - (b) SaaS 販売代理事業への問い合わせ獲得
-   - (c) 販売代理店パートナーの新規開拓
-   - (d) 上記の複合 (優先度は?)
-3. **投稿の温度感**: LOCOREACH 版と揃える (ネイビー + フラット) or 完全に TUSG ブランドで作り直す
-
-### C. 実装アプローチ
-
-1. **camomile 側の既存 skill を "TUSG 用に多アカウント化" する**
-   - メリット: 既存資産を最大活用、運用ノウハウ引継ぎ
-   - デメリット: skill 本体の修正が必要 (camomile 開発者の作業必要)
-2. **TUSG 用に skill を新規作成する** (LOCOREACH 版を参考に)
-   - メリット: TUSG 独自の設計 (YouTube Short, HP ブログ枠) を最初から入れられる
-   - デメリット: 新規開発コスト
-3. **既存 skill を丸ごとフォーク → TUSG 用に改造**
-   - 中間案
-
-推奨: **1 → 2 の段階移行**。まず既存 skill にアカウント切替機能 (LOCOREACH / TUSG) を足して即運用開始、後で YouTube Short と HP ブログ枠を TUSG 版だけに追加する。
-
-### D. 投稿先の技術要件
-
-| 投稿先 | 必要な API / 連携 | 現状 (TUSG 側) |
+| 曜日 | ジャンル | 内容の例 |
 |---|---|---|
-| Instagram フィード | Meta Graph API (Instagram Business Account) | **未確認** |
-| Instagram ストーリーズ | 同上 | **未確認** |
-| Threads | Threads API (Meta) | **未確認** |
-| YouTube Short | YouTube Data API v3 | **未確認** |
-| HP ブログ | Cloudflare Pages Functions で API 実装 + 記事一覧ページを新規作成 | **未実装** (現状 tusg-site に blog 機能なし) |
+| 月 | **MEO** | Google マップの順位対策、GBP 運用、口コミ返信のコツ |
+| 火 | **AIO** | AI 時代の店舗最適化、生成 AI 活用、ChatGPT × 店舗 |
+| 水 | **店舗運営 × テック** | 業務効率化、シフト・勤怠、予約管理、キャッシュレス |
+| 木 | **WEB 開発** | SaaS / 業務システム開発、DX 事例、既存改善 |
+| 金 | **HP 集客・HP 開発** | LP 改善、SEO、CV 導線設計、tusg.site 事例 |
+| 土 | **失敗例・落とし穴** | よくある IT 導入失敗、MEO の NG 例、店舗運営あるある |
+| 日 | **TUSG の考え** | 会社紹介、パートナーポリシー、AML 準拠の姿勢、経営マインド |
+
+### C. CTA 設計 (毎投稿共通)
+
+- **カルーセル最終ページ**: 「30秒で今の状況を整理 → tusg.site/hearing」
+- **キャプション末尾**: プロフィールから無料診断 URL 誘導
+- **ストーリーズ**: リンクスタンプで直接 tusg.site/hearing へ
+- **Threads**: 本文末尾に短縮 URL または直リンク
+- **プロフィール URL**: 現状の Instagram bio 内 URL を `https://tusg.site/hearing` に固定 (実装時に確認)
+
+### D. YouTube Short と HP ブログ
+
+- YouTube: **一旦保留**。SNS 稼働が安定してから Phase 3 で検討
+- HP ブログ: **v1 では判断保留**。Phase 2 で改めて検討 (SNS の反応が集まり、コンテンツ資産が溜まった段階で判断)
 
 ---
 
-## 次のアクション候補
+## 実装アプローチ (提案)
 
-### Phase 0: 準備・仕様確定 (今週)
+### 推奨: フェーズ段階でフォーク型 (計画メモ v0 の option 3)
 
-- [ ] TUSG 用 Instagram / Threads / YouTube アカウントの存在確認
-- [ ] 7 ジャンル案の確定
-- [ ] 投稿目的の確定 (KPI 設計込み)
-- [ ] camomile 側にリクエスト: skill の多アカウント化検討
+**理由**:
+1. camomile 側の skill 修正は camomile オーナーの承認・作業が必要 → タイムラインが読めない
+2. TUSG は独自の目的 (30秒無料診断 CV) と独自ブランド (ダークグリーン系) を持つ
+3. tusg-site リポジトリの中で自己完結させれば、TUSG チームで運用意思決定できる
 
-### Phase 1: 既存 skill 借用 (2〜3 週間)
+**構成**:
+```
+tusg-site/
+  workers/
+    tusg-autopost-cron/    # 新規: 毎日 20:00 JST に起動、投稿を実行
+  functions/
+    api/autopost/
+      generate.js          # 新規: 曜日→ジャンル→カルーセル画像+キャプション生成
+      publish.js           # 新規: Meta Graph API (Instagram+Threads) 投稿
+      schedule.js          # 新規: 予約/取消/再送
+  docs/
+    OWNED_MEDIA_AUTOPOST_2026-09.md   # 本メモ
+    AUTOPOST_TEMPLATES/               # ジャンル別テンプレ (画像レイアウト、文言、ハッシュタグ)
+```
 
-- [ ] LOCOREACH 版 skill を TUSG アカウントで動くように改修 (camomile 側で作業)
-- [ ] TUSG ブランドカラーへの色替え設定
-- [ ] 7 ジャンル分の TUSG 用テンプレを 1 サイクル分作成
-- [ ] 20:00 JST 起動確認、1 週間 dry-run
+**Meta 側**:
+- 現在 LocoFlow アプリ (info@tusg.site) が Meta 審査中
+- **TUSG owned media 用に別 Meta アプリを立てる**か、LocoFlow アプリに @tusg_official を追加権限で通すか要判断
+- ⚠ 別 Meta アプリのほうが blast radius (審査失敗リスクの隔離) を分けられて安全
+
+### Phase 分割
+
+**Phase 0: 準備 (今週〜来週)**
+- [ ] Meta アプリ判断: 別立て vs LocoFlow アプリ拡張
+- [ ] @tusg_official Instagram をビジネスアカウント化 (未対応の場合)
+- [ ] Facebook ページを @tusg_official と紐付け (Instagram Business 化に必須)
+- [ ] Instagram bio の URL を `https://tusg.site/hearing` に固定
+- [ ] TUSG ブランドガイド (色 / フォント / ロゴ配置) を明文化
+- [ ] ジャンル別テンプレの初稿 7 枚 (Canva で作成)
+
+**Phase 1: MVP 稼働 (2〜3 週間)**
+- [ ] Cloudflare Worker `tusg-autopost-cron` を実装 (毎日 20:00 JST 起動)
+- [ ] 曜日 → ジャンル選択ロジック
+- [ ] Meta Graph API で Instagram フィード投稿
+- [ ] Meta Graph API で Threads 投稿 (連動)
+- [ ] Instagram ストーリーズ配信 (別 API)
+- [ ] 1 週間 dry-run (ステージング投稿 or 手動確認)
 - [ ] 本番稼働開始
 
-### Phase 2: TUSG 独自枠追加 (1〜2 ヶ月)
+**Phase 2: 拡張 (1〜2 ヶ月)**
+- [ ] HP ブログ機能追加 (`functions/api/blog/*` + `public/blog/`) — 効果次第で判断
+- [ ] 投稿別の CV 計測 (UTM パラメータ付与)
+- [ ] A/B テスト (曜日入れ替え、CTA 文言など)
 
-- [ ] YouTube Short 自動投稿の追加
-- [ ] HP ブログ機能の tusg-site 実装:
-  - `functions/api/blog/publish.js` (投稿受け付け)
-  - `functions/api/blog/[slug].js` (単記事)
-  - `public/blog/` (一覧ページ)
-  - D1 or KV でストレージ
-- [ ] skill から 4 チャネル (Insta + Threads + YouTube + Blog) に同時配信
-
-### Phase 3: 分析・最適化 (継続)
-
-- [ ] 投稿別リーチ・エンゲージ計測
-- [ ] ジャンル別勝ちパターン抽出
-- [ ] 週次レポート自動生成
+**Phase 3: 拡張 (2 ヶ月以降)**
+- [ ] YouTube Short 追加検討
+- [ ] リール動画自動生成
+- [ ] 週次レポート自動生成 (goandgoing53@gmail.com 宛)
 
 ---
 
-## リスク・注意点
+## リスクと注意点
 
-1. **Meta Developer 側の審査**: 現在 LocoFlow アプリ (info@tusg.site) で審査待ちがあり、TUSG 用 Instagram/Threads 連携も同アプリの追加権限で通すか、別アプリで通すか検討必要
-2. **投稿ミスの blast radius**: 自動投稿は「気づいたら誤った内容が公開されている」リスクがある。ドライラン期間 + ステージング (下書き投稿) の仕組みを最初から入れる
-3. **アカウント BAN リスク**: Meta / YouTube の自動投稿には rate limit と品質基準あり。camomile 側の運用実績をベンチマークにする
-4. **TUSG の実態と齟齬**: SMBC AML 対応で「実在せぬスタッフ・顧客の映像を使わない」方針にしたばかり。同じ規律を SNS 投稿にも適用する必要あり (ストック画像・生成画像の使い方に注意)
-5. **info@tusg.site → info@tusg.co.jp 移行**: SNS アカウント連絡先メールを co.jp に切り替えるタイミング設計
+1. **既存投稿 13 件との整合**: 現在の @tusg_official フィードは統一デザインではない (絵文字・赤丸・緑色図形が混在)。自動投稿で新デザインを出すと世代混在で見える。
+   - 案 A: 既存 13 件をアーカイブしてリセット (フォロワー 17 人には notice 出す)
+   - 案 B: 上書きせず、下から新デザインが積み上がるのを待つ
+2. **Meta アプリ審査**: LocoFlow の審査中に別アプリを追加審査するとリスク分散になる (どちらか通ればどちらかの用途で使える)
+3. **誤投稿 blast radius**: 自動投稿は「気づかないうちに違う内容が公開されている」リスクがある。
+   - Cloudflare Worker で「投稿予定内容を先に Slack へ通知 → 15 分後に自動実行」パターンを推奨
+4. **AML 準拠**: SMBC 対応で決めた「実在せぬ人物写真は使わない」方針を SNS 投稿にも適用。生成画像は「イメージです」明記か、AI 生成であることを明示
+5. **アカウント BAN**: Meta / Threads は自動投稿を厳密には禁止していないが、API 利用は quota / policy 遵守が必須。dry-run で頻度感を掴んでから本番へ
+6. **info@tusg.site → info@tusg.co.jp 移行タイミング**: Instagram の連絡先メール、Meta アプリのオーナーメールも将来切替が必要
+
+---
+
+## 決めていただきたい残り事項
+
+上記 A/B/C/D は決着。以下だけ残っています。
+
+1. **Meta アプリの立て方**: 別アプリ新設 (推奨) / LocoFlow アプリに追加権限で通す
+2. **既存 IG 投稿 13 件の扱い**: アーカイブしてリセット / そのまま残して下から新デザイン追加
+3. **本メモの docs/ を box に自動 sync するか**: box 側の `sources/tusg-site.json` を更新すべきか
+4. **Phase 1 の着手時期**: 今週から / SMBC 案件が落ち着いてから / etc
 
 ---
 
 ## 参考
 
-- box 内での関連ドキュメント:
-  - `/home/user/box/locoreach/docs/POST_SCHEDULE_2026-08.md` (GBP 投稿予約の実装記録、SNS 自動投稿とは別だが設計思想は参考になる)
-  - `/home/user/box/tusgplatform/artifacts/tusgplatform/tusg-ai/skills/reach-post-generation.md` (TUSG 系 REACH 投稿生成の基本方針)
+- 関連 box ドキュメント:
+  - `/home/user/box/locoreach/docs/POST_SCHEDULE_2026-08.md` (GBP 投稿予約の実装記録)
+  - `/home/user/box/tusgplatform/artifacts/tusgplatform/tusg-ai/skills/reach-post-generation.md` (投稿生成の基本方針)
   - `/home/user/box/CLAUDE.md` (box 全体の運用ルール)
-- 現行 tusg-site 側の関連:
-  - `wrangler.toml` (Cloudflare Pages + Functions 構成、ブログ機能追加時のベース)
-  - `functions/api/consultations.js` (Resend 連携パターン、通知系の参考)
+- 現行 tusg-site:
+  - `wrangler.toml` (Cloudflare Pages + Functions 構成)
+  - `functions/api/consultations.js` (Resend 連携 & 通知パターン参考)
+  - `public/hearing.html` (30秒無料診断 LP = CTA 到達点)
