@@ -19,8 +19,9 @@
     {
       "slug": "meo-01",
       "cover_tag": "MEO",
-      "cover_hook": "Google マップの\n順位が上がらないとき、\n最初に見るべき 5 つ",
-      "cover_sub": "確認すること 5 つ",
+      "cover_hook": "順位が上がらない\n5 つの盲点",
+      "cover_sub": "スマホで今すぐ、自分でチェック",
+      "cover_keywords": ["数字で見る", "見落とし", "対処あり"],
       "body": [
         {
           "num": "01",

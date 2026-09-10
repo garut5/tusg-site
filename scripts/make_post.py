@@ -163,54 +163,117 @@ def _draw_logo(img: Image.Image, draw: ImageDraw.ImageDraw) -> None:
 
 # ---- 各スライド生成 ----
 
-def make_cover(tag: str, hook: str, sub: str) -> Image.Image:
+def _draw_pill(draw, xy, text, font, bg_color, text_color, pad_x=28, pad_y=14, radius=32):
+    """角丸ピル (キーワードバブル) を描画、右端 x を返す。hanamisocial の "数字 / 損 / 問い" 風。"""
+    x, y = xy
+    tw = draw.textlength(text, font=font)
+    # フォントの実際の高さ (ascent + descent 相当)
+    try:
+        bbox = font.getbbox(text)
+        th = bbox[3] - bbox[1]
+    except Exception:
+        th = font.size
+    box_w = int(tw + pad_x * 2)
+    box_h = int(th + pad_y * 2 + 8)
+    draw.rounded_rectangle(
+        [(x, y), (x + box_w, y + box_h)],
+        radius=radius,
+        fill=bg_color,
+    )
+    # テキストの垂直位置微調整
+    text_y_offset = pad_y - (bbox[1] if 'bbox' in locals() else 0)
+    draw.text((x + pad_x, y + text_y_offset), text, font=font, fill=text_color)
+    return x + box_w
+
+
+def _draw_highlight_bar(draw, xy_center, lines, font, bg_color, text_color,
+                       pad_x=40, pad_y=24, radius=24, lh=None):
+    """スポットライトバー (白背景 + 大きな黒/緑テキスト) を描画。中央寄せ。hanamisocial の "どれかが入っていると" 風。"""
+    cx, cy = xy_center
+    if lh is None:
+        lh = int(font.size * 1.3)
+    # 各行の幅を取ってブロック幅 = 最大行幅を計算
+    widths = [draw.textlength(ln, font=font) for ln in lines]
+    max_w = max(widths) if widths else 0
+    box_w = int(max_w + pad_x * 2)
+    box_h = int(lh * len(lines) + pad_y * 2)
+    x = cx - box_w // 2
+    y = cy - box_h // 2
+    draw.rounded_rectangle(
+        [(x, y), (x + box_w, y + box_h)],
+        radius=radius,
+        fill=bg_color,
+    )
+    ty = y + pad_y
+    for ln, w in zip(lines, widths):
+        draw.text((x + (box_w - w) // 2, ty), ln, font=font, fill=text_color)
+        ty += lh
+    return (x, y, x + box_w, y + box_h)
+
+
+def make_cover(tag: str, hook: str, sub: str, keywords: list[str] | None = None) -> Image.Image:
+    """カバー。hanamisocial 風の「白スポットライト + ピルキーワード」で親指を止める。"""
     img = Image.new("RGB", (CANVAS_W, CANVAS_H), COLOR_BG)
     draw = ImageDraw.Draw(img)
 
-    # 上部: ゴールドの縦線 + カテゴリタグ
-    tag_font = load_font(38, weight="bold")
-    tag_y = MARGIN_TOP
-    # 縦線 (ゴールド)
+    # 上部: ゴールドの縦線 + カテゴリタグ (小さめ、控えめ)
+    tag_font = load_font(30, weight="bold")
+    tag_y = MARGIN_TOP - 20
     draw.rectangle(
-        [(MARGIN_X, tag_y - 4), (MARGIN_X + 6, tag_y + 38)],
+        [(MARGIN_X, tag_y), (MARGIN_X + 5, tag_y + 34)],
         fill=COLOR_GOLD,
     )
-    draw.text((MARGIN_X + 24, tag_y - 2), tag, font=tag_font, fill=COLOR_GOLD)
+    draw.text((MARGIN_X + 20, tag_y - 4), tag, font=tag_font, fill=COLOR_GOLD)
 
-    # 中央: メインフック (大きく、多行)
+    # 中央上: hook を「白スポットライトバー」で強調 (hanamisocial の "どれかが入っていると" 相当)
+    # hook は "\n" 区切りで複数行を許す
     hook_font = load_font(72, weight="bold")
-    hook_lh = 110
-    # フック高さを見てだいたい中央に配置
-    hook_lines = hook.count("\n") + 1
-    hook_h = hook_lh * hook_lines
-    hook_y = (CANVAS_H - hook_h) // 2 - 40
-    _draw_text_block(
+    hook_lines = hook.split("\n")
+    # 中央 y は縦位置 40% 付近
+    center_y = int(CANVAS_H * 0.42)
+    bbox = _draw_highlight_bar(
         draw,
-        (MARGIN_X, hook_y),
-        hook,
+        (CANVAS_W // 2, center_y),
+        hook_lines,
         hook_font,
-        COLOR_TEXT,
-        hook_lh,
-        CANVAS_W - MARGIN_X * 2,
+        bg_color=(255, 255, 255),
+        text_color=COLOR_BG,   # TUSG グリーン文字を白背景に
+        pad_x=48,
+        pad_y=32,
+        radius=28,
+        lh=98,
     )
+    _, _, _, hook_bottom = bbox
 
-    # フック下の下線 (装飾)
-    line_y = hook_y + hook_h + 40
-    draw.line(
-        [(MARGIN_X, line_y), (MARGIN_X + 200, line_y)],
-        fill=COLOR_GOLD,
-        width=4,
-    )
+    # フック下: キーワードピル (3〜4 個) を左寄せで並べる。無指定なら sub のみ。
+    if keywords:
+        pill_font = load_font(34, weight="bold")
+        pill_y = hook_bottom + 40
+        pill_x = MARGIN_X + 20
+        gap = 20
+        for kw in keywords[:4]:
+            pill_x = _draw_pill(
+                draw,
+                (pill_x, pill_y),
+                kw,
+                pill_font,
+                bg_color=COLOR_GOLD,
+                text_color=COLOR_BG,
+                pad_x=28,
+                pad_y=12,
+                radius=28,
+            ) + gap
 
-    # サブタイトル (下線の下)
+    # サブタイトル (キーワードの下 or 直接 hook の下)
     sub_font = load_font(34, weight="regular")
+    sub_y = hook_bottom + (140 if keywords else 60)
     _draw_text_block(
         draw,
-        (MARGIN_X, line_y + 30),
+        (MARGIN_X, sub_y),
         sub,
         sub_font,
         COLOR_TEXT_MUTED,
-        50,
+        52,
         CANVAS_W - MARGIN_X * 2,
     )
 
@@ -560,7 +623,12 @@ def main():
     print(f"selected: {entry['slug']} ({genre_meta['label']})", file=sys.stderr)
 
     # カバー
-    cover = make_cover(entry["cover_tag"], entry["cover_hook"], entry["cover_sub"])
+    cover = make_cover(
+        entry["cover_tag"],
+        entry["cover_hook"],
+        entry["cover_sub"],
+        keywords=entry.get("cover_keywords"),
+    )
     cover.save(outdir / "cover.jpg", quality=90)
 
     # 要約スライド (「▼ この投稿でわかること」→ 5 point 一覧)
