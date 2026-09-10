@@ -1,0 +1,112 @@
+name: Autopost cron (daily 20:41 JST)
+
+# 毎日 20:41 JST に本体 Pages Function POST /api/autopost/scheduled を叩く。
+# 投稿ロジック・IG/Threads API 呼び出しは Cloudflare 側に集約されている。
+# ここは Bearer トークン 1 本を握って POST するだけ。
+#
+# ■ cron の分をずらしている理由
+#
+# GitHub Actions の scheduled workflow は、公式に「毎時00分は混みやすく
+# 遅延・ドロップの原因」と明記されている。LOCOREACH_AI の運用実測でも
+# +24〜57分の遅延を踏んでいる。00分を避け 41分に置く。
+# それでも数時間〜半日ずれる日はあるが、Cloudflare 側で posted 判定を
+# 入れるまでは実運用で問題があれば再検討する。
+#
+# ■ 安全ゲート
+#
+# GitHub Secret `AUTOPOST_LIVE` が "true" のときのみ実投稿。
+# 未設定 / それ以外は dry_run=true を送る (Meta には何も届かない)。
+# 手動起動 (workflow_dispatch) のデフォルトも dry_run=true にしている。
+# LOCOREACH_AI の教訓: 手動で投げ直すときは入力を必ず明示すること。
+
+on:
+  schedule:
+    - cron: '41 11 * * *'  # 20:41 JST
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'dry_run で試す (投稿しない)'
+        type: choice
+        options: ['true', 'false']
+        default: 'true'
+
+concurrency:
+  group: autopost-cron
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: 実投稿判定 (schedule = AUTOPOST_LIVE 依存 / dispatch = 入力優先)
+        id: mode
+        env:
+          LIVE: ${{ secrets.AUTOPOST_LIVE }}
+          DISPATCH_DRY: ${{ github.event.inputs.dry_run }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            if [ "$DISPATCH_DRY" = "false" ] && [ "$LIVE" = "true" ]; then
+              echo "dry_run=false" >> "$GITHUB_OUTPUT"
+              echo "実投稿します (dispatch + LIVE=true)"
+            else
+              echo "dry_run=true" >> "$GITHUB_OUTPUT"
+              echo "dry_run です (dispatch, DISPATCH_DRY=$DISPATCH_DRY, LIVE=$LIVE)"
+            fi
+          else
+            if [ "$LIVE" = "true" ]; then
+              echo "dry_run=false" >> "$GITHUB_OUTPUT"
+              echo "実投稿します (schedule + LIVE=true)"
+            else
+              echo "dry_run=true" >> "$GITHUB_OUTPUT"
+              echo "dry_run です (schedule, LIVE=$LIVE)"
+            fi
+          fi
+
+      - name: 投稿トリガーを送る
+        env:
+          TOKEN: ${{ secrets.AUTOPOST_TRIGGER_TOKEN }}
+          DRY_RUN: ${{ steps.mode.outputs.dry_run }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "::error::AUTOPOST_TRIGGER_TOKEN が Secrets に無い"
+            exit 1
+          fi
+          body=$(printf '{"dry_run":%s,"source":"github-actions"}' "$DRY_RUN")
+          http_code=$(curl -sS -o /tmp/resp.txt -w "%{http_code}" \
+            -X POST "https://tusg.site/api/autopost/scheduled" \
+            -H "Authorization: Bearer $TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "$body")
+          echo "HTTP $http_code"
+          echo "--- response (token 値は含まれない) ---"
+          cat /tmp/resp.txt
+          echo ""
+          if [ "$http_code" != "200" ]; then
+            echo "::error::HTTP $http_code"
+            exit 1
+          fi
+
+      # LOCOREACH_AI の教訓 #3: 通知経路そのものが死んでいないかは
+      # notify-test.yml で別途手動確認。ここでは失敗時のみ Google Chat へ。
+      # NOTIFY_WEBHOOK 未設定なら何もしない。
+      - name: 失敗を Google Chat へ知らせる
+        if: failure()
+        env:
+          NOTIFY_WEBHOOK: ${{ secrets.NOTIFY_WEBHOOK }}
+          WF_NAME: ${{ github.workflow }}
+          WF_REPO: ${{ github.repository }}
+          WF_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ -z "$NOTIFY_WEBHOOK" ]; then
+            echo "NOTIFY_WEBHOOK 未設定。通知しません"
+            exit 0
+          fi
+          msg=$(printf '⚠️ %s / %s が失敗しました\n%s' \
+            "$WF_REPO" "$WF_NAME" "$WF_URL")
+          body=$(MSG="$msg" python3 -c "import json,os; print(json.dumps({'text': os.environ['MSG']}))")
+          # 状態コードだけ出す (URL・値をログに出さない)
+          http=$(curl -sS -o /dev/null -w "%{http_code}" \
+            -X POST -H "Content-Type: application/json" \
+            -d "$body" "$NOTIFY_WEBHOOK" || echo "0")
+          echo "通知しました (HTTP $http)"

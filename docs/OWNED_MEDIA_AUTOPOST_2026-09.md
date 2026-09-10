@@ -179,9 +179,13 @@ tusg-site/
 - [x] Instagram 実機投稿テスト (media_id: 18415161658155287)
 - [x] **R2 バケット** `tusg-autopost-assets` 新設 & Pages に binding 追加
 - [x] **Cron 化 (GitHub Actions cron)** — Cloudflare 無料枠は 5 個上限のため GitHub Actions で代替
-  - `.github/workflows/autopost-cron.yml` 毎日 11:00 UTC (20:00 JST) 起動
+  - `.github/workflows/autopost-cron.yml` 毎日 **11:41 UTC = 20:41 JST** 起動
+    - cron の分は 41 分にしている (00 分は GitHub Actions 高負荷で遅延しやすい、LOCOREACH_AI の実測ノウハウ)
+    - workflow_dispatch のデフォルトは dry_run=true (手動で投げ直すときに勝手に投稿しないように)
+  - `.github/workflows/credentials-check.yml` 手動実行、値を出さず有無だけ表示
   - AUTOPOST_LIVE secret で本番/dry_run 切替
-  - 手動起動 (workflow_dispatch) も対応
+  - 失敗時 NOTIFY_WEBHOOK (Google Chat 等) に通知 (未設定なら無音)
+  - LOCOREACH_AI の運用パターンに準拠
 - [x] Threads クライアント実装 (2 本目 Meta アプリ待ち)
 - [ ] リール投稿の実機テスト (縦動画 mp4 準備できたら)
 - [ ] ストーリーズ投稿の実機テスト
