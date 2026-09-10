@@ -8,3 +8,7 @@ node_modules/
 dist/
 .cache/
 scratchpad/
+
+# Python cache (autopost 系スクリプト実行時に生成)
+__pycache__/
+*.pyc

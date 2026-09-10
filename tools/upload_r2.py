@@ -74,23 +74,43 @@ def main():
         raise SystemExit("AUTOPOST_TRIGGER_TOKEN not set")
 
     outdir = Path(args.outdir)
-    post_json = outdir / "post.json"
-    if not post_json.is_file():
-        raise SystemExit(f"post.json not found: {post_json}")
-    meta = json.loads(post_json.read_text(encoding="utf-8"))
+    # post.json (carousel) と reel.json (reel) の両方に対応
+    meta_path = outdir / "post.json"
+    is_reel = False
+    if not meta_path.is_file():
+        meta_path = outdir / "reel.json"
+        is_reel = True
+    if not meta_path.is_file():
+        raise SystemExit(f"post.json / reel.json not found in {outdir}")
+    meta = json.loads(meta_path.read_text(encoding="utf-8"))
 
     date = args.date or meta.get("date_jst") or dt.date.today().isoformat()
     slug = meta["slug"]
     prefix = args.prefix.strip("/")
 
-    # 順序を明確に: cover → body-01, body-02, ...
+    if is_reel:
+        # リール: reel_file 1 本を video として上げる
+        reel_file = meta.get("reel_file", "reel.mp4")
+        path = outdir / reel_file
+        if not path.is_file():
+            raise SystemExit(f"missing reel: {path}")
+        key = f"{prefix}/{date}-{slug}{path.suffix.lower()}"
+        print(f"  uploading {reel_file} -> {key}", file=sys.stderr)
+        result = upload_one(site, token, key, path)
+        meta["video_url"] = result["public_url"]
+        meta["r2_prefix"] = prefix
+        meta_path.write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(f"wrote video_url to {meta_path}", file=sys.stderr)
+        print(f"  {result['public_url']}")
+        return
+
+    # カルーセル: cover → body-01, body-02, ...
     file_names = [meta["cover_file"]] + list(meta.get("body_files", []))
     image_urls: list[str] = []
     for i, fname in enumerate(file_names):
         path = outdir / fname
         if not path.is_file():
             raise SystemExit(f"missing image: {path}")
-        # R2 key: carousel/2026-09-10-web_dev-01-01.jpg
         key = f"{prefix}/{date}-{slug}-{i + 1:02d}{path.suffix.lower()}"
         print(f"  uploading {fname} -> {key}", file=sys.stderr)
         result = upload_one(site, token, key, path)
@@ -98,8 +118,8 @@ def main():
 
     meta["image_urls"] = image_urls
     meta["r2_prefix"] = prefix
-    post_json.write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"wrote image_urls to {post_json}", file=sys.stderr)
+    meta_path.write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"wrote image_urls to {meta_path}", file=sys.stderr)
     for u in image_urls:
         print(f"  {u}")
 
