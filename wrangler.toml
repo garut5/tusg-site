@@ -17,5 +17,16 @@ CONSULTATION_NOTIFICATION_TO = "info@tusg.site"
 # CONSULTATION_NOTIFICATION_CC = ""  # 必要時のみ設定
 SITE_URL = "https://tusg.site"
 
-# 秘密情報 (Cloudflare Dashboard または wrangler pages secret put で設定):
+# 30秒無料診断 の秘密情報 (Cloudflare Dashboard または wrangler pages secret put で設定):
 #   RESEND_API_KEY
+
+# TUSG 自社メディア自動投稿 (functions/api/autopost/*.js)
+# 詳細は docs/OWNED_MEDIA_AUTOPOST_2026-09.md 参照
+# 以下はすべて Cloudflare Dashboard で Secret として設定済み:
+#   META_APP_ID                       ex: 2153589091921280
+#   INSTAGRAM_APP_ID                  ex: 1077407761327382
+#   INSTAGRAM_APP_SECRET              (機密)
+#   INSTAGRAM_BUSINESS_ACCOUNT_ID     ex: 17841436660255520 (@tusg_official)
+#   INSTAGRAM_ACCESS_TOKEN            (機密 / 60日有効、失効前に refresh 必要)
+# 将来 Threads 追加時 (Phase 1 後半):
+#   THREADS_APP_ID / THREADS_APP_SECRET / THREADS_ACCESS_TOKEN

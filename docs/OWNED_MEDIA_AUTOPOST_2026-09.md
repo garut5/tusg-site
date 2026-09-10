@@ -1,6 +1,6 @@
 # TUSG 自社メディア自動投稿 計画メモ
 
-作成: 2026-09-09 / 更新: 2026-09-09 (v2 / Meta アプリ・既存投稿の扱いを追加確定)
+作成: 2026-09-09 / 更新: 2026-09-10 (v3 / Meta アプリ作成完了 & Cloudflare secrets 登録済 & Worker 骨組み完成)
 起票者: 坂本 (合同会社TUSG)
 記録: セッション中の口頭依頼 (「camomile が LOCOREACH でやっている毎日自動投稿を、TUSG でもやりたい」)
 
@@ -141,27 +141,38 @@ tusg-site/
 **Phase 0: 準備 (今週〜来週)**
 - [x] Meta アプリ方針決定: **新規 2 アプリ** (tusg-autopost / tusg-threads-autopost)
 - [x] 既存 IG 投稿 13 件の扱い: **アーカイブ後、リブランド告知 → 削除**
-- [ ] Meta アプリ「tusg-autopost」新規作成 (TUSG OFFICIAL business)
-  - Product: Instagram Graph API
-  - Instagram Business Account: @tusg_official 紐付け
-- [ ] Meta アプリ「tusg-threads-autopost」新規作成 (TUSG OFFICIAL business)
-  - Product: Threads API
-- [ ] @tusg_official Instagram をビジネスアカウント化 (未対応の場合)
-- [ ] Facebook ページを @tusg_official と紐付け (Instagram Business 化に必須)
+- [x] Meta アプリ「tusg-autopost」新規作成 (TUSG OFFICIAL business, App ID: `2153589091921280`)
+- [x] Instagram Graph API ユースケース設定 + permissions 追加
+  - `instagram_business_basic` / `instagram_business_content_publish`
+  - `instagram_business_manage_comments` / `_manage_insights`
+  - `pages_show_list` / `pages_read_engagement` / `business_management`
+- [x] @tusg_official を Instagram Tester として登録 & 承認 (2026-09-10)
+- [x] 長期アクセストークン発行 (60 日有効、`2026-11-09` 頃失効)
+- [x] Cloudflare Pages に secrets 登録済 (Production):
+  - `META_APP_ID` = `2153589091921280`
+  - `INSTAGRAM_APP_ID` = `1077407761327382`
+  - `INSTAGRAM_APP_SECRET` = (Secret 保存)
+  - `INSTAGRAM_BUSINESS_ACCOUNT_ID` = `17841436660255520`
+  - `INSTAGRAM_ACCESS_TOKEN` = (Secret 保存)
+- [ ] `AUTOPOST_TRIGGER_TOKEN` を Cloudflare secret に登録 (Worker 認証用)
+- [ ] Meta アプリ「tusg-threads-autopost」新規作成 (Phase 1 後半)
 - [ ] Instagram bio の URL を `https://tusg.site/hearing` に固定
 - [ ] TUSG ブランドガイド (色 / フォント / ロゴ配置) を明文化
-  - ベース: 現行 HP のダークグリーン系 (#0F3D2E 系)
-  - ロゴ: 既存の TUSG (T+G の緑色ロゴ) を使用
 - [ ] ジャンル別テンプレの初稿 7 枚 (Canva で作成)
-- [ ] Cloudflare Pages に Meta App 用 secrets 追加 (`META_APP_ID`, `META_APP_SECRET`, `META_ACCESS_TOKEN`, `THREADS_APP_ID`, `THREADS_APP_SECRET`, `THREADS_ACCESS_TOKEN`)
 
 **Phase 1: MVP 稼働 (2〜3 週間)**
-- [ ] Cloudflare Worker `tusg-autopost-cron` を実装 (毎日 20:00 JST 起動)
-- [ ] 曜日 → ジャンル選択ロジック
-- [ ] Meta Graph API で Instagram フィード投稿
-- [ ] Meta Graph API で Threads 投稿 (連動)
-- [ ] Instagram ストーリーズ配信 (別 API)
-- [ ] 1 週間 dry-run (ステージング投稿 or 手動確認)
+- [x] Cloudflare Pages Functions: 投稿 API 骨組み実装
+  - `functions/api/autopost/_instagram.js` (Instagram Graph API クライアント、single/carousel 対応)
+  - `functions/api/autopost/_content.js` (曜日→ジャンル判定、キャプション生成、7 ジャンル定義)
+  - `functions/api/autopost/publish.js` (POST /api/autopost/publish、Bearer 認証)
+  - `functions/api/autopost/verify.js` (GET /api/autopost/verify、疎通確認)
+  - `tests/autopost.test.mjs` (14 tests)
+- [ ] Instagram の疎通テスト (`GET /api/autopost/verify` で me() 呼び出し)
+- [ ] dry_run で 1 投稿分のキャプション生成テスト
+- [ ] テスト画像 (`https://` の公開 URL) で 1 投稿の実機テスト
+- [ ] 曜日別テンプレ 7 種を Canva で作成 & Cloudflare Images (or R2) に配置
+- [ ] Cron worker `workers/tusg-autopost-cron` を追加 (毎日 20:00 JST 起動)
+- [ ] 1 週間 dry-run
 - [ ] 本番稼働開始
 
 **Phase 2: 拡張 (1〜2 ヶ月)**
