@@ -20,6 +20,14 @@ function json(body, status = 200) {
   });
 }
 
+function guessTokenType(token) {
+  if (!token) return "empty";
+  if (token.startsWith("IGAA") || token.startsWith("IGQV")) return "instagram_business_login (graph.instagram.com 用)";
+  if (token.startsWith("EAAB") || token.startsWith("EAAG") || token.startsWith("EAA")) return "facebook_graph (graph.facebook.com 用)";
+  if (token.length < 50) return "short (トークンではない可能性)";
+  return "unknown (フォーマット判定不能)";
+}
+
 function checkAuth(request, env) {
   const expected = env.AUTOPOST_TRIGGER_TOKEN;
   if (!expected) return false;
@@ -37,12 +45,18 @@ export async function onRequestGet({ request, env }) {
     return json({ ok: false, message: "Unauthorized" }, 401);
   }
 
+  const token = env.INSTAGRAM_ACCESS_TOKEN || "";
   const status = {
     has_META_APP_ID: Boolean(env.META_APP_ID),
     has_INSTAGRAM_APP_ID: Boolean(env.INSTAGRAM_APP_ID),
     has_INSTAGRAM_APP_SECRET: Boolean(env.INSTAGRAM_APP_SECRET),
     has_INSTAGRAM_BUSINESS_ACCOUNT_ID: Boolean(env.INSTAGRAM_BUSINESS_ACCOUNT_ID),
-    has_INSTAGRAM_ACCESS_TOKEN: Boolean(env.INSTAGRAM_ACCESS_TOKEN),
+    has_INSTAGRAM_ACCESS_TOKEN: Boolean(token),
+    // トークン形式診断 (値そのものは出さない):
+    token_length: token.length,
+    token_prefix: token.slice(0, 5),
+    token_type_guess: guessTokenType(token),
+    graph_host: env.INSTAGRAM_GRAPH_HOST || "https://graph.instagram.com (default)",
   };
 
   let account = null;

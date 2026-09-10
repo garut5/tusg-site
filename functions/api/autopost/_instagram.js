@@ -16,8 +16,12 @@
 //   const result = await ig.publishSingle({ image_url, caption });
 //   const result = await ig.publishCarousel({ image_urls: [...], caption });
 
+// Instagram Business Login (ig_biz_login_oauth) 経由で発行されたトークンは
+// graph.instagram.com で使用。Facebook Login 経由なら graph.facebook.com。
+// 環境変数 INSTAGRAM_GRAPH_HOST で切替可能 (default: graph.instagram.com)。
+const DEFAULT_GRAPH_HOST = "https://graph.instagram.com";
+const FACEBOOK_GRAPH_HOST = "https://graph.facebook.com";
 const GRAPH_API_VERSION = "v21.0";
-const GRAPH_BASE = `https://graph.facebook.com/${GRAPH_API_VERSION}`;
 const MAX_CAROUSEL_ITEMS = 10;
 const MEDIA_PROCESS_POLL_INTERVAL_MS = 2000;
 const MEDIA_PROCESS_TIMEOUT_MS = 60000;
@@ -30,8 +34,10 @@ export class InstagramClient {
     if (!env.INSTAGRAM_BUSINESS_ACCOUNT_ID) {
       throw new Error("INSTAGRAM_BUSINESS_ACCOUNT_ID is not configured");
     }
-    this.token = env.INSTAGRAM_ACCESS_TOKEN;
-    this.igUserId = env.INSTAGRAM_BUSINESS_ACCOUNT_ID;
+    this.token = String(env.INSTAGRAM_ACCESS_TOKEN).trim();
+    this.igUserId = String(env.INSTAGRAM_BUSINESS_ACCOUNT_ID).trim();
+    const host = (env.INSTAGRAM_GRAPH_HOST || DEFAULT_GRAPH_HOST).replace(/\/$/, "");
+    this.base = `${host}/${GRAPH_API_VERSION}`;
   }
 
   async publishSingle({ image_url, caption }) {
@@ -69,7 +75,7 @@ export class InstagramClient {
   }
 
   async _createContainer(params) {
-    const url = `${GRAPH_BASE}/${this.igUserId}/media`;
+    const url = `${this.base}/${this.igUserId}/media`;
     const body = new URLSearchParams({ access_token: this.token });
     for (const [k, v] of Object.entries(params)) {
       if (v !== undefined && v !== null && v !== "") body.set(k, String(v));
@@ -83,7 +89,7 @@ export class InstagramClient {
   }
 
   async _waitContainerReady(containerId) {
-    const url = `${GRAPH_BASE}/${containerId}?fields=status_code,status&access_token=${encodeURIComponent(this.token)}`;
+    const url = `${this.base}/${containerId}?fields=status_code,status&access_token=${encodeURIComponent(this.token)}`;
     const deadline = Date.now() + MEDIA_PROCESS_TIMEOUT_MS;
     while (Date.now() < deadline) {
       const res = await fetch(url);
@@ -98,7 +104,7 @@ export class InstagramClient {
   }
 
   async _publishContainer(creationId) {
-    const url = `${GRAPH_BASE}/${this.igUserId}/media_publish`;
+    const url = `${this.base}/${this.igUserId}/media_publish`;
     const body = new URLSearchParams({
       creation_id: creationId,
       access_token: this.token,
@@ -112,7 +118,10 @@ export class InstagramClient {
   }
 
   async me() {
-    const url = `${GRAPH_BASE}/${this.igUserId}?fields=id,username,name&access_token=${encodeURIComponent(this.token)}`;
+    // graph.instagram.com では /me が使える。graph.facebook.com では igUserId 指定が必要。
+    const isFacebookHost = this.base.includes("graph.facebook.com");
+    const path = isFacebookHost ? `/${this.igUserId}` : "/me";
+    const url = `${this.base}${path}?fields=id,username,name&access_token=${encodeURIComponent(this.token)}`;
     const res = await fetch(url);
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
