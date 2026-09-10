@@ -218,6 +218,58 @@ def make_cover(tag: str, hook: str, sub: str) -> Image.Image:
     return img
 
 
+def make_summary(cover_tag: str, cover_sub: str, body_items: list[dict]) -> Image.Image:
+    """カバー直後の要約スライド。5 point の一覧 (title のみ) を並べて俯瞰させる。"""
+    img = Image.new("RGB", (CANVAS_W, CANVAS_H), COLOR_BG)
+    draw = ImageDraw.Draw(img)
+
+    # 上部: ゴールド縦線 + 「この投稿でわかること」
+    tag_font = load_font(30, weight="bold")
+    tag_y = MARGIN_TOP - 10
+    draw.rectangle([(MARGIN_X, tag_y), (MARGIN_X + 5, tag_y + 34)], fill=COLOR_GOLD)
+    draw.text((MARGIN_X + 20, tag_y - 4), f"▼ この投稿でわかること",
+              font=tag_font, fill=COLOR_GOLD)
+
+    # 上部サブ (カテゴリ名)
+    subtag_font = load_font(22, weight="regular")
+    draw.text((MARGIN_X + 20, tag_y + 40), cover_tag, font=subtag_font, fill=COLOR_TEXT_MUTED)
+
+    # 中央: point の title 一覧 (5 個)
+    item_font = load_font(36, weight="bold")
+    num_font = load_font(30, weight="bold")
+    max_w = CANVAS_W - MARGIN_X * 2 - 90
+
+    item_h_estimate = 80
+    total_h = item_h_estimate * len(body_items)
+    y = (CANVAS_H - total_h) // 2 - 40
+
+    for item in body_items:
+        num = item["num"]
+        title = item["title"]
+        # 番号 (ゴールド、丸背景無し、シンプルに)
+        draw.text((MARGIN_X, y - 4), num, font=num_font, fill=COLOR_GOLD)
+        # タイトル (改行 1 行にトリム、長ければ 1 行に収める)
+        title_lines = _text_wrap(draw, title, item_font, max_w)
+        # 1 行だけ描画 (長すぎたら短縮)
+        first_line = title_lines[0]
+        if len(title_lines) > 1:
+            # 2 行以上なら「...」で省略
+            trimmed = first_line
+            while draw.textlength(trimmed + "…", font=item_font) > max_w and len(trimmed) > 0:
+                trimmed = trimmed[:-1]
+            first_line = trimmed + "…" if trimmed != first_line else first_line
+        draw.text((MARGIN_X + 90, y), first_line, font=item_font, fill=COLOR_TEXT)
+        # 区切り線 (薄いゴールド)
+        line_y = y + 60
+        if item != body_items[-1]:
+            draw.line([(MARGIN_X + 90, line_y), (CANVAS_W - MARGIN_X, line_y)],
+                      fill=(184, 148, 79, 40), width=1)
+        y += item_h_estimate
+
+    _draw_logo(img, draw)
+    return img
+
+
 def make_cta() -> Image.Image:
     """最終スライド。診断ページへ誘導する CTA 用。"""
     img = Image.new("RGB", (CANVAS_W, CANVAS_H), COLOR_BG)
@@ -294,7 +346,7 @@ def make_cta() -> Image.Image:
     return img
 
 
-def make_body(idx: int, num: str, title: str, desc: str, total: int | None = None) -> Image.Image:
+def make_body(idx: int, num: str, title: str, desc: str, action: str = "", total: int | None = None) -> Image.Image:
     """本文スライド。左上に「大きな薄い数字」を装飾で置き、その下にタイトルと説明。
     下部にページインジケータ (1 / 5 スタイル)、右下に TUSG ロゴ。"""
     img = Image.new("RGB", (CANVAS_W, CANVAS_H), COLOR_BG)
@@ -333,11 +385,16 @@ def make_body(idx: int, num: str, title: str, desc: str, total: int | None = Non
     title_lines = _text_wrap(draw, title, title_font, max_w)
     desc_lines = _text_wrap(draw, desc, desc_font, max_w)
 
+    action_font = load_font(30, weight="bold")
+    action_lh = 48
+    action_lines = _text_wrap(draw, action, action_font, max_w) if action else []
+
     title_h = title_lh * len(title_lines)
     desc_h = desc_lh * len(desc_lines)
+    action_h = (action_lh * len(action_lines) + 30) if action_lines else 0  # 上のマージンも含む
     underline_gap = 30
-    title_desc_gap = 60
-    total_h = title_h + underline_gap + title_desc_gap + desc_h
+    title_desc_gap = 50
+    total_h = title_h + underline_gap + title_desc_gap + desc_h + action_h
 
     # 中央 (縦位置的に真ん中付近) に配置。ロゴエリアを避けるため
     # 実際の中央より少し上にオフセット。
@@ -360,6 +417,13 @@ def make_body(idx: int, num: str, title: str, desc: str, total: int | None = Non
     for line in desc_lines:
         draw.text((MARGIN_X, y), line, font=desc_font, fill=COLOR_TEXT_MUTED)
         y += desc_lh
+
+    # アクション (「→ こうしよう」等)
+    if action_lines:
+        y += 30
+        for line in action_lines:
+            draw.text((MARGIN_X, y), line, font=action_font, fill=COLOR_GOLD)
+            y += action_lh
 
     # 下部: ページインジケータ (1 / 5 スタイル)
     if total is not None and total > 1:
@@ -499,11 +563,21 @@ def main():
     cover = make_cover(entry["cover_tag"], entry["cover_hook"], entry["cover_sub"])
     cover.save(outdir / "cover.jpg", quality=90)
 
-    # 本文スライド (最大 5 枚)
+    # 要約スライド (「▼ この投稿でわかること」→ 5 point 一覧)
     body_items = entry["body"][:5]
     body_files: list[str] = []
+    summary_img = make_summary(entry["cover_tag"], entry["cover_sub"], body_items)
+    summary_fname = "summary.jpg"
+    summary_img.save(outdir / summary_fname, quality=90)
+    body_files.append(summary_fname)
+
+    # 本文スライド (最大 5 枚)、各 point に action (「→ こうしよう」) 対応
     for i, item in enumerate(body_items):
-        img = make_body(i, item["num"], item["title"], item["desc"], total=len(body_items))
+        img = make_body(
+            i, item["num"], item["title"], item["desc"],
+            action=item.get("action", ""),
+            total=len(body_items),
+        )
         fname = f"body-{i + 1:02d}.jpg"
         img.save(outdir / fname, quality=90)
         body_files.append(fname)
