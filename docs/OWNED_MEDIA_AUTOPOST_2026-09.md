@@ -161,15 +161,19 @@ tusg-site/
 - [ ] ジャンル別テンプレの初稿 7 枚 (Canva で作成)
 
 **Phase 1: MVP 稼働 (2〜3 週間)**
-- [x] Cloudflare Pages Functions: 投稿 API 骨組み実装
-  - `functions/api/autopost/_instagram.js` (Instagram Graph API クライアント、single/carousel 対応)
-  - `functions/api/autopost/_content.js` (曜日→ジャンル判定、キャプション生成、7 ジャンル定義)
-  - `functions/api/autopost/publish.js` (POST /api/autopost/publish、Bearer 認証)
-  - `functions/api/autopost/verify.js` (GET /api/autopost/verify、疎通確認)
-  - `tests/autopost.test.mjs` (14 tests)
-- [ ] Instagram の疎通テスト (`GET /api/autopost/verify` で me() 呼び出し)
-- [ ] dry_run で 1 投稿分のキャプション生成テスト
-- [ ] テスト画像 (`https://` の公開 URL) で 1 投稿の実機テスト
+- [x] Cloudflare Pages Functions: 投稿 API 実装
+  - `functions/api/autopost/_instagram.js` (Instagram Graph API クライアント)
+    - 静止画 (single) / カルーセル (画像+動画混在可) / **リール (縦動画)** / **ストーリーズ**
+    - 動画は 5 分のトランスコード待機 timeout、静止画は 60 秒
+  - `functions/api/autopost/_content.js` (曜日→ジャンル判定、キャプション生成、7 ジャンル)
+  - `functions/api/autopost/publish.js` (POST /api/autopost/publish、Bearer 認証、4 モード対応)
+  - `functions/api/autopost/verify.js` (GET /api/autopost/verify、疎通確認 + トークン診断)
+  - `tests/autopost.test.mjs` (14 tests all pass)
+- [x] Instagram の疎通テスト (`GET /api/autopost/verify` で me() 成功、@tusg_official 認識)
+- [x] dry_run で 1 投稿分のキャプション生成テスト (成功)
+- [x] テスト画像で 1 投稿の実機テスト (成功、media_id: 18415161658155287)
+- [ ] リール投稿の実機テスト (動画 URL 準備できたら)
+- [ ] ストーリーズ投稿の実機テスト
 - [ ] 曜日別テンプレ 7 種を Canva で作成 & Cloudflare Images (or R2) に配置
 - [ ] Cron worker `workers/tusg-autopost-cron` を追加 (毎日 20:00 JST 起動)
 - [ ] 1 週間 dry-run
