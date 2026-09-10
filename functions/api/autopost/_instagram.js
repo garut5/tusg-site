@@ -38,6 +38,10 @@ export class InstagramClient {
     this.igUserId = String(env.INSTAGRAM_BUSINESS_ACCOUNT_ID).trim();
     const host = (env.INSTAGRAM_GRAPH_HOST || DEFAULT_GRAPH_HOST).replace(/\/$/, "");
     this.base = `${host}/${GRAPH_API_VERSION}`;
+    this.isFacebookHost = host.includes("graph.facebook.com");
+    // graph.instagram.com では /me/... で self-reference。
+    // graph.facebook.com では /{ig-business-account-id}/... を指定。
+    this.selfPath = this.isFacebookHost ? `/${this.igUserId}` : "/me";
   }
 
   async publishSingle({ image_url, caption }) {
@@ -75,7 +79,7 @@ export class InstagramClient {
   }
 
   async _createContainer(params) {
-    const url = `${this.base}/${this.igUserId}/media`;
+    const url = `${this.base}${this.selfPath}/media`;
     const body = new URLSearchParams({ access_token: this.token });
     for (const [k, v] of Object.entries(params)) {
       if (v !== undefined && v !== null && v !== "") body.set(k, String(v));
@@ -104,7 +108,7 @@ export class InstagramClient {
   }
 
   async _publishContainer(creationId) {
-    const url = `${this.base}/${this.igUserId}/media_publish`;
+    const url = `${this.base}${this.selfPath}/media_publish`;
     const body = new URLSearchParams({
       creation_id: creationId,
       access_token: this.token,
@@ -118,10 +122,7 @@ export class InstagramClient {
   }
 
   async me() {
-    // graph.instagram.com では /me が使える。graph.facebook.com では igUserId 指定が必要。
-    const isFacebookHost = this.base.includes("graph.facebook.com");
-    const path = isFacebookHost ? `/${this.igUserId}` : "/me";
-    const url = `${this.base}${path}?fields=id,username,name&access_token=${encodeURIComponent(this.token)}`;
+    const url = `${this.base}${this.selfPath}?fields=id,username,name&access_token=${encodeURIComponent(this.token)}`;
     const res = await fetch(url);
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
