@@ -1,0 +1,17 @@
+name = "tusg-autopost-cron"
+main = "src/index.js"
+compatibility_date = "2025-01-01"
+
+# 毎日 11:00 UTC = 20:00 JST に起動
+[triggers]
+crons = ["0 11 * * *"]
+
+# 環境変数 (secret は wrangler secret put で設定)
+[vars]
+# 本体 Pages の URL (どのドメインでも同じ実装が動く)
+SITE_URL = "https://tusg.site"
+# 本番稼働の安全ゲート: "true" で実投稿、それ以外は dry_run のみ
+AUTOPOST_LIVE = "false"
+
+# 秘密情報 (以下は `npx wrangler secret put ... --config workers/tusg-autopost-cron/wrangler.toml` で設定):
+#   AUTOPOST_TRIGGER_TOKEN   (Pages 側と同じ値。Pages Function を叩く時の Bearer トークン)

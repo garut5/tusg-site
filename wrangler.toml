@@ -28,5 +28,14 @@ SITE_URL = "https://tusg.site"
 #   INSTAGRAM_APP_SECRET              (機密)
 #   INSTAGRAM_BUSINESS_ACCOUNT_ID     ex: 17841436660255520 (@tusg_official)
 #   INSTAGRAM_ACCESS_TOKEN            (機密 / 60日有効、失効前に refresh 必要)
-# 将来 Threads 追加時 (Phase 1 後半):
+# Threads 用 (2 本目 Meta アプリ tusg-threads-autopost 作成後に設定):
 #   THREADS_APP_ID / THREADS_APP_SECRET / THREADS_ACCESS_TOKEN
+#   THREADS_USER_ID (任意、未設定なら /me が使われる)
+
+# 自動投稿の Bearer 認証トークン (Cron / manual トリガーで使用):
+#   AUTOPOST_TRIGGER_TOKEN
+
+# R2 バケット (テンプレ画像 / リール動画 のホスティング)
+[[r2_buckets]]
+binding = "AUTOPOST_ASSETS"
+bucket_name = "tusg-autopost-assets"

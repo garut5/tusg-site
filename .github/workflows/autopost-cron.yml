@@ -1,0 +1,76 @@
+name: Autopost cron (daily 20:00 JST)
+
+# 毎日 20:00 JST = 11:00 UTC に起動。GitHub Actions は Cloudflare の cron 上限に依存しないため
+# Workers Paid 契約なしで動く。ただし GitHub Actions の scheduled workflow は高負荷時に
+# 5-15 分の遅延が発生することがある (日次投稿には許容範囲)。
+#
+# 安全ゲート:
+#   - GitHub Secret `AUTOPOST_LIVE` が "true" の時のみ実投稿
+#   - それ以外は dry_run=true を送信 (Meta には何も届かない)
+#
+# 手動起動 (テスト):
+#   Actions タブ → "Autopost cron" → Run workflow
+
+on:
+  schedule:
+    - cron: '0 11 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'dry_run で試す (投稿しない)'
+        type: boolean
+        default: true
+
+concurrency:
+  group: autopost-cron
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Determine live mode
+        id: mode
+        env:
+          LIVE: ${{ secrets.AUTOPOST_LIVE }}
+          DISPATCH_DRY: ${{ github.event.inputs.dry_run }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            if [ "$DISPATCH_DRY" = "false" ] && [ "$LIVE" = "true" ]; then
+              echo "dry_run=false" >> "$GITHUB_OUTPUT"
+            else
+              echo "dry_run=true" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            if [ "$LIVE" = "true" ]; then
+              echo "dry_run=false" >> "$GITHUB_OUTPUT"
+            else
+              echo "dry_run=true" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+      - name: Trigger scheduled autopost
+        env:
+          TOKEN: ${{ secrets.AUTOPOST_TRIGGER_TOKEN }}
+          DRY_RUN: ${{ steps.mode.outputs.dry_run }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "::error::AUTOPOST_TRIGGER_TOKEN secret is not set"
+            exit 1
+          fi
+          body=$(printf '{"dry_run":%s,"source":"github-actions"}' "$DRY_RUN")
+          echo "Sending (dry_run=$DRY_RUN)"
+          http_code=$(curl -sS -o /tmp/resp.txt -w "%{http_code}" \
+            -X POST "https://tusg.site/api/autopost/scheduled" \
+            -H "Authorization: Bearer $TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "$body")
+          echo "HTTP $http_code"
+          echo "---response---"
+          cat /tmp/resp.txt
+          echo ""
+          if [ "$http_code" != "200" ]; then
+            echo "::error::HTTP $http_code"
+            exit 1
+          fi

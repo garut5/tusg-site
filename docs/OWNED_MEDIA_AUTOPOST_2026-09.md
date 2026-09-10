@@ -1,6 +1,6 @@
 # TUSG 自社メディア自動投稿 計画メモ
 
-作成: 2026-09-09 / 更新: 2026-09-10 (v3 / Meta アプリ作成完了 & Cloudflare secrets 登録済 & Worker 骨組み完成)
+作成: 2026-09-09 / 更新: 2026-09-10 (v4 / リール/ストーリーズ対応、Cron 化 (GitHub Actions)、R2 資産ホスティング、Threads クライアント)
 起票者: 坂本 (合同会社TUSG)
 記録: セッション中の口頭依頼 (「camomile が LOCOREACH でやっている毎日自動投稿を、TUSG でもやりたい」)
 
@@ -164,20 +164,66 @@ tusg-site/
 - [x] Cloudflare Pages Functions: 投稿 API 実装
   - `functions/api/autopost/_instagram.js` (Instagram Graph API クライアント)
     - 静止画 (single) / カルーセル (画像+動画混在可) / **リール (縦動画)** / **ストーリーズ**
-    - 動画は 5 分のトランスコード待機 timeout、静止画は 60 秒
+    - 動画は 5 分のトランスコード待機、静止画は 60 秒
+  - `functions/api/autopost/_threads.js` (Threads API クライアント)
+    - text / image / video / carousel、500 文字上限自動トリム対応
   - `functions/api/autopost/_content.js` (曜日→ジャンル判定、キャプション生成、7 ジャンル)
-  - `functions/api/autopost/publish.js` (POST /api/autopost/publish、Bearer 認証、4 モード対応)
-  - `functions/api/autopost/verify.js` (GET /api/autopost/verify、疎通確認 + トークン診断)
+  - `functions/api/autopost/publish.js` (POST、Instagram、4 モード)
+  - `functions/api/autopost/publish-threads.js` (POST、Threads、4 モード)
+  - `functions/api/autopost/scheduled.js` (POST、cron から叩かれるルート、R2 テンプレ→placehold フォールバック)
+  - `functions/api/autopost/verify.js` (GET、疎通 + Instagram/Threads 両方診断)
+  - `functions/api/autopost/asset.js` (POST/GET/DELETE、R2 アップロード管理、認証必須)
+  - `functions/assets/[[path]].js` (GET、R2 の公開読み込み、認証なし)
   - `tests/autopost.test.mjs` (14 tests all pass)
-- [x] Instagram の疎通テスト (`GET /api/autopost/verify` で me() 成功、@tusg_official 認識)
-- [x] dry_run で 1 投稿分のキャプション生成テスト (成功)
-- [x] テスト画像で 1 投稿の実機テスト (成功、media_id: 18415161658155287)
-- [ ] リール投稿の実機テスト (動画 URL 準備できたら)
+- [x] Instagram 疎通テスト (verify で me() 成功、@tusg_official)
+- [x] Instagram 実機投稿テスト (media_id: 18415161658155287)
+- [x] **R2 バケット** `tusg-autopost-assets` 新設 & Pages に binding 追加
+- [x] **Cron 化 (GitHub Actions cron)** — Cloudflare 無料枠は 5 個上限のため GitHub Actions で代替
+  - `.github/workflows/autopost-cron.yml` 毎日 11:00 UTC (20:00 JST) 起動
+  - AUTOPOST_LIVE secret で本番/dry_run 切替
+  - 手動起動 (workflow_dispatch) も対応
+- [x] Threads クライアント実装 (2 本目 Meta アプリ待ち)
+- [ ] リール投稿の実機テスト (縦動画 mp4 準備できたら)
 - [ ] ストーリーズ投稿の実機テスト
-- [ ] 曜日別テンプレ 7 種を Canva で作成 & Cloudflare Images (or R2) に配置
-- [ ] Cron worker `workers/tusg-autopost-cron` を追加 (毎日 20:00 JST 起動)
-- [ ] 1 週間 dry-run
-- [ ] 本番稼働開始
+- [ ] 曜日別テンプレ 7 種を Canva で作成 → `/api/autopost/asset` で R2 にアップ
+- [ ] Threads 用 2 本目 Meta アプリ (`tusg-threads-autopost`) 新規作成 & トークン取得
+- [ ] GitHub Actions secrets 追加 (`AUTOPOST_TRIGGER_TOKEN` / `AUTOPOST_LIVE`)
+- [ ] 1 週間 dry-run (毎日 11:00 UTC の GitHub Actions 実行ログを確認)
+- [ ] 本番稼働開始 (`AUTOPOST_LIVE=true` に切替 + `wrangler.toml` の該当 var も更新)
+
+**Cron 実装メモ** (`workers/_tusg-autopost-cron-cf.disabled/` に Cloudflare Worker 版のコードは保管、
+将来 Workers Paid ($5/月) に切替、または他 cron を 1 つ空けたら復活可能)
+
+## 追加された API エンドポイント (v4 時点)
+
+| エンドポイント | 認証 | 用途 |
+|---|---|---|
+| `GET /api/autopost/verify` | Bearer | 疎通確認、Instagram/Threads/R2 状態診断 |
+| `POST /api/autopost/publish` | Bearer | Instagram 投稿 (single/carousel/reel/story) |
+| `POST /api/autopost/publish-threads` | Bearer | Threads 投稿 (text/image/video/carousel) |
+| `POST /api/autopost/scheduled` | Bearer | Cron から叩かれるルート、今日のジャンルで自動生成 |
+| `POST /api/autopost/asset?key=...` | Bearer | R2 にファイルアップロード |
+| `DELETE /api/autopost/asset?key=...` | Bearer | R2 からファイル削除 |
+| `GET /api/autopost/asset?prefix=...` | Bearer | R2 のファイル一覧 |
+| `GET /assets/<key>` | 公開 | R2 の公開読み込み (Instagram/Threads API が fetch する URL) |
+
+## R2 テンプレ画像アップロード手順 (Canva で作成後)
+
+```bash
+# 例: 月曜 MEO 用テンプレを R2 にアップロード
+curl -X POST \
+  -H "Authorization: Bearer $AUTOPOST_TRIGGER_TOKEN" \
+  -H "Content-Type: image/jpeg" \
+  --data-binary "@/path/to/meo-template.jpg" \
+  "https://tusg.site/api/autopost/asset?key=genre/meo.jpg"
+
+# 全 7 種:
+#   genre/meo.jpg / aio.jpg / operation_tech.jpg / web_dev.jpg
+#   genre/hp_growth.jpg / pitfalls.jpg / tusg_way.jpg
+
+# アップ後、公開 URL は https://tusg.site/assets/genre/meo.jpg で開ける
+# scheduled.js は自動でこの URL を優先使用する (R2 に無ければ placehold.co フォールバック)
+```
 
 **Phase 2: 拡張 (1〜2 ヶ月)**
 - [ ] HP ブログ機能追加 (`functions/api/blog/*` + `public/blog/`) — 効果次第で判断
