@@ -1,0 +1,179 @@
+name: TUSG daily carousel (19:41 JST)
+
+# 毎日 19:41 JST (= 10:41 UTC)。今日の曜日のジャンルを content.json から選び、
+# PIL でカルーセル画像を生成し、R2 にアップロードし、Instagram に投稿する。
+#
+# ■ LOCOREACH_AI との違い (docs/OWNED_MEDIA_AUTOPOST_2026-09.md v5 参照)
+#   ・時刻: 19:41 JST (LOCOREACH の 20:41 と 1 時間ずらす)
+#   ・デザイン: TUSG グリーン + ゴールド、TUSG ロゴ
+#   ・CTA: 記事誘導ではなく直接 tusg.site/hearing (30秒無料診断)
+#   ・音声・リールは Phase 1b で追加、まずはカルーセルのみ
+#
+# ■ 安全ゲート
+#   AUTOPOST_LIVE=true のときのみ実投稿。それ以外は dry_run。
+#   手動起動 (workflow_dispatch) の dry_run デフォルトも true。
+
+on:
+  schedule:
+    - cron: '41 10 * * *'  # 19:41 JST
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'dry_run で試す (投稿しない)'
+        type: choice
+        options: ['true', 'false']
+        default: 'true'
+      slug:
+        description: '特定 slug でテスト (空なら今日のジャンルから自動)'
+        required: false
+        default: ''
+
+concurrency:
+  group: tusg-carousel
+  cancel-in-progress: false
+
+permissions:
+  contents: write   # posted.json 更新のため
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 依存パッケージ (Pillow + 日本語フォント)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          pip install --quiet Pillow
+
+      - name: 実投稿判定
+        id: mode
+        env:
+          LIVE: ${{ secrets.AUTOPOST_LIVE }}
+          DISPATCH_DRY: ${{ github.event.inputs.dry_run }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            if [ "$DISPATCH_DRY" = "false" ] && [ "$LIVE" = "true" ]; then
+              echo "dry_run=false" >> "$GITHUB_OUTPUT"
+            else
+              echo "dry_run=true" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            if [ "$LIVE" = "true" ]; then
+              echo "dry_run=false" >> "$GITHUB_OUTPUT"
+            else
+              echo "dry_run=true" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+          echo "決定: dry_run=$(cat "$GITHUB_OUTPUT" | grep dry_run | cut -d= -f2)"
+
+      - name: カルーセル画像を作る
+        id: make
+        run: |
+          extra=""
+          if [ -n "${{ github.event.inputs.slug }}" ]; then
+            extra="--slug ${{ github.event.inputs.slug }}"
+          fi
+          python3 scripts/make_post.py --outdir out/post $extra
+          echo "slug=$(python3 -c "import json;print(json.load(open('out/post/post.json',encoding='utf-8'))['slug'])")" >> "$GITHUB_OUTPUT"
+
+      - name: 同じ slug を二度出さない
+        id: dedupe
+        run: |
+          # posted.json は checkout 時点のもの。並行実行や別ブランチからの
+          # commit があるかもしれないので、判定直前に取り直す。
+          git fetch -q origin "${GITHUB_REF_NAME}"
+          git checkout -q "origin/${GITHUB_REF_NAME}" -- posted.json
+          if python3 scripts/posted.py check --channel carousel --item out/post/post.json; then
+            echo "fresh=1" >> "$GITHUB_OUTPUT"
+          else
+            echo "fresh=0" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: 画像を R2 へアップロード
+        id: upload
+        if: ${{ steps.dedupe.outputs.fresh == '1' }}
+        env:
+          AUTOPOST_TRIGGER_TOKEN: ${{ secrets.AUTOPOST_TRIGGER_TOKEN }}
+          SITE_URL: https://tusg.site
+        run: |
+          python3 tools/upload_r2.py out/post --prefix carousel
+
+      # Instagram は image_url を自分で取りに来る。取れない URL を渡すと
+      # 途中まで進んでから失敗するので、投稿前にこちらで確かめる
+      # (LOCOREACH_AI post.yml パターン)
+      - name: 画像が本当に返るか確かめる
+        id: check
+        if: ${{ steps.dedupe.outputs.fresh == '1' }}
+        run: |
+          python3 - <<'PY'
+          import json, sys, urllib.request
+          d = json.load(open("out/post/post.json", encoding="utf-8"))
+          urls = d["image_urls"]
+          for u in urls:
+              req = urllib.request.Request(u, method="HEAD",
+                                           headers={"User-Agent": "tusg-autopost/1.0"})
+              with urllib.request.urlopen(req, timeout=30) as r:
+                  if r.status != 200:
+                      sys.exit(f"{u} が {r.status} を返しました")
+          print(f"✓ {len(urls)} 件すべて取得できました")
+          PY
+
+      - name: 投稿する (or dry_run)
+        if: ${{ steps.dedupe.outputs.fresh == '1' }}
+        env:
+          AUTOPOST_TRIGGER_TOKEN: ${{ secrets.AUTOPOST_TRIGGER_TOKEN }}
+          SITE_URL: https://tusg.site
+          DRY_RUN: ${{ steps.mode.outputs.dry_run }}
+        run: |
+          python3 tools/publish_carousel.py out/post
+
+      - name: 投稿済みとして記録する
+        if: ${{ success() && steps.dedupe.outputs.fresh == '1' && steps.mode.outputs.dry_run != 'true' }}
+        run: |
+          for i in 1 2 3 4; do
+            git fetch -q origin "${GITHUB_REF_NAME}"
+            git reset -q --hard "origin/${GITHUB_REF_NAME}"
+            python3 scripts/posted.py record --channel carousel --item out/post/post.json
+            git add posted.json
+            if git diff --cached --quiet; then echo "記録する変更なし"; exit 0; fi
+            git -c user.name="tusg-autopost-bot" -c user.email="info@tusg.site" \
+                commit -q -m "chore(autopost): カルーセル $(jq -r .slug out/post/post.json) を投稿済みとして記録"
+            if git push -q origin "HEAD:${GITHUB_REF_NAME}"; then exit 0; fi
+            echo "push 失敗、$((2 ** i))秒後に再試行 ($i/4)"
+            sleep $((2 ** i))
+          done
+          echo "push できませんでした"; exit 1
+
+      - name: 投稿済みのため出しませんでした
+        if: ${{ steps.dedupe.outputs.fresh == '0' }}
+        run: |
+          echo "この slug はすでに投稿済み。二重投稿を避けるため出していません。"
+          echo "posted.json の carousel を見てください。"
+
+      - name: 失敗を Google Chat へ知らせる
+        if: failure()
+        env:
+          NOTIFY_WEBHOOK: ${{ secrets.NOTIFY_WEBHOOK }}
+          WF_NAME: ${{ github.workflow }}
+          WF_REPO: ${{ github.repository }}
+          WF_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          SLUG: ${{ steps.make.outputs.slug }}
+        run: |
+          if [ -z "$NOTIFY_WEBHOOK" ]; then
+            echo "NOTIFY_WEBHOOK 未設定、通知しません"
+            exit 0
+          fi
+          msg=$(printf '⚠️ %s / %s が失敗しました (slug=%s)\n%s' \
+            "$WF_REPO" "$WF_NAME" "$SLUG" "$WF_URL")
+          body=$(MSG="$msg" python3 -c "import json,os; print(json.dumps({'text': os.environ['MSG']}))")
+          http=$(curl -sS -o /dev/null -w "%{http_code}" \
+            -X POST -H "Content-Type: application/json" \
+            -d "$body" "$NOTIFY_WEBHOOK" || echo "0")
+          echo "通知しました (HTTP $http)"

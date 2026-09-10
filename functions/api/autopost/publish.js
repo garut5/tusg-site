@@ -127,12 +127,18 @@ export async function onRequestPost({ request, env }) {
   let caption = "";
   if (needsCaption(mode)) {
     try {
-      caption = buildCaption({
-        title: payload.title || genre.label,
-        body: payload.body || "",
-        genreKey: genre.key,
-      });
-      assertCaption(caption);
+      if (typeof payload.caption === "string" && payload.caption.length > 0) {
+        // 呼び出し側 (Python make_post.py 等) が完成した caption を直接指定した場合
+        caption = payload.caption;
+        assertCaption(caption);
+      } else {
+        caption = buildCaption({
+          title: payload.title || genre.label,
+          body: payload.body || "",
+          genreKey: genre.key,
+        });
+        assertCaption(caption);
+      }
     } catch (e) {
       return json({ ok: false, message: `caption error: ${e.message}` }, 400);
     }
