@@ -218,53 +218,158 @@ def make_cover(tag: str, hook: str, sub: str) -> Image.Image:
     return img
 
 
-def make_body(idx: int, num: str, title: str, desc: str) -> Image.Image:
+def make_cta() -> Image.Image:
+    """最終スライド。診断ページへ誘導する CTA 用。"""
     img = Image.new("RGB", (CANVAS_W, CANVAS_H), COLOR_BG)
     draw = ImageDraw.Draw(img)
 
-    # 上部: ゴールド縦線 + 番号タグ (「01」など)
-    tag_font = load_font(38, weight="bold")
-    tag_y = MARGIN_TOP
+    # 上部: ゴールド縦線 + ラベル
+    tag_font = load_font(30, weight="bold")
+    tag_y = MARGIN_TOP - 10
     draw.rectangle(
-        [(MARGIN_X, tag_y - 4), (MARGIN_X + 6, tag_y + 38)],
+        [(MARGIN_X, tag_y), (MARGIN_X + 5, tag_y + 34)],
         fill=COLOR_GOLD,
     )
-    draw.text((MARGIN_X + 24, tag_y - 2), num, font=tag_font, fill=COLOR_GOLD)
+    draw.text((MARGIN_X + 20, tag_y - 4), "NEXT ACTION", font=tag_font, fill=COLOR_GOLD)
 
-    # 中央上: title (大きい)
-    title_font = load_font(58, weight="bold")
-    title_lh = 88
-    title_y = MARGIN_TOP + 110
-    end_y = _draw_text_block(
-        draw,
-        (MARGIN_X, title_y),
-        title,
-        title_font,
-        COLOR_TEXT,
-        title_lh,
-        CANVAS_W - MARGIN_X * 2,
+    # メインメッセージ (縦センター)
+    main_font = load_font(64, weight="bold")
+    main_lh = 96
+    max_w = CANVAS_W - MARGIN_X * 2
+    main_text = "まず今の状況を\n整理しませんか"
+    main_lines = _text_wrap(draw, main_text, main_font, max_w)
+    main_h = main_lh * len(main_lines)
+
+    sub_font = load_font(32, weight="regular")
+    sub_lh = 52
+    sub_text = "30 秒で答えられる\nシンプルな 8 つの質問"
+    sub_lines = _text_wrap(draw, sub_text, sub_font, max_w)
+    sub_h = sub_lh * len(sub_lines)
+
+    total_h = main_h + 60 + sub_h
+    y = (CANVAS_H - total_h) // 2 - 100
+
+    for line in main_lines:
+        draw.text((MARGIN_X, y), line, font=main_font, fill=COLOR_TEXT)
+        y += main_lh
+    # 装飾下線
+    draw.line([(MARGIN_X, y + 8), (MARGIN_X + 140, y + 8)], fill=COLOR_GOLD, width=4)
+    y += 60
+    for line in sub_lines:
+        draw.text((MARGIN_X, y), line, font=sub_font, fill=COLOR_TEXT_MUTED)
+        y += sub_lh
+
+    # ボタン風 CTA
+    btn_y = y + 60
+    btn_h = 100
+    btn_w = CANVAS_W - MARGIN_X * 2
+    draw.rectangle(
+        [(MARGIN_X, btn_y), (MARGIN_X + btn_w, btn_y + btn_h)],
+        outline=COLOR_GOLD,
+        width=4,
+    )
+    # ボタン内テキスト
+    btn_font = load_font(34, weight="bold")
+    btn_text = "→ プロフィール URL から診断"
+    tw = draw.textlength(btn_text, font=btn_font)
+    draw.text(
+        (MARGIN_X + (btn_w - tw) // 2, btn_y + (btn_h - 40) // 2),
+        btn_text,
+        font=btn_font,
+        fill=COLOR_GOLD,
     )
 
-    # 下線 (装飾)
-    line_y = end_y + 20
+    # 説明 (ボタン下)
+    hint_font = load_font(24, weight="regular")
+    hint = "tusg.site/hearing (無料・登録不要)"
+    hw = draw.textlength(hint, font=hint_font)
+    draw.text(
+        (MARGIN_X + (btn_w - hw) // 2, btn_y + btn_h + 20),
+        hint,
+        font=hint_font,
+        fill=COLOR_TEXT_MUTED,
+    )
+
+    _draw_logo(img, draw)
+    return img
+
+
+def make_body(idx: int, num: str, title: str, desc: str, total: int | None = None) -> Image.Image:
+    """本文スライド。左上に「大きな薄い数字」を装飾で置き、その下にタイトルと説明。
+    下部にページインジケータ (1 / 5 スタイル)、右下に TUSG ロゴ。"""
+    img = Image.new("RGB", (CANVAS_W, CANVAS_H), COLOR_BG)
+    draw = ImageDraw.Draw(img)
+
+    # 装飾: 左上に大きな半透明の数字 ("01" 等) を背景として置く
+    # (視覚的アンカー、単調な空欄を減らす)
+    deco_font = load_font(280, weight="bold")
+    deco_text = num
+    # 半透明にするため、別レイヤーに描いて alpha_composite
+    deco_layer = Image.new("RGBA", (CANVAS_W, CANVAS_H), (0, 0, 0, 0))
+    deco_draw = ImageDraw.Draw(deco_layer)
+    deco_draw.text((MARGIN_X - 20, MARGIN_TOP - 40), deco_text,
+                   font=deco_font, fill=(184, 148, 79, 45))  # ゴールドを 18% 透明
+    img = Image.alpha_composite(img.convert("RGBA"), deco_layer).convert("RGB")
+    draw = ImageDraw.Draw(img)
+
+    # 前面: 小さな番号ラベル (ゴールド縦線 + 番号)
+    tag_font = load_font(30, weight="bold")
+    tag_y = MARGIN_TOP - 10
+    draw.rectangle(
+        [(MARGIN_X, tag_y), (MARGIN_X + 5, tag_y + 34)],
+        fill=COLOR_GOLD,
+    )
+    draw.text((MARGIN_X + 20, tag_y - 4), f"POINT {num}",
+              font=tag_font, fill=COLOR_GOLD)
+
+    # コンテンツを縦方向センターに配置するため、まず title + desc の
+    # 総高さを計算して y 開始位置を決める。
+    title_font = load_font(62, weight="bold")
+    title_lh = 96
+    desc_font = load_font(36, weight="regular")
+    desc_lh = 58
+    max_w = CANVAS_W - MARGIN_X * 2
+
+    title_lines = _text_wrap(draw, title, title_font, max_w)
+    desc_lines = _text_wrap(draw, desc, desc_font, max_w)
+
+    title_h = title_lh * len(title_lines)
+    desc_h = desc_lh * len(desc_lines)
+    underline_gap = 30
+    title_desc_gap = 60
+    total_h = title_h + underline_gap + title_desc_gap + desc_h
+
+    # 中央 (縦位置的に真ん中付近) に配置。ロゴエリアを避けるため
+    # 実際の中央より少し上にオフセット。
+    content_top = (CANVAS_H - total_h) // 2 - 40
+
+    y = content_top
+    for line in title_lines:
+        draw.text((MARGIN_X, y), line, font=title_font, fill=COLOR_TEXT)
+        y += title_lh
+
+    # 装飾下線
+    y_underline = y + 10
     draw.line(
-        [(MARGIN_X, line_y), (MARGIN_X + 100, line_y)],
+        [(MARGIN_X, y_underline), (MARGIN_X + 120, y_underline)],
         fill=COLOR_GOLD,
-        width=3,
+        width=4,
     )
+    y += title_desc_gap
 
-    # desc (説明、小さめ、読みやすい行間)
-    desc_font = load_font(34, weight="regular")
-    desc_lh = 56
-    _draw_text_block(
-        draw,
-        (MARGIN_X, line_y + 40),
-        desc,
-        desc_font,
-        COLOR_TEXT_MUTED,
-        desc_lh,
-        CANVAS_W - MARGIN_X * 2,
-    )
+    for line in desc_lines:
+        draw.text((MARGIN_X, y), line, font=desc_font, fill=COLOR_TEXT_MUTED)
+        y += desc_lh
+
+    # 下部: ページインジケータ (1 / 5 スタイル)
+    if total is not None and total > 1:
+        page_num = idx + 1
+        page_font = load_font(22, weight="regular")
+        page_text = f"{page_num:02d} / {total:02d}"
+        pw = draw.textlength(page_text, font=page_font)
+        px = MARGIN_X
+        py = CANVAS_H - LOGO_BOTTOM_MARGIN + 4
+        draw.text((px, py), page_text, font=page_font, fill=COLOR_TEXT_MUTED)
 
     _draw_logo(img, draw)
     return img
@@ -395,12 +500,19 @@ def main():
     cover.save(outdir / "cover.jpg", quality=90)
 
     # 本文スライド (最大 5 枚)
+    body_items = entry["body"][:5]
     body_files: list[str] = []
-    for i, item in enumerate(entry["body"][:5]):
-        img = make_body(i, item["num"], item["title"], item["desc"])
+    for i, item in enumerate(body_items):
+        img = make_body(i, item["num"], item["title"], item["desc"], total=len(body_items))
         fname = f"body-{i + 1:02d}.jpg"
         img.save(outdir / fname, quality=90)
         body_files.append(fname)
+
+    # 最終 CTA スライド (診断ページへ誘導)
+    cta_img = make_cta()
+    cta_fname = "cta.jpg"
+    cta_img.save(outdir / cta_fname, quality=90)
+    body_files.append(cta_fname)
 
     caption = build_caption(entry, content["meta"])
 
