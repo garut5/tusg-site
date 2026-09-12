@@ -162,6 +162,7 @@
   width: 100%; /* choice-grid 内で 100% 幅 */
   max-width: 100%;
   box-sizing: border-box;
+  text-wrap: pretty; /* 孤立 1 文字改行を抑制 (未対応ブラウザは無視) */
 }
 .wiz-choice-row .wiz-choice { width: auto; } /* row 内は inline サイズ */
 

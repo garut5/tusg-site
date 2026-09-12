@@ -7,7 +7,7 @@ import {
   COMMON_QUESTIONS,
   BRANCH_QUESTIONS,
   FREE_TEXT_CONFIG,
-} from "./config.js?v=1786400000";
+} from "./config.js?v=1786400002";
 import {
   classify,
   isValidEmail,

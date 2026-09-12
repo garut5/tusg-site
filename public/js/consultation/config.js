@@ -144,8 +144,8 @@ export const CATEGORIES = {
 
 // -------- STEP 1: 最初の質問 (最も近い困りごと) --------
 export const PRIMARY_ISSUES = [
-  { value: "hp_create", label: "ホームページを新しく作りたい／作り替えたい", cat: "hp_website" },
-  { value: "hp_leads", label: "ホームページからの問い合わせを増やしたい", cat: "hp_website" },
+  { value: "hp_create", label: "ホームページを作りたい／作り替えたい", cat: "hp_website" },
+  { value: "hp_leads", label: "ホームページの問い合わせを増やしたい", cat: "hp_website" },
   { value: "sns_map", label: "MEO・Google マップ・SNS で集客したい", cat: "hp_website" },
   { value: "reduce_paper_excel", label: "紙・Excel・LINEでの管理を減らしたい", cat: "workflow_automation" },
   { value: "internal_efficiency", label: "社内業務を効率化・自動化したい", cat: "workflow_automation" },
