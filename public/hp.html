@@ -22,6 +22,99 @@
 <link rel="stylesheet" href="/css/style.css?v=1786300000">
 <style>
 /* hp.html 固有の Propagate 風ハイライト & プランカード */
+/* Propagate 風 セクション区切り (黒い横線) */
+.hp-rule {
+  border: 0;
+  height: 4px;
+  background: var(--ink-900);
+  margin: 0 auto;
+  max-width: 60px;
+}
+.hp-rule--long {
+  max-width: 100%;
+  height: 1px;
+  background: var(--ink-900);
+  opacity: .9;
+}
+/* Propagate 風 eyebrow ラベル (緑ベタ) */
+.hp-eyebrow {
+  display: inline-block;
+  background: var(--green-900);
+  color: #fff;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  border-radius: 2px;
+}
+/* Propagate 風 チェックリスト */
+.hp-check {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0 0;
+  display: grid;
+  gap: 12px;
+}
+.hp-check li {
+  position: relative;
+  padding-left: 32px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--ink-700);
+}
+.hp-check li::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 4px;
+  width: 22px; height: 22px;
+  background: var(--green-700);
+  border-radius: 4px;
+}
+.hp-check li::after {
+  content: "";
+  position: absolute;
+  left: 6px; top: 9px;
+  width: 10px; height: 6px;
+  border-left: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: rotate(-45deg);
+}
+/* Propagate 風 比較テーブル */
+.hp-feat-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  margin-top: 32px;
+  background: #fff;
+  border: 1px solid #e6e2d8;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.hp-feat-table th, .hp-feat-table td {
+  padding: 14px 12px;
+  border-bottom: 1px solid #f0ede4;
+  text-align: center;
+  vertical-align: middle;
+}
+.hp-feat-table th:first-child, .hp-feat-table td:first-child {
+  text-align: left;
+  font-weight: 600;
+  color: var(--ink-700);
+  background: #faf8f2;
+  width: 32%;
+}
+.hp-feat-table thead th {
+  background: var(--ink-900);
+  color: #fff;
+  font-weight: 700;
+  padding: 16px 12px;
+}
+.hp-feat-table thead th.hp-feat-rec {
+  background: var(--green-700);
+}
+.hp-feat-table tbody tr:last-child td { border-bottom: 0; }
+.hp-feat-table .hp-yes { color: var(--green-700); font-weight: 700; font-size: 18px; }
+.hp-feat-table .hp-no { color: #cbd0d6; font-weight: 700; font-size: 18px; }
 .hp-mark {
   background-image: linear-gradient(transparent 62%, rgba(210,232,215,.9) 62%, rgba(210,232,215,.9) 92%, transparent 92%);
   background-repeat: repeat-x;
@@ -178,8 +271,8 @@
   "@type": "FAQPage",
   "mainEntity": [
     {"@type": "Question", "name": "既に他社で作ったホームページの改善もできますか？", "acceptedAnswer": {"@type": "Answer", "text": "はい。現状のサイトのURLをお送りいただければ、無料相談で改善余地を診断のうえ、必要な範囲だけ月額運用に切り替えられます。ゼロから作り直す必要はありません。"}},
-    {"@type": "Question", "name": "制作費と月額の違いは？", "acceptedAnswer": {"@type": "Answer", "text": "初期費用は0円、代わりに月額4,800円〜のプランに含めて回収する体系です。公開後の修正・改善・SEO/AIO対策までを月額に含みます。"}},
-    {"@type": "Question", "name": "お試しプランと通常プランの違いは？", "acceptedAnswer": {"@type": "Answer", "text": "お試しプラン(月4,800円〜)は既存HPの応急改善向けで最低契約3か月から。スタンダード(月9,800円〜)以上は制作+MEO+月次改善込みで最低契約6か月からです。プラン変更も可能です。"}},
+    {"@type": "Question", "name": "制作費と月額の違いは？", "acceptedAnswer": {"@type": "Answer", "text": "初期費用は0円、代わりに月額5,300円〜のプランに含めて回収する体系です。公開後の修正・改善・SEO/AIO対策までを月額に含みます。"}},
+    {"@type": "Question", "name": "お試しプランと通常プランの違いは？", "acceptedAnswer": {"@type": "Answer", "text": "お試しプラン(月5,300円〜)は既存HPの応急改善向けで最低契約3か月から。スタンダード(月13,300円〜)以上は制作+MEO+月次改善込みで最低契約6か月からです。プラン変更も可能です。"}},
     {"@type": "Question", "name": "契約期間や解約条件は？", "acceptedAnswer": {"@type": "Answer", "text": "最低契約期間は用意していますが、途中解約時の違約金や、公開後のデータ・ドメイン返却条件は契約書に明記します。曖昧な運用はしません。"}},
     {"@type": "Question", "name": "SEO・AI検索対策も含まれますか？", "acceptedAnswer": {"@type": "Answer", "text": "含まれます。Google検索での上位表示だけでなく、ChatGPT等のAI検索から引用されやすい構造化データ・FAQ設計まで、月額運用に組み込みます。"}}
   ]
@@ -228,9 +321,15 @@
     <div class="storytell" data-reveal>
       <div class="storytell__media"><div class="storytell__media-inner" data-mask role="img" aria-label="スマホでホームページを見る様子(イメージ)" style="background-image:url('https://images.unsplash.com/photo-1616469829581-73993eb86b02?w=1200&h=900&fit=crop&q=85');"></div></div>
       <div>
-        <span class="signature">Problem</span>
+        <span class="hp-eyebrow">PROBLEM</span>
         <h2 style="margin-top:20px;" data-split>「作って公開」で止まっているホームページは、<span class="hp-mark">成果を生みません</span>。</h2>
-        <p>スマホで見にくい・電話番号がタップできない・料金が書かれていない・更新日が古い。読者は <span class="hp-mark">3 秒</span> でその判断をして、離脱します。制作して 3 年前で止まっているホームページの <span class="hp-mark">8 割</span> は、この 4 つのどれかに引っかかっています。</p>
+        <p>スマホで見にくい・電話番号がタップできない・料金が書かれていない・更新日が古い。読者は <span class="hp-mark">3 秒</span> でその判断をして、離脱します。制作して 3 年前で止まっているホームページの <span class="hp-mark">8 割</span> は、次の 4 つのどれかに引っかかっています。</p>
+        <ul class="hp-check">
+          <li>スマホで見ると文字が小さい・タップしづらい</li>
+          <li>電話・LINE・フォームまで 3 タップ以上かかる</li>
+          <li>料金がまったく書かれていない</li>
+          <li>「お知らせ」の日付が 1 年以上前で止まっている</li>
+        </ul>
       </div>
     </div>
   </div>
@@ -246,7 +345,7 @@
 <section class="section--edit" style="background:var(--paper); padding-top:96px;">
   <div class="container">
     <div class="section-head" data-reveal>
-      <span class="signature">4 Essentials</span>
+      <span class="hp-eyebrow">4 ESSENTIALS</span>
       <h2 class="section-title" style="margin-top:20px;" data-split>問い合わせが増えるサイトの、4 つの必須要素</h2>
       <p class="section-lede">派手なデザインや大型リニューアルは、必ずしも必要ありません。まずこの 4 つを押さえることから。</p>
     </div>
@@ -267,7 +366,7 @@
 <section class="section--edit" style="padding-top:96px;">
   <div class="container">
     <div class="section-head" data-reveal>
-      <span class="signature">Cases</span>
+      <span class="hp-eyebrow">CASES</span>
       <h2 class="section-title" style="margin-top:20px;" data-split>実例：小さな改善が数字を変える</h2>
       <p class="section-lede">大規模リニューアルではなく、既存ページの 3〜5 か所を月次で改善した結果です。</p>
     </div>
@@ -284,7 +383,7 @@
 <section class="section--edit" style="padding-top:96px; background:var(--paper);">
   <div class="container">
     <div class="section-head" data-reveal>
-      <span class="signature">Process</span>
+      <span class="hp-eyebrow">PROCESS</span>
       <h2 class="section-title" style="margin-top:20px;" data-split>進め方</h2>
       <p class="section-lede">最短 2 週間で公開、その後は月次で改善サイクルを回します。</p>
     </div>
@@ -301,7 +400,7 @@
 <section class="section--edit" style="padding-top:96px;">
   <div class="container">
     <div class="section-head" data-reveal>
-      <span class="signature">Plans</span>
+      <span class="hp-eyebrow">PLANS</span>
       <h2 class="section-title" style="margin-top:20px;" data-split>料金プラン</h2>
       <p class="section-lede">初期費用 <span class="hp-mark">0 円</span>、制作から公開後の改善まで月額に込み。まずは <span class="hp-mark">お試しプラン</span> から始められます。</p>
     </div>
@@ -309,10 +408,10 @@
     <div class="hp-plans" data-stagger>
       <div class="hp-plan">
         <span class="hp-tag">LIGHT</span>
-        <h3 class="hp-plan__name">お試しプラン</h3>
-        <p class="hp-plan__lede">まずは既存 HP の応急処置から。1 か月試して、続けるか判断できます。</p>
+        <h3 class="hp-plan__name">ライトプラン</h3>
+        <p class="hp-plan__lede">まずは既存 HP の応急改善から。1 か月試して、続けるか判断できます。</p>
         <div class="hp-plan__price">
-          <span class="hp-plan__price-num">4,800</span>
+          <span class="hp-plan__price-num">5,300</span>
           <span class="hp-plan__price-unit">円 / 月</span>
           <span class="hp-plan__price-from">〜（税別）</span>
         </div>
@@ -329,10 +428,10 @@
       <div class="hp-plan hp-plan--rec">
         <span class="hp-plan__badge">おすすめ</span>
         <span class="hp-tag">STANDARD</span>
-        <h3 class="hp-plan__name">スタンダード</h3>
+        <h3 class="hp-plan__name">スタンダードプラン</h3>
         <p class="hp-plan__lede">問い合わせを増やしたい方向け。制作 + MEO + 月次改善を月額パッケージで。</p>
         <div class="hp-plan__price">
-          <span class="hp-plan__price-num">9,800</span>
+          <span class="hp-plan__price-num">13,300</span>
           <span class="hp-plan__price-unit">円 / 月</span>
           <span class="hp-plan__price-from">〜（税別）</span>
         </div>
@@ -349,10 +448,10 @@
 
       <div class="hp-plan">
         <span class="hp-tag">PREMIUM</span>
-        <h3 class="hp-plan__name">プレミアム</h3>
+        <h3 class="hp-plan__name">プレミアムプラン</h3>
         <p class="hp-plan__lede">記事更新まで丸ごとお任せしたい方向け。集客に必要な打ち手を全部込みで。</p>
         <div class="hp-plan__price">
-          <span class="hp-plan__price-num">19,800</span>
+          <span class="hp-plan__price-num">18,300</span>
           <span class="hp-plan__price-unit">円 / 月</span>
           <span class="hp-plan__price-from">〜（税別）</span>
         </div>
@@ -368,6 +467,33 @@
       </div>
     </div>
 
+    <!-- プラン比較テーブル (Propagate 風) -->
+    <div style="overflow-x:auto; margin-top:32px;" data-reveal>
+      <table class="hp-feat-table">
+        <thead>
+          <tr>
+            <th>機能</th>
+            <th>ライト</th>
+            <th class="hp-feat-rec">スタンダード</th>
+            <th>プレミアム</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>初期費用</td><td>0 円</td><td>0 円</td><td>0 円</td></tr>
+          <tr><td>ページ数</td><td>1〜3</td><td>3〜8</td><td>制限なし</td></tr>
+          <tr><td>月次改善</td><td>月 1 回</td><td>月 2 回</td><td>月 4 回</td></tr>
+          <tr><td>アクセス解析</td><td><span class="hp-yes">✓</span></td><td><span class="hp-yes">✓</span></td><td><span class="hp-yes">✓</span></td></tr>
+          <tr><td>ヒートマップ</td><td><span class="hp-no">−</span></td><td><span class="hp-yes">✓</span></td><td><span class="hp-yes">✓</span></td></tr>
+          <tr><td>MEO 連携運用</td><td><span class="hp-no">−</span></td><td><span class="hp-yes">✓</span></td><td><span class="hp-yes">✓</span></td></tr>
+          <tr><td>MEO 投稿代行</td><td><span class="hp-no">−</span></td><td><span class="hp-no">−</span></td><td>月 4 本</td></tr>
+          <tr><td>SEO / AIO 対策</td><td>基本のみ</td><td><span class="hp-yes">✓</span></td><td><span class="hp-yes">✓</span></td></tr>
+          <tr><td>AIO 記事更新</td><td><span class="hp-no">−</span></td><td><span class="hp-no">−</span></td><td>月 2 本</td></tr>
+          <tr><td>月次レポート</td><td><span class="hp-no">−</span></td><td>簡易</td><td>詳細 + 提案</td></tr>
+          <tr><td>最低契約期間</td><td>3 か月</td><td>6 か月</td><td>6 か月</td></tr>
+        </tbody>
+      </table>
+    </div>
+
     <p class="hp-price-foot">
       ※すべて税別。初期費用 0 円 / 制作費は月額に含めて回収します。<br>
       ページ数・機能により金額は前後します。無料相談で正式お見積もりします。
@@ -379,7 +505,7 @@
 <section class="section--edit" style="padding-top:64px;">
   <div class="container" style="max-width:820px;">
     <div class="section-head" data-reveal>
-      <span class="signature">At a glance</span>
+      <span class="hp-eyebrow">AT A GLANCE</span>
       <h2 class="section-title" style="margin-top:20px;" data-split>契約・運用の目安</h2>
     </div>
     <dl class="spec-table" data-reveal>
@@ -397,7 +523,7 @@
 <section class="section--edit" style="padding-top:96px; background:var(--paper);">
   <div class="container" style="max-width:920px;">
     <div class="section-head" data-reveal>
-      <span class="signature">Comparison</span>
+      <span class="hp-eyebrow">COMPARISON</span>
       <h2 class="section-title" style="margin-top:20px;" data-split>3 つの選択肢を比べる</h2>
       <p class="section-lede">自作 / 従来型の制作会社 / TUSG の月額運用、それぞれ向く場面が違います。</p>
     </div>
@@ -413,7 +539,7 @@
         </thead>
         <tbody>
           <tr><td style="padding:14px 12px; border-bottom:1px solid #eee; font-weight:600;">初期費用</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">0〜数万円</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">30〜150 万円</td><td style="padding:14px 12px; border-bottom:1px solid #eee;"><span class="hp-mark">0 円</span></td></tr>
-          <tr><td style="padding:14px 12px; border-bottom:1px solid #eee; font-weight:600;">月額運用費</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">2,000 円〜</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">2〜10 万円 (別料金)</td><td style="padding:14px 12px; border-bottom:1px solid #eee;"><span class="hp-mark">4,800 円〜</span></td></tr>
+          <tr><td style="padding:14px 12px; border-bottom:1px solid #eee; font-weight:600;">月額運用費</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">2,000 円〜</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">2〜10 万円 (別料金)</td><td style="padding:14px 12px; border-bottom:1px solid #eee;"><span class="hp-mark">5,300 円〜</span></td></tr>
           <tr><td style="padding:14px 12px; border-bottom:1px solid #eee; font-weight:600;">制作の負担</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">全部自分</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">丸投げ可 (要件整理も)</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">ヒアリング後お任せ</td></tr>
           <tr><td style="padding:14px 12px; border-bottom:1px solid #eee; font-weight:600;">公開後の改善</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">自分で対応</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">別料金 (都度見積)</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">月額に込み</td></tr>
           <tr><td style="padding:14px 12px; border-bottom:1px solid #eee; font-weight:600;">SEO / AIO 対策</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">自分で学習</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">オプション扱い</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">月額に込み</td></tr>
@@ -429,7 +555,7 @@
 <section class="section--edit" style="padding-top:96px;">
   <div class="container">
     <div class="section-head" data-reveal>
-      <span class="signature">Why TUSG</span>
+      <span class="hp-eyebrow">WHY TUSG</span>
       <h2 class="section-title" style="margin-top:20px;" data-split>TUSG の 3 つの違い</h2>
     </div>
     <div class="trio" data-stagger>
@@ -444,7 +570,7 @@
 <section class="section--edit" style="padding-top:96px; background:var(--paper);">
   <div class="container">
     <div class="section-head" data-reveal>
-      <span class="signature">Use cases</span>
+      <span class="hp-eyebrow">USE CASES</span>
       <h2 class="section-title" style="margin-top:20px;" data-split>ご依頼のパターン</h2>
     </div>
     <div class="cases" data-stagger>
@@ -459,13 +585,13 @@
 <section class="section--edit" style="padding-top:96px;">
   <div class="container" style="max-width:820px;">
     <div class="section-head" data-reveal>
-      <span class="signature">FAQ</span>
+      <span class="hp-eyebrow">FAQ</span>
       <h2 class="section-title" style="margin-top:20px;" data-split>よくあるご質問</h2>
     </div>
     <div style="display:grid; gap:12px;" data-reveal>
       <details class="card"><summary>既に他社で作ったホームページの改善もできますか？</summary><p>はい。現状のサイトの URL をお送りいただければ、無料相談で改善余地を診断のうえ、必要な範囲だけ月額運用に切り替えられます。ゼロから作り直す必要はありません。</p></details>
-      <details class="card"><summary>制作費と月額の違いは？</summary><p>初期費用は 0 円、代わりに月額 4,800 円〜のプランに含めて回収する体系です。公開後の修正・改善・SEO/AIO 対策までを月額に含みます。プラン別の詳細は「料金プラン」セクションをご覧ください。</p></details>
-      <details class="card"><summary>お試しプランと通常プランの違いは？</summary><p>お試しプラン (月 4,800 円〜) は既存 HP の応急改善向けで、最低契約 3 か月から。スタンダード (月 9,800 円〜) 以上は制作 + MEO + 月次改善が込みで、最低契約 6 か月からとなります。途中でプラン変更も可能です。</p></details>
+      <details class="card"><summary>制作費と月額の違いは？</summary><p>初期費用は 0 円、代わりに月額 5,300 円〜のプランに含めて回収する体系です。公開後の修正・改善・SEO/AIO 対策までを月額に含みます。プラン別の詳細は「料金プラン」セクションをご覧ください。</p></details>
+      <details class="card"><summary>お試しプランと通常プランの違いは？</summary><p>お試しプラン (月 5,300 円〜) は既存 HP の応急改善向けで、最低契約 3 か月から。スタンダード (月 13,300 円〜) 以上は制作 + MEO + 月次改善が込みで、最低契約 6 か月からとなります。途中でプラン変更も可能です。</p></details>
       <details class="card"><summary>契約期間や解約条件は？</summary><p>最低契約期間は用意していますが、途中解約時の違約金や、公開後のデータ・ドメイン返却条件は契約書に明記します。曖昧な運用はしません。</p></details>
       <details class="card"><summary>SEO・AI 検索対策も含まれますか？</summary><p>含まれます。Google 検索での上位表示だけでなく、ChatGPT 等の AI 検索から引用されやすい構造化データ・FAQ 設計まで、月額運用に組み込みます。</p></details>
       <details class="card"><summary>大阪以外でも対応可能ですか？</summary><p>はい。ヒアリング・打ち合わせはオンラインで日本全国対応可能です。対面が必要な場合は近畿圏を中心に伺います。</p></details>
