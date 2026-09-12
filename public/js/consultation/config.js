@@ -128,10 +128,25 @@ export const CATEGORIES = {
     ],
     recommend: ["現在の業務整理", "必要な機能の整理", "既存サービスでの対応可否確認"],
   },
+  hp_website: {
+    key: "hp_website",
+    title: "ホームページ制作・運用のご相談",
+    summary:
+      "ホームページの新規制作 / 作り替えから、公開後の MEO・AIO 集客・LINE 公式運用まで、月額サブスクで一貫サポートできる可能性があります。制作費は月額に含めて回収する体系（初期費用 0 円）で、契約期間 3 年の月額固定です。",
+    what_next: [
+      "現在のホームページ有無と URL・業種の確認",
+      "希望ページ数（1 / 2〜6 / 7〜12）と公開時期",
+      "公開後は保守だけで OK か、MEO・AIO まで運用代行が必要か",
+    ],
+    recommend: ["ホームページ制作・運用", "MEO / AIO 運用代行", "LINE 公式運用"],
+  },
 };
 
 // -------- STEP 1: 最初の質問 (最も近い困りごと) --------
 export const PRIMARY_ISSUES = [
+  { value: "hp_create", label: "ホームページを新しく作りたい／作り替えたい", cat: "hp_website" },
+  { value: "hp_leads", label: "ホームページからの問い合わせを増やしたい", cat: "hp_website" },
+  { value: "sns_map", label: "MEO・Google マップ・SNS で集客したい", cat: "hp_website" },
   { value: "reduce_paper_excel", label: "紙・Excel・LINEでの管理を減らしたい", cat: "workflow_automation" },
   { value: "internal_efficiency", label: "社内業務を効率化・自動化したい", cat: "workflow_automation" },
   { value: "build_saas", label: "自社専用のWebシステムやSaaSを作りたい", cat: "custom_saas" },
@@ -140,7 +155,6 @@ export const PRIMARY_ISSUES = [
   { value: "workforce", label: "シフト・勤怠・スタッフ管理を改善したい", cat: "workforce_management" },
   { value: "multi_tenant", label: "店舗・拠点・代理店ごとに情報を管理したい", cat: "multi_tenant_management" },
   { value: "reservation", label: "予約・問い合わせ対応を自動化したい", cat: "customer_engagement" },
-  { value: "sns_map", label: "InstagramやGoogleマップなどを活用したい", cat: "customer_engagement" },
   { value: "dashboard", label: "データを集計して経営状況を見えるようにしたい", cat: "data_dashboard" },
   { value: "existing_maintenance", label: "既存システムを改善・保守してほしい", cat: "security_operations" },
   { value: "security", label: "セキュリティや情報管理を改善したい", cat: "security_operations" },
@@ -273,6 +287,12 @@ export const BRANCH_QUESTIONS = {
   ],
   requirements_discovery: [
     { id: "biggest_pain", label: "今一番困っていること (自由記述、任意)", type: "text", required: false, maxLength: 400 },
+  ],
+  hp_website: [
+    { id: "hp_status", label: "現在のホームページの状況", type: "single", options: ["ある（改善したい）", "ある（作り替えたい）", "ない（新規作成）", "検討中"], required: false },
+    { id: "hp_pages", label: "希望するページ数", type: "single", options: ["1 ページ", "2〜6 ページ", "7〜12 ページ", "未定"], required: false },
+    { id: "hp_ops_style", label: "公開後の運用スタイル", type: "single", options: ["保守だけで良い（忘れて OK）", "MEO / AIO まで運用代行してほしい", "LINE 公式も活用したい", "未定"], required: false },
+    { id: "hp_current_url", label: "現在のホームページ URL があれば（任意）", type: "text", required: false, maxLength: 200 },
   ],
 };
 
