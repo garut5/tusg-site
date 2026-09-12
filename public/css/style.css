@@ -849,9 +849,13 @@ body { background: var(--cream); color: var(--charcoal); font-size: 16px; letter
 
 /* エディトリアル本文セクション */
 .section--edit { padding: 120px 0; }
-@media (max-width: 767px) { .section--edit { padding: 72px 0; } }
-.section--edit .section-title { font-size: 32px; margin-bottom: 20px; letter-spacing: .05em; }
-@media (min-width: 768px) { .section--edit .section-title { font-size: 40px; } }
+@media (max-width: 767px) { .section--edit { padding: 56px 0; } }
+.section--edit .section-title {
+  font-size: 24px; margin-bottom: 16px; letter-spacing: .04em;
+  line-height: 1.5; text-wrap: pretty;
+}
+@media (min-width: 500px) { .section--edit .section-title { font-size: 28px; margin-bottom: 20px; } }
+@media (min-width: 768px) { .section--edit .section-title { font-size: 40px; letter-spacing: .05em; line-height: 1.4; } }
 .section--edit .section-lead { font-size: 15px; line-height: 1.9; color: var(--graphite); max-width: 640px; }
 .section--edit .eyebrow {
   background: transparent; color: var(--forest);
@@ -875,10 +879,12 @@ body { background: var(--cream); color: var(--charcoal); font-size: 16px; letter
   display: inline-block; padding-right: 24px;
 }
 .storytell h2 {
-  font-family: var(--serif); font-size: 26px; font-weight: 700;
-  letter-spacing: .05em; line-height: 1.6; margin: 0 0 20px;
+  font-family: var(--serif); font-size: 22px; font-weight: 700;
+  letter-spacing: .03em; line-height: 1.5; margin: 0 0 16px;
+  text-wrap: pretty;
 }
-@media (min-width: 900px) { .storytell h2 { font-size: 32px; } }
+@media (min-width: 500px) { .storytell h2 { font-size: 26px; margin: 0 0 20px; } }
+@media (min-width: 900px) { .storytell h2 { font-size: 32px; letter-spacing: .05em; line-height: 1.6; } }
 .storytell p { color: var(--graphite); font-size: 15px; line-height: 2; margin: 0 0 24px; }
 
 /* 4サービス縦積みリスト (editorial) */
