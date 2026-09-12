@@ -20,6 +20,131 @@
 <meta property="og:url" content="https://tusg.site/hp.html">
 <meta name="theme-color" content="#0e3d21">
 <link rel="stylesheet" href="/css/style.css?v=1786300000">
+<style>
+/* hp.html 固有の Propagate 風ハイライト & プランカード */
+.hp-mark {
+  background-image: linear-gradient(transparent 62%, rgba(210,232,215,.9) 62%, rgba(210,232,215,.9) 92%, transparent 92%);
+  background-repeat: repeat-x;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  padding: 0 2px;
+  font-weight: 700;
+}
+.hp-tag {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: #e8f3ec;
+  color: var(--green-700);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+.hp-plans {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  align-items: stretch;
+}
+@media (max-width: 900px) {
+  .hp-plans { grid-template-columns: 1fr; }
+}
+.hp-plan {
+  position: relative;
+  background: #fff;
+  border: 1px solid #e6e2d8;
+  border-radius: 14px;
+  padding: 28px 24px 24px;
+  display: flex; flex-direction: column; gap: 14px;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.hp-plan:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(15,22,35,.06); }
+.hp-plan--rec {
+  border-color: var(--green-700);
+  box-shadow: 0 8px 28px rgba(20,80,42,.12);
+}
+.hp-plan__badge {
+  position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+  background: var(--green-700); color: #fff;
+  padding: 4px 14px; border-radius: 999px;
+  font-size: 12px; font-weight: 700; letter-spacing: .04em;
+}
+.hp-plan__name {
+  font-family: "Noto Serif JP", serif;
+  font-size: 22px; font-weight: 700; color: var(--ink-900);
+  margin: 0;
+}
+.hp-plan__lede {
+  font-size: 13px; color: var(--ink-500); margin: 0;
+}
+.hp-plan__price {
+  display: flex; align-items: baseline; gap: 4px;
+  border-bottom: 1px solid #eee; padding-bottom: 14px;
+}
+.hp-plan__price-num {
+  font-family: "Noto Serif JP", serif;
+  font-size: 34px; font-weight: 700; color: var(--ink-900);
+  line-height: 1;
+}
+.hp-plan__price-unit {
+  font-size: 13px; color: var(--ink-500);
+}
+.hp-plan__price-from {
+  font-size: 12px; color: var(--ink-400); margin-left: 4px;
+}
+.hp-plan__list {
+  list-style: none; padding: 0; margin: 0;
+  display: flex; flex-direction: column; gap: 10px;
+  font-size: 14px; color: var(--ink-700);
+  flex: 1;
+}
+.hp-plan__list li {
+  position: relative; padding-left: 24px;
+}
+.hp-plan__list li::before {
+  content: ""; position: absolute; left: 0; top: 6px;
+  width: 16px; height: 10px;
+  border-left: 2px solid var(--green-700);
+  border-bottom: 2px solid var(--green-700);
+  transform: rotate(-45deg);
+}
+.hp-plan__cta {
+  display: block; text-align: center;
+  padding: 12px 16px; border-radius: 8px;
+  background: var(--green-700); color: #fff;
+  font-weight: 700; font-size: 14px;
+  text-decoration: none;
+}
+.hp-plan__cta:hover { background: var(--green-900); }
+.hp-plan__note {
+  font-size: 11px; color: var(--ink-400); text-align: center; margin: 0;
+}
+.hp-price-foot {
+  margin-top: 20px;
+  font-size: 13px; color: var(--ink-500); text-align: center;
+}
+/* Hero と CTA の em を Propagate 風の緑ハイライト下線に */
+.ehero__title em, .cta-band--edit h2 em {
+  font-style: normal;
+  background-image: linear-gradient(transparent 62%, rgba(210,232,215,.9) 62%, rgba(210,232,215,.9) 92%, transparent 92%);
+  background-repeat: repeat-x;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  padding: 0 2px;
+}
+.ehero__sub em {
+  font-style: normal;
+  color: #d5e8de;
+  background-image: linear-gradient(transparent 78%, rgba(213,232,222,.35) 78%, rgba(213,232,222,.35) 92%, transparent 92%);
+  background-repeat: repeat-x;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  padding: 0 2px;
+}
+.short-quote .hp-mark {
+  background-image: linear-gradient(transparent 60%, rgba(210,232,215,.85) 60%, rgba(210,232,215,.85) 94%, transparent 94%);
+}
+</style>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -53,7 +178,8 @@
   "@type": "FAQPage",
   "mainEntity": [
     {"@type": "Question", "name": "既に他社で作ったホームページの改善もできますか？", "acceptedAnswer": {"@type": "Answer", "text": "はい。現状のサイトのURLをお送りいただければ、無料相談で改善余地を診断のうえ、必要な範囲だけ月額運用に切り替えられます。ゼロから作り直す必要はありません。"}},
-    {"@type": "Question", "name": "制作費と月額の違いは？", "acceptedAnswer": {"@type": "Answer", "text": "初期費用は0円、代わりに月額に含めて回収する体系です。公開後の修正・改善・SEO/AIO対策までを月額に含みます。詳細は無料相談でお伝えします。"}},
+    {"@type": "Question", "name": "制作費と月額の違いは？", "acceptedAnswer": {"@type": "Answer", "text": "初期費用は0円、代わりに月額4,800円〜のプランに含めて回収する体系です。公開後の修正・改善・SEO/AIO対策までを月額に含みます。"}},
+    {"@type": "Question", "name": "お試しプランと通常プランの違いは？", "acceptedAnswer": {"@type": "Answer", "text": "お試しプラン(月4,800円〜)は既存HPの応急改善向けで最低契約3か月から。スタンダード(月9,800円〜)以上は制作+MEO+月次改善込みで最低契約6か月からです。プラン変更も可能です。"}},
     {"@type": "Question", "name": "契約期間や解約条件は？", "acceptedAnswer": {"@type": "Answer", "text": "最低契約期間は用意していますが、途中解約時の違約金や、公開後のデータ・ドメイン返却条件は契約書に明記します。曖昧な運用はしません。"}},
     {"@type": "Question", "name": "SEO・AI検索対策も含まれますか？", "acceptedAnswer": {"@type": "Answer", "text": "含まれます。Google検索での上位表示だけでなく、ChatGPT等のAI検索から引用されやすい構造化データ・FAQ設計まで、月額運用に組み込みます。"}}
   ]
@@ -86,8 +212,8 @@
   <div class="container ehero__inner">
     <div class="breadcrumb"><a href="/index.html">トップ</a><span>›</span><a href="/business.html">事業内容</a><span>›</span>ホームページ制作・運用</div>
     <span class="ehero__label">— WEBSITE / HP</span>
-    <h1 class="ehero__title" data-split><span class="p">ホームページはあるのに、</span><span class="p">問い合わせが</span><span class="p">増えない。</span></h1>
-    <p class="ehero__sub"><span class="p">会って話せば「良さ」は伝わるのに、</span><span class="p">ホームページからは相談が来ない。</span><span class="p">その落差を、月額運用で埋めます。</span></p>
+    <h1 class="ehero__title" data-split><span class="p">ホームページはあるのに、</span><span class="p"><em>問い合わせが</em></span><span class="p"><em>増えない。</em></span></h1>
+    <p class="ehero__sub"><span class="p">会って話せば「良さ」は伝わるのに、</span><span class="p">ホームページからは相談が来ない。</span><span class="p">その落差を、<em>月額運用</em>で埋めます。</span></p>
     <div class="editorial-hero__cta">
       <a href="/hearing.html" class="btn btn--primary btn--lg">30秒無料診断へ →</a>
     </div>
@@ -103,8 +229,8 @@
       <div class="storytell__media"><div class="storytell__media-inner" data-mask role="img" aria-label="スマホでホームページを見る様子(イメージ)" style="background-image:url('https://images.unsplash.com/photo-1616469829581-73993eb86b02?w=1200&h=900&fit=crop&q=85');"></div></div>
       <div>
         <span class="signature">Problem</span>
-        <h2 style="margin-top:20px;" data-split>「作って公開」で止まっているホームページは、成果を生みません。</h2>
-        <p>スマホで見にくい・電話番号がタップできない・料金が書かれていない・更新日が古い。読者は 3 秒でその判断をして、離脱します。制作して 3 年前で止まっているホームページの 8 割は、この 4 つのどれかに引っかかっています。</p>
+        <h2 style="margin-top:20px;" data-split>「作って公開」で止まっているホームページは、<span class="hp-mark">成果を生みません</span>。</h2>
+        <p>スマホで見にくい・電話番号がタップできない・料金が書かれていない・更新日が古い。読者は <span class="hp-mark">3 秒</span> でその判断をして、離脱します。制作して 3 年前で止まっているホームページの <span class="hp-mark">8 割</span> は、この 4 つのどれかに引っかかっています。</p>
       </div>
     </div>
   </div>
@@ -112,7 +238,7 @@
 
 <section class="section--edit" style="padding-top:0;">
   <div class="container">
-    <blockquote class="short-quote" data-reveal>「作って納品」ではなく、「公開後に育てる」を月額で。</blockquote>
+    <blockquote class="short-quote" data-reveal>「作って納品」ではなく、<span class="hp-mark">「公開後に育てる」</span>を月額で。</blockquote>
   </div>
 </section>
 
@@ -171,19 +297,96 @@
   </div>
 </section>
 
-<!-- 費用の目安 -->
+<!-- 料金プラン -->
 <section class="section--edit" style="padding-top:96px;">
   <div class="container">
     <div class="section-head" data-reveal>
+      <span class="signature">Plans</span>
+      <h2 class="section-title" style="margin-top:20px;" data-split>料金プラン</h2>
+      <p class="section-lede">初期費用 <span class="hp-mark">0 円</span>、制作から公開後の改善まで月額に込み。まずは <span class="hp-mark">お試しプラン</span> から始められます。</p>
+    </div>
+
+    <div class="hp-plans" data-stagger>
+      <div class="hp-plan">
+        <span class="hp-tag">LIGHT</span>
+        <h3 class="hp-plan__name">お試しプラン</h3>
+        <p class="hp-plan__lede">まずは既存 HP の応急処置から。1 か月試して、続けるか判断できます。</p>
+        <div class="hp-plan__price">
+          <span class="hp-plan__price-num">4,800</span>
+          <span class="hp-plan__price-unit">円 / 月</span>
+          <span class="hp-plan__price-from">〜（税別）</span>
+        </div>
+        <ul class="hp-plan__list">
+          <li>1〜3 ページ構成</li>
+          <li>スマホ表示・導線の応急改善</li>
+          <li>月 1 回の小改善（テキスト・画像差替え）</li>
+          <li>アクセス解析の初期設定</li>
+        </ul>
+        <a href="/hearing.html" class="hp-plan__cta">このプランで相談する →</a>
+        <p class="hp-plan__note">最低契約 3 か月から</p>
+      </div>
+
+      <div class="hp-plan hp-plan--rec">
+        <span class="hp-plan__badge">おすすめ</span>
+        <span class="hp-tag">STANDARD</span>
+        <h3 class="hp-plan__name">スタンダード</h3>
+        <p class="hp-plan__lede">問い合わせを増やしたい方向け。制作 + MEO + 月次改善を月額パッケージで。</p>
+        <div class="hp-plan__price">
+          <span class="hp-plan__price-num">9,800</span>
+          <span class="hp-plan__price-unit">円 / 月</span>
+          <span class="hp-plan__price-from">〜（税別）</span>
+        </div>
+        <ul class="hp-plan__list">
+          <li>3〜8 ページ、必要に応じて新規制作</li>
+          <li>Google マップ（MEO）連携運用</li>
+          <li>月 2 回の改善サイクル</li>
+          <li>アクセス解析 + ヒートマップ導入</li>
+          <li>SEO / AIO の基本対策</li>
+        </ul>
+        <a href="/hearing.html" class="hp-plan__cta">このプランで相談する →</a>
+        <p class="hp-plan__note">最低契約 6 か月から</p>
+      </div>
+
+      <div class="hp-plan">
+        <span class="hp-tag">PREMIUM</span>
+        <h3 class="hp-plan__name">プレミアム</h3>
+        <p class="hp-plan__lede">記事更新まで丸ごとお任せしたい方向け。集客に必要な打ち手を全部込みで。</p>
+        <div class="hp-plan__price">
+          <span class="hp-plan__price-num">19,800</span>
+          <span class="hp-plan__price-unit">円 / 月</span>
+          <span class="hp-plan__price-from">〜（税別）</span>
+        </div>
+        <ul class="hp-plan__list">
+          <li>ページ数上限なし</li>
+          <li>月 4 回の改善サイクル</li>
+          <li>AIO 対策記事 月 2 本更新</li>
+          <li>MEO 投稿代行 月 4 本</li>
+          <li>月次レポート + 改善提案</li>
+        </ul>
+        <a href="/hearing.html" class="hp-plan__cta">このプランで相談する →</a>
+        <p class="hp-plan__note">最低契約 6 か月から</p>
+      </div>
+    </div>
+
+    <p class="hp-price-foot">
+      ※すべて税別。初期費用 0 円 / 制作費は月額に含めて回収します。<br>
+      ページ数・機能により金額は前後します。無料相談で正式お見積もりします。
+    </p>
+  </div>
+</section>
+
+<!-- 契約の目安 -->
+<section class="section--edit" style="padding-top:64px;">
+  <div class="container" style="max-width:820px;">
+    <div class="section-head" data-reveal>
       <span class="signature">At a glance</span>
-      <h2 class="section-title" style="margin-top:20px;" data-split>費用・契約の目安</h2>
-      <p class="section-lede">初期費用 0 円、月額に運用まで込みの体系。具体的な金額は規模と要件でお見積もりします。</p>
+      <h2 class="section-title" style="margin-top:20px;" data-split>契約・運用の目安</h2>
     </div>
     <dl class="spec-table" data-reveal>
-      <div class="spec-table__row"><dt>契約形態</dt><dd>月額運用契約 (制作 + 公開後の運用を含む)<small>個別契約書に基づく</small></dd></div>
+      <div class="spec-table__row"><dt>契約形態</dt><dd>月額運用契約（制作 + 公開後の運用を含む）<small>個別契約書に基づく</small></dd></div>
       <div class="spec-table__row"><dt>初期費用</dt><dd>0 円<small>制作費は月額に含めて回収</small></dd></div>
-      <div class="spec-table__row"><dt>報酬</dt><dd>ページ数・機能・運用範囲により変動<small>詳細は個別お見積もり (無料)</small></dd></div>
-      <div class="spec-table__row"><dt>公開後の改善</dt><dd>月次で修正・追加・SEO/AIO 対策<small>本数の上限は契約範囲内で明記</small></dd></div>
+      <div class="spec-table__row"><dt>最低契約期間</dt><dd>お試し 3 か月／その他 6 か月<small>継続は自動更新（1 か月前解約可）</small></dd></div>
+      <div class="spec-table__row"><dt>公開後の改善</dt><dd>月次で修正・追加・SEO/AIO 対策<small>本数の上限はプランに準拠</small></dd></div>
       <div class="spec-table__row"><dt>解約時</dt><dd>ドメイン・データはお客様に返却<small>違約金の有無・条件は契約書に明記</small></dd></div>
       <div class="spec-table__row"><dt>対応地域</dt><dd>大阪府・関西全域<small>オンライン日本全国</small></dd></div>
     </dl>
@@ -209,7 +412,8 @@
           </tr>
         </thead>
         <tbody>
-          <tr><td style="padding:14px 12px; border-bottom:1px solid #eee; font-weight:600;">初期費用</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">0〜数万円</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">30〜200 万円</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">0 円</td></tr>
+          <tr><td style="padding:14px 12px; border-bottom:1px solid #eee; font-weight:600;">初期費用</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">0〜数万円</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">30〜150 万円</td><td style="padding:14px 12px; border-bottom:1px solid #eee;"><span class="hp-mark">0 円</span></td></tr>
+          <tr><td style="padding:14px 12px; border-bottom:1px solid #eee; font-weight:600;">月額運用費</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">2,000 円〜</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">2〜10 万円 (別料金)</td><td style="padding:14px 12px; border-bottom:1px solid #eee;"><span class="hp-mark">4,800 円〜</span></td></tr>
           <tr><td style="padding:14px 12px; border-bottom:1px solid #eee; font-weight:600;">制作の負担</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">全部自分</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">丸投げ可 (要件整理も)</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">ヒアリング後お任せ</td></tr>
           <tr><td style="padding:14px 12px; border-bottom:1px solid #eee; font-weight:600;">公開後の改善</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">自分で対応</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">別料金 (都度見積)</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">月額に込み</td></tr>
           <tr><td style="padding:14px 12px; border-bottom:1px solid #eee; font-weight:600;">SEO / AIO 対策</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">自分で学習</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">オプション扱い</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">月額に込み</td></tr>
@@ -260,7 +464,8 @@
     </div>
     <div style="display:grid; gap:12px;" data-reveal>
       <details class="card"><summary>既に他社で作ったホームページの改善もできますか？</summary><p>はい。現状のサイトの URL をお送りいただければ、無料相談で改善余地を診断のうえ、必要な範囲だけ月額運用に切り替えられます。ゼロから作り直す必要はありません。</p></details>
-      <details class="card"><summary>制作費と月額の違いは？</summary><p>初期費用は 0 円、代わりに月額に含めて回収する体系です。公開後の修正・改善・SEO/AIO 対策までを月額に含みます。詳細は無料相談でお伝えします。</p></details>
+      <details class="card"><summary>制作費と月額の違いは？</summary><p>初期費用は 0 円、代わりに月額 4,800 円〜のプランに含めて回収する体系です。公開後の修正・改善・SEO/AIO 対策までを月額に含みます。プラン別の詳細は「料金プラン」セクションをご覧ください。</p></details>
+      <details class="card"><summary>お試しプランと通常プランの違いは？</summary><p>お試しプラン (月 4,800 円〜) は既存 HP の応急改善向けで、最低契約 3 か月から。スタンダード (月 9,800 円〜) 以上は制作 + MEO + 月次改善が込みで、最低契約 6 か月からとなります。途中でプラン変更も可能です。</p></details>
       <details class="card"><summary>契約期間や解約条件は？</summary><p>最低契約期間は用意していますが、途中解約時の違約金や、公開後のデータ・ドメイン返却条件は契約書に明記します。曖昧な運用はしません。</p></details>
       <details class="card"><summary>SEO・AI 検索対策も含まれますか？</summary><p>含まれます。Google 検索での上位表示だけでなく、ChatGPT 等の AI 検索から引用されやすい構造化データ・FAQ 設計まで、月額運用に組み込みます。</p></details>
       <details class="card"><summary>大阪以外でも対応可能ですか？</summary><p>はい。ヒアリング・打ち合わせはオンラインで日本全国対応可能です。対面が必要な場合は近畿圏を中心に伺います。</p></details>
@@ -271,8 +476,8 @@
 <!-- CTA -->
 <section class="cta-band--edit">
   <div class="container">
-    <h2 data-split data-reveal>今の HP の改善余地、30 秒でお預けください。</h2>
-    <p>URL があれば、その場で 5 か所の改善提案をお返しします。</p>
+    <h2 data-split data-reveal>今の HP の改善余地、<em>30 秒</em>でお預けください。</h2>
+    <p>URL があれば、その場で <strong>5 か所の改善提案</strong>をお返しします。相談無料・営業なし。</p>
     <a href="/hearing.html" class="btn btn--inverse btn--lg">30 秒無料診断へ →</a>
   </div>
 </section>
