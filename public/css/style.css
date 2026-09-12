@@ -1067,8 +1067,12 @@ body { background: var(--cream); color: var(--charcoal); font-size: 16px; letter
   color: var(--charcoal); max-width: 640px;
   padding: 16px 0; border-top: 1px solid var(--line-2); border-bottom: 1px solid var(--line-2);
   margin: 40px 0;
+  word-break: auto-phrase; line-break: strict; text-wrap: pretty;
 }
 @media (min-width: 900px) { .short-quote { font-size: 22px; } }
+
+/* spec-table の dd も熟語の途中改行を防止 */
+.spec-table__row dd { word-break: auto-phrase; line-break: strict; text-wrap: pretty; }
 
 /* ==========================================================
    Cinematic Motion Layer (v4)
