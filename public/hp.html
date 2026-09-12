@@ -173,17 +173,32 @@
 .hp-plan__price {
   display: flex; align-items: baseline; gap: 4px;
   border-bottom: 1px solid #eee; padding-bottom: 14px;
+  flex-wrap: wrap;
 }
 .hp-plan__price-num {
   font-family: "Noto Serif JP", serif;
   font-size: 34px; font-weight: 700; color: var(--ink-900);
   line-height: 1;
+  white-space: nowrap;
 }
 .hp-plan__price-unit {
   font-size: 13px; color: var(--ink-500);
+  white-space: nowrap;
 }
 .hp-plan__price-from {
   font-size: 12px; color: var(--ink-400); margin-left: 4px;
+  white-space: nowrap;
+  flex-basis: 100%;
+  margin-left: 0;
+}
+/* Options セクションの 2 カラム (900px 以下で 1 カラム) */
+.hp-plans--two {
+  grid-template-columns: repeat(2, 1fr);
+  max-width: 820px;
+  margin-left: auto; margin-right: auto;
+}
+@media (max-width: 900px) {
+  .hp-plans--two { grid-template-columns: 1fr; }
 }
 .hp-plan__list {
   list-style: none; padding: 0; margin: 0;
@@ -515,10 +530,10 @@
       </p>
     </div>
 
-    <div class="hp-plans" data-stagger style="grid-template-columns: repeat(2, 1fr); max-width:820px; margin:0 auto;">
+    <div class="hp-plans hp-plans--two" data-stagger>
       <div class="hp-plan hp-plan--rec">
         <span class="hp-plan__badge">おすすめ</span>
-        <span class="hp-tag">MEO / AIO 運用代行</span>
+        <span class="hp-tag">MEO・AIO</span>
         <h3 class="hp-plan__name">運用代行プラン</h3>
         <p class="hp-plan__lede">運用まるごとおまかせしたい方に</p>
         <div class="hp-plan__price">
