@@ -123,6 +123,20 @@
   padding: 0 2px;
   font-weight: 700;
 }
+/* short-quote 内のマークは丸ごと保持 (「公開後に育てる」の分断防止) */
+.short-quote .hp-mark { white-space: nowrap; }
+/* 比較表と料金テーブルは keep-all + phrase-wrap で日本語の中折り防止 */
+.hp-comp td, .hp-comp th,
+.hp-feat-table td, .hp-feat-table th {
+  word-break: keep-all;
+  overflow-wrap: normal;
+  text-wrap: pretty;
+}
+/* Storytell 内 h2 も同様の折り返し (カタカナ途中で切れる問題対策) */
+.storytell h2 {
+  word-break: auto-phrase;
+  line-break: strict;
+}
 .hp-tag {
   display: inline-block;
   padding: 4px 12px;
@@ -261,8 +275,12 @@
 }
 .hp-comp thead th {
   background: #f7f4ec; color: var(--ink-700);
-  padding: 16px 12px; text-align: left; font-weight: 600; font-size: 14px;
+  padding: 12px 8px; text-align: left; font-weight: 600; font-size: 12px;
   border-bottom: 1px solid #e6e2d8;
+  line-height: 1.4;
+}
+@media (min-width: 500px) {
+  .hp-comp thead th { padding: 16px 12px; font-size: 14px; }
 }
 .hp-comp thead th.hp-comp__ours {
   background: var(--green-700); color: #fff;
@@ -275,9 +293,14 @@
   margin-bottom: 4px; font-weight: 700;
 }
 .hp-comp tbody td {
-  padding: 14px 12px; border-bottom: 1px solid #f0ede4;
+  padding: 12px 8px; border-bottom: 1px solid #f0ede4;
   vertical-align: middle;
+  font-size: 13px; line-height: 1.5;
 }
+@media (min-width: 500px) {
+  .hp-comp tbody td { padding: 14px 12px; font-size: 15px; }
+}
+.hp-comp tbody td small { font-size: 11px; color: var(--ink-500); font-weight: normal; }
 .hp-comp tbody tr:last-child td { border-bottom: 0; }
 .hp-comp tbody td:first-child {
   font-weight: 600; color: var(--ink-700);
@@ -395,7 +418,7 @@
       <div class="storytell__media"><div class="storytell__media-inner" data-mask role="img" aria-label="ノート PC で Web サイトを閲覧する様子(イメージ)" style="background-image:url('https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1200&h=900&fit=crop&q=85');"></div></div>
       <div>
         <span class="hp-eyebrow">PROBLEM</span>
-        <h2 style="margin-top:20px; text-wrap:pretty;" data-split>「作って公開」で止まっているホームページは、<br><span class="hp-mark">成果を生みません</span>。</h2>
+        <h2 style="margin-top:20px; text-wrap:pretty;" data-split>「作って公開」で止まっている<br>ホームページは、<br><span class="hp-mark">成果を生みません</span>。</h2>
         <p>スマホで見にくい・電話番号がタップできない・料金が書かれていない・更新日が古い。読者は <span class="hp-mark">3 秒</span> でその判断をして、離脱します。制作して 3 年前で止まっているホームページの <span class="hp-mark">8 割</span> は、次の 4 つのどれかに引っかかっています。</p>
         <ul class="hp-check">
           <li>スマホで見ると文字が小さい・タップしづらい</li>
@@ -652,13 +675,13 @@
           </tr>
         </thead>
         <tbody>
-          <tr><td>初期費用</td><td>0〜数万円</td><td>30〜150 万円</td><td class="hp-comp__ours"><span class="hp-mark">0 円</span></td></tr>
-          <tr><td>月額運用費</td><td>2,000 円〜</td><td>2〜10 万円<br>(別料金)</td><td class="hp-comp__ours"><span class="hp-mark">9,800〜19,800 円</span><br><small>(税別)</small></td></tr>
-          <tr><td>制作の負担</td><td>全部自分</td><td>丸投げ可<br>(要件整理も)</td><td class="hp-comp__ours">ヒアリング後お任せ</td></tr>
-          <tr><td>公開後の改善</td><td>自分で対応</td><td>別料金<br>(都度見積)</td><td class="hp-comp__ours">月額に込み</td></tr>
-          <tr><td>SEO / AIO 対策</td><td>自分で学習</td><td>オプション扱い</td><td class="hp-comp__ours">月額に込み<br>(SEO)</td></tr>
-          <tr><td>解約時のデータ</td><td>アカウント依存</td><td>要確認<br>(契約次第)</td><td class="hp-comp__ours">全返却<br>(契約書明記)</td></tr>
-          <tr><td>向いている方</td><td>時間があり<br>自習好き</td><td>1 発リリース重視</td><td class="hp-comp__ours">数字で育てたい</td></tr>
+          <tr><td>初期費用</td><td>0〜数万円</td><td>30〜150万円</td><td class="hp-comp__ours"><span class="hp-mark">0円</span></td></tr>
+          <tr><td>月額運用費</td><td>2,000円〜</td><td>2〜10万円<br><small>(別料金)</small></td><td class="hp-comp__ours"><span class="hp-mark">9,800〜19,800円</span><br><small>(税別)</small></td></tr>
+          <tr><td>制作の負担</td><td>全部自分</td><td>丸投げ可</td><td class="hp-comp__ours">ヒアリング後お任せ</td></tr>
+          <tr><td>公開後の改善</td><td>自分で対応</td><td>別料金</td><td class="hp-comp__ours">月額に込み</td></tr>
+          <tr><td>SEO / AIO 対策</td><td>自分で学習</td><td>オプション扱い</td><td class="hp-comp__ours">月額に込み</td></tr>
+          <tr><td>解約時のデータ</td><td>アカウント依存</td><td>契約次第</td><td class="hp-comp__ours">全返却</td></tr>
+          <tr><td>向いている方</td><td>自分で作りたい</td><td>まず作りたい</td><td class="hp-comp__ours">育てて集客したい</td></tr>
         </tbody>
       </table>
     </div>
