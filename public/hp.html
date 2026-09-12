@@ -216,6 +216,28 @@
   margin-top: 20px;
   font-size: 13px; color: var(--ink-500); text-align: center;
 }
+/* 全プラン共通の機能ブロック */
+.hp-included {
+  margin-top: 40px;
+  padding: 28px;
+  background: #f7f4ec;
+  border-radius: 12px;
+  border: 1px solid #e6e2d8;
+}
+.hp-included__head {
+  font-family: "Noto Serif JP", serif;
+  font-size: 18px;
+  margin: 0 0 8px;
+  color: var(--ink-900);
+}
+.hp-included__note {
+  margin: 16px 0 0;
+  font-size: 13px;
+  color: var(--ink-500);
+  padding-top: 16px;
+  border-top: 1px dashed #d8d2c2;
+}
+.hp-included .hp-check { margin-top: 12px; }
 /* Hero と CTA の em を Propagate 風の緑ハイライト下線に */
 .ehero__title em, .cta-band--edit h2 em {
   font-style: normal;
@@ -271,8 +293,9 @@
   "@type": "FAQPage",
   "mainEntity": [
     {"@type": "Question", "name": "既に他社で作ったホームページの改善もできますか？", "acceptedAnswer": {"@type": "Answer", "text": "はい。現状のサイトのURLをお送りいただければ、無料相談で改善余地を診断のうえ、必要な範囲だけ月額運用に切り替えられます。ゼロから作り直す必要はありません。"}},
-    {"@type": "Question", "name": "制作費と月額の違いは？", "acceptedAnswer": {"@type": "Answer", "text": "初期費用は0円、代わりに月額5,500円(税込)〜のプランに含めて回収する体系です。公開後の保守・修正・SEO対策までを月額に含みます。"}},
-    {"@type": "Question", "name": "ライトとスタンダードの違いは？", "acceptedAnswer": {"@type": "Answer", "text": "ライト(月5,500円税込・契約1年)は既存HPの保守・応急改善向け。スタンダード(月16,500円税込・契約3年)はTOP+固定5ページの新規制作+サーバー管理・定期監査・SEO対策までを月額込みで提供します。プレミアム(月34,800円税込・契約3年)はさらにMEO/AIO対策・最新情報投稿(月4本)まで含み、集客の入口を全方位でカバーします。"}},
+    {"@type": "Question", "name": "制作費と月額の違いは？", "acceptedAnswer": {"@type": "Answer", "text": "初期費用は0円、代わりに月額9,800円(税別)〜のサブスクプランに含めて回収する体系です。制作+サーバー管理+ウイルスチェック+月2回までの軽微修正までを月額に含みます。"}},
+    {"@type": "Question", "name": "プランの選び方は？", "acceptedAnswer": {"@type": "Answer", "text": "ページ数だけで選べます。1ページ(月9,800円)・2〜6ページ(月14,800円)・7〜12ページ(月19,800円)の3プラン。すべて税別・初期費用0円・最低契約6か月です。中身の機能は全プラン共通。集客活動が必要な方はMEO対策(+11,000円)/AIO対策(+8,800円)/最新情報投稿(+5,500円)をオプションで追加できます。"}},
+    {"@type": "Question", "name": "「忘れて OK」とはどういう意味？", "acceptedAnswer": {"@type": "Answer", "text": "契約後は定期打ち合わせを設けず、こちらから催促の連絡もしません。サーバー・SSL・ウイルスチェックは自動で動き、月2回までの軽微修正が必要な時だけご連絡いただければOK。営業のような月次の定例会・改善提案は集客オプションを付けた時だけ発生する設計です。"}},
     {"@type": "Question", "name": "契約期間や解約条件は？", "acceptedAnswer": {"@type": "Answer", "text": "最低契約期間は用意していますが、途中解約時の違約金や、公開後のデータ・ドメイン返却条件は契約書に明記します。曖昧な運用はしません。"}},
     {"@type": "Question", "name": "SEO・AI検索対策も含まれますか？", "acceptedAnswer": {"@type": "Answer", "text": "含まれます。Google検索での上位表示だけでなく、ChatGPT等のAI検索から引用されやすい構造化データ・FAQ設計まで、月額運用に組み込みます。"}}
   ]
@@ -306,7 +329,7 @@
     <div class="breadcrumb"><a href="/index.html">トップ</a><span>›</span><a href="/business.html">事業内容</a><span>›</span>ホームページ制作・運用</div>
     <span class="ehero__label">— WEBSITE / HP</span>
     <h1 class="ehero__title" data-split><span class="p">ホームページはあるのに、</span><span class="p"><em>問い合わせが</em></span><span class="p"><em>増えない。</em></span></h1>
-    <p class="ehero__sub"><span class="p">会って話せば「良さ」は伝わるのに、</span><span class="p">ホームページからは相談が来ない。</span><span class="p">その落差を、<em>月額運用</em>で埋めます。</span></p>
+    <p class="ehero__sub"><span class="p">会って話せば「良さ」は伝わるのに、</span><span class="p">ホームページからは相談が来ない。</span><span class="p">その落差を、<em>月額 9,800 円〜</em> の「忘れて OK」な運用で埋めます。</span></p>
     <div class="editorial-hero__cta">
       <a href="/hearing.html" class="btn btn--primary btn--lg">30秒無料診断へ →</a>
     </div>
@@ -396,117 +419,158 @@
   </div>
 </section>
 
-<!-- 料金プラン -->
+<!-- 料金プラン (ページ数で選ぶ) -->
 <section class="section--edit" style="padding-top:96px;">
   <div class="container">
     <div class="section-head" data-reveal>
       <span class="hp-eyebrow">PLANS</span>
-      <h2 class="section-title" style="margin-top:20px;" data-split>料金プラン</h2>
-      <p class="section-lede">初期費用 <span class="hp-mark">0 円</span>、制作から公開後の保守・改善まで月額に込み。まずは <span class="hp-mark">ライトプラン</span> から始められます。</p>
+      <h2 class="section-title" style="margin-top:20px;" data-split>必要なページ数で選ぶ</h2>
+      <p class="section-lede">
+        契約後は <span class="hp-mark">「忘れて OK」</span> の運用設計。定期打ち合わせなし、こちらから催促もしません。<br>
+        毎月の集客活動が必要な方は、下段の <span class="hp-mark">集客オプション</span> を必要な時だけ追加できます。
+      </p>
     </div>
 
     <div class="hp-plans" data-stagger>
       <div class="hp-plan">
-        <span class="hp-tag">LIGHT</span>
-        <h3 class="hp-plan__name">ライトプラン</h3>
-        <p class="hp-plan__lede">まずは既存 HP の保守・応急改善から。1 年単位で始められます。</p>
+        <span class="hp-tag">1 PAGE</span>
+        <h3 class="hp-plan__name">1 ページ</h3>
+        <p class="hp-plan__lede">LP・名刺代わりの一枚もの向け</p>
         <div class="hp-plan__price">
-          <span class="hp-plan__price-num">5,500</span>
+          <span class="hp-plan__price-num">9,800</span>
           <span class="hp-plan__price-unit">円 / 月</span>
-          <span class="hp-plan__price-from">（税込）</span>
+          <span class="hp-plan__price-from">〜（税別）</span>
         </div>
         <ul class="hp-plan__list">
-          <li>既存 HP の保守 (最大 3 ページ)</li>
-          <li>サーバー管理費・独自 SSL 込み</li>
-          <li>ウイルスチェック (改ざん・マルウェア検知)</li>
-          <li>軽微修正 月 1 回まで</li>
-          <li>初期費用 0 円</li>
+          <li>TOP 1 ページ構成</li>
+          <li>問い合わせ導線 1 系統（電話・LINE・フォーム のいずれか）</li>
         </ul>
         <a href="/hearing.html" class="hp-plan__cta">このプランで相談する →</a>
-        <p class="hp-plan__note">契約期間 1 年 (自動更新)</p>
       </div>
 
       <div class="hp-plan hp-plan--rec">
-        <span class="hp-plan__badge">おすすめ</span>
-        <span class="hp-tag">STANDARD</span>
-        <h3 class="hp-plan__name">スタンダードプラン</h3>
-        <p class="hp-plan__lede">TOP + 固定 5 ページ・スマホ対応 の制作 + 保守が月額パッケージで揃います。</p>
+        <span class="hp-plan__badge">最多ご利用</span>
+        <span class="hp-tag">2-6 PAGES</span>
+        <h3 class="hp-plan__name">2〜6 ページ</h3>
+        <p class="hp-plan__lede">中小企業・店舗の標準構成</p>
         <div class="hp-plan__price">
-          <span class="hp-plan__price-num">16,500</span>
+          <span class="hp-plan__price-num">14,800</span>
           <span class="hp-plan__price-unit">円 / 月</span>
-          <span class="hp-plan__price-from">（税込）</span>
+          <span class="hp-plan__price-from">〜（税別）</span>
         </div>
         <ul class="hp-plan__list">
-          <li>ホームページ制作 (TOP + 固定 5 ページ・スマホ対応)</li>
-          <li>サーバー管理費 (稼働監視・独自 SSL・定期バックアップ)</li>
-          <li>定期監査 (月次でセキュリティ・稼働・SEO を点検し是正)</li>
-          <li>ウイルスチェック (改ざん・マルウェア検知)</li>
-          <li>SEO 対策 (内部最適化・表示速度・構造化・キーワード調整)</li>
-          <li>軽微修正 月 2 回まで / 大きな仕様変更 月 1 回まで</li>
-          <li>初期費用 0 円</li>
+          <li>TOP + 固定 5 ページまで</li>
+          <li>問い合わせ導線 複数系統</li>
         </ul>
         <a href="/hearing.html" class="hp-plan__cta">このプランで相談する →</a>
-        <p class="hp-plan__note">契約期間 3 年 (36 か月・自動更新)</p>
       </div>
 
       <div class="hp-plan">
-        <span class="hp-tag">PREMIUM</span>
-        <h3 class="hp-plan__name">プレミアムプラン</h3>
-        <p class="hp-plan__lede">スタンダード + MEO / AIO 対策 + 最新情報投稿まで丸ごとお任せ。集客の入口を全方位で。</p>
+        <span class="hp-tag">7-12 PAGES</span>
+        <h3 class="hp-plan__name">7〜12 ページ</h3>
+        <p class="hp-plan__lede">サービス・実績・採用など多い方向け</p>
         <div class="hp-plan__price">
-          <span class="hp-plan__price-num">34,800</span>
+          <span class="hp-plan__price-num">19,800</span>
           <span class="hp-plan__price-unit">円 / 月</span>
-          <span class="hp-plan__price-from">（税込）</span>
+          <span class="hp-plan__price-from">〜（税別）</span>
         </div>
         <ul class="hp-plan__list">
-          <li>スタンダードの全機能</li>
-          <li>ページ数上限なし・拡張可能</li>
-          <li><strong>MEO 対策</strong> (GBP 最適化・口コミ返信・投稿代行 月 4 本)</li>
-          <li><strong>AIO 対策</strong> (構造化データ充実・FAQ 拡充・引用されやすい記事化)</li>
-          <li><strong>最新情報の投稿</strong> (お知らせ・新商品・キャンペーン 月 4 本まで)</li>
-          <li>月次レポート + 改善提案</li>
-          <li>軽微修正 月 4 回まで / 大きな仕様変更 月 2 回まで</li>
+          <li>TOP + 固定 11 ページまで</li>
+          <li>カテゴリ分け・下層ページ設計</li>
         </ul>
         <a href="/hearing.html" class="hp-plan__cta">このプランで相談する →</a>
-        <p class="hp-plan__note">契約期間 3 年 (36 か月・自動更新)</p>
       </div>
     </div>
 
-    <!-- プラン比較テーブル (Propagate 風) -->
-    <div style="overflow-x:auto; margin-top:32px;" data-reveal>
-      <table class="hp-feat-table">
-        <thead>
-          <tr>
-            <th>機能</th>
-            <th>ライト</th>
-            <th class="hp-feat-rec">スタンダード</th>
-            <th>プレミアム</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>月額 (税込)</td><td>5,500 円</td><td>16,500 円</td><td>34,800 円</td></tr>
-          <tr><td>初期費用</td><td>0 円</td><td>0 円</td><td>0 円</td></tr>
-          <tr><td>ページ数</td><td>最大 3</td><td>TOP + 固定 5</td><td>制限なし</td></tr>
-          <tr><td>サーバー管理・独自 SSL</td><td><span class="hp-yes">✓</span></td><td><span class="hp-yes">✓</span></td><td><span class="hp-yes">✓</span></td></tr>
-          <tr><td>定期バックアップ</td><td><span class="hp-no">−</span></td><td><span class="hp-yes">✓</span></td><td><span class="hp-yes">✓</span></td></tr>
-          <tr><td>ウイルスチェック</td><td><span class="hp-yes">✓</span></td><td><span class="hp-yes">✓</span></td><td><span class="hp-yes">✓</span></td></tr>
-          <tr><td>定期監査 (月次)</td><td><span class="hp-no">−</span></td><td><span class="hp-yes">✓</span></td><td><span class="hp-yes">✓</span></td></tr>
-          <tr><td>SEO 対策 (内部最適化)</td><td><span class="hp-no">−</span></td><td><span class="hp-yes">✓</span></td><td><span class="hp-yes">✓</span></td></tr>
-          <tr><td>軽微修正</td><td>月 1 回</td><td>月 2 回</td><td>月 4 回</td></tr>
-          <tr><td>大きな仕様変更</td><td><span class="hp-no">−</span></td><td>月 1 回</td><td>月 2 回</td></tr>
-          <tr><td>MEO 対策 (GBP 最適化・口コミ返信)</td><td><span class="hp-no">−</span></td><td><span class="hp-no">−</span></td><td><span class="hp-yes">✓</span></td></tr>
-          <tr><td>MEO 投稿代行</td><td><span class="hp-no">−</span></td><td><span class="hp-no">−</span></td><td>月 4 本</td></tr>
-          <tr><td>AIO 対策 (構造化・引用対策)</td><td><span class="hp-no">−</span></td><td><span class="hp-no">−</span></td><td><span class="hp-yes">✓</span></td></tr>
-          <tr><td>最新情報の投稿</td><td><span class="hp-no">−</span></td><td><span class="hp-no">−</span></td><td>月 4 本</td></tr>
-          <tr><td>月次レポート</td><td><span class="hp-no">−</span></td><td><span class="hp-no">−</span></td><td>詳細 + 提案</td></tr>
-          <tr><td>契約期間</td><td>1 年</td><td>3 年</td><td>3 年</td></tr>
-        </tbody>
-      </table>
+    <!-- 全プラン共通の機能 -->
+    <div class="hp-included" data-reveal>
+      <h3 class="hp-included__head">全プラン共通で込み — <span class="hp-mark">忘れて OK な運用設計</span></h3>
+      <ul class="hp-check">
+        <li>オリジナルデザイン ＋ スマートフォン対応</li>
+        <li>文章作成サポート（制作時）</li>
+        <li>サーバー管理費・独自 SSL・定期バックアップ</li>
+        <li>ウイルスチェック（改ざん・マルウェア検知）</li>
+        <li>SEO 基本対策（内部最適化・表示速度・構造化データ）</li>
+        <li>軽微修正（電話番号・営業時間・価格変更など）月 2 回まで</li>
+        <li><strong>定期打ち合わせなし・こちらから催促もしません</strong></li>
+      </ul>
+      <p class="hp-included__note">
+        初期費用 0 円 / 最低契約期間 6 か月 / 契約期間中は月額固定。<br>
+        ページ数を超える大幅な追加、新規機能開発は事前見積もりのうえ別途費用となります。
+      </p>
+    </div>
+
+    <p class="hp-price-foot">※金額はすべて税別（10% の消費税が別途かかります）</p>
+  </div>
+</section>
+
+<!-- 集客オプション -->
+<section class="section--edit" style="padding-top:96px; background:var(--paper);">
+  <div class="container">
+    <div class="section-head" data-reveal>
+      <span class="hp-eyebrow">OPTIONS</span>
+      <h2 class="section-title" style="margin-top:20px;" data-split>集客オプション（必要な時だけ）</h2>
+      <p class="section-lede">
+        制作プランは「忘れて OK」のミニマム設計。<span class="hp-mark">ここぞという時期だけ</span> 集客オプションを追加できます。<br>
+        追加も解除もいつでも 1 か月単位で。
+      </p>
+    </div>
+
+    <div class="hp-plans" data-stagger>
+      <div class="hp-plan">
+        <span class="hp-tag">MEO</span>
+        <h3 class="hp-plan__name">MEO 対策</h3>
+        <p class="hp-plan__lede">Google マップで見つけてもらう</p>
+        <div class="hp-plan__price">
+          <span class="hp-plan__price-num">+11,000</span>
+          <span class="hp-plan__price-unit">円 / 月</span>
+          <span class="hp-plan__price-from">（税別）</span>
+        </div>
+        <ul class="hp-plan__list">
+          <li>Google ビジネスプロフィール最適化</li>
+          <li>口コミ返信代行</li>
+          <li>投稿代行 月 4 本</li>
+          <li>順位の月次計測レポート</li>
+        </ul>
+      </div>
+
+      <div class="hp-plan">
+        <span class="hp-tag">AIO</span>
+        <h3 class="hp-plan__name">AIO 対策</h3>
+        <p class="hp-plan__lede">ChatGPT 等の AI 検索に拾われる</p>
+        <div class="hp-plan__price">
+          <span class="hp-plan__price-num">+8,800</span>
+          <span class="hp-plan__price-unit">円 / 月</span>
+          <span class="hp-plan__price-from">（税別）</span>
+        </div>
+        <ul class="hp-plan__list">
+          <li>構造化データ充実</li>
+          <li>FAQ ページ設計・拡充</li>
+          <li>AI 引用されやすい記事化</li>
+          <li>llms.txt / llms-full.txt 整備</li>
+        </ul>
+      </div>
+
+      <div class="hp-plan">
+        <span class="hp-tag">NEWS</span>
+        <h3 class="hp-plan__name">最新情報投稿</h3>
+        <p class="hp-plan__lede">お知らせ・新商品・キャンペーン</p>
+        <div class="hp-plan__price">
+          <span class="hp-plan__price-num">+5,500</span>
+          <span class="hp-plan__price-unit">円 / 月</span>
+          <span class="hp-plan__price-from">（税別）</span>
+        </div>
+        <ul class="hp-plan__list">
+          <li>お知らせ投稿 月 4 本</li>
+          <li>新商品・キャンペーン告知</li>
+          <li>SNS 連携投稿（オプション）</li>
+        </ul>
+      </div>
     </div>
 
     <p class="hp-price-foot">
-      ※金額はすべて税込。初期費用 0 円 / 制作費は月額に含めて回収します。<br>
-      作業量が大きいもの・新規機能開発を伴うものは事前にお見積もりのうえ別途費用を申し受ける場合があります。
+      ※オプションは制作プランへの月額加算です（単独契約はできません）。<br>
+      3 つセットの <strong>「集客フルパック」+22,000 円/月（税別）</strong>（通常 +25,300 円 → 3,300 円お得）もあります。
     </p>
   </div>
 </section>
@@ -519,10 +583,10 @@
       <h2 class="section-title" style="margin-top:20px;" data-split>契約・運用の目安</h2>
     </div>
     <dl class="spec-table" data-reveal>
-      <div class="spec-table__row"><dt>契約形態</dt><dd>月額運用契約（制作 + 公開後の運用を含む）<small>個別契約書に基づく</small></dd></div>
+      <div class="spec-table__row"><dt>契約形態</dt><dd>月額サブスクリプション契約（制作 + 保守を含む）<small>個別契約書に基づく</small></dd></div>
       <div class="spec-table__row"><dt>初期費用</dt><dd>0 円<small>制作費は月額に含めて回収</small></dd></div>
-      <div class="spec-table__row"><dt>契約期間</dt><dd>ライト 1 年／スタンダード・プレミアム 3 年<small>継続は自動更新（1 か月前解約可）</small></dd></div>
-      <div class="spec-table__row"><dt>公開後の改善</dt><dd>月次で修正・追加・SEO/AIO 対策<small>本数の上限はプランに準拠</small></dd></div>
+      <div class="spec-table__row"><dt>最低契約期間</dt><dd>6 か月<small>継続は自動更新（1 か月前解約可）</small></dd></div>
+      <div class="spec-table__row"><dt>公開後の運用</dt><dd>軽微修正 月 2 回まで<small>定期打ち合わせなし・こちらから催促もしません</small></dd></div>
       <div class="spec-table__row"><dt>解約時</dt><dd>ドメイン・データはお客様に返却<small>違約金の有無・条件は契約書に明記</small></dd></div>
       <div class="spec-table__row"><dt>対応地域</dt><dd>大阪府・関西全域<small>オンライン日本全国</small></dd></div>
     </dl>
@@ -549,7 +613,7 @@
         </thead>
         <tbody>
           <tr><td style="padding:14px 12px; border-bottom:1px solid #eee; font-weight:600;">初期費用</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">0〜数万円</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">30〜150 万円</td><td style="padding:14px 12px; border-bottom:1px solid #eee;"><span class="hp-mark">0 円</span></td></tr>
-          <tr><td style="padding:14px 12px; border-bottom:1px solid #eee; font-weight:600;">月額運用費</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">2,000 円〜</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">2〜10 万円 (別料金)</td><td style="padding:14px 12px; border-bottom:1px solid #eee;"><span class="hp-mark">5,500〜34,800 円</span></td></tr>
+          <tr><td style="padding:14px 12px; border-bottom:1px solid #eee; font-weight:600;">月額運用費</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">2,000 円〜</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">2〜10 万円 (別料金)</td><td style="padding:14px 12px; border-bottom:1px solid #eee;"><span class="hp-mark">9,800〜19,800 円 (税別)</span></td></tr>
           <tr><td style="padding:14px 12px; border-bottom:1px solid #eee; font-weight:600;">制作の負担</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">全部自分</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">丸投げ可 (要件整理も)</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">ヒアリング後お任せ</td></tr>
           <tr><td style="padding:14px 12px; border-bottom:1px solid #eee; font-weight:600;">公開後の改善</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">自分で対応</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">別料金 (都度見積)</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">月額に込み</td></tr>
           <tr><td style="padding:14px 12px; border-bottom:1px solid #eee; font-weight:600;">SEO / AIO 対策</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">自分で学習</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">オプション扱い</td><td style="padding:14px 12px; border-bottom:1px solid #eee;">月額に込み</td></tr>
@@ -600,9 +664,11 @@
     </div>
     <div style="display:grid; gap:12px;" data-reveal>
       <details class="card"><summary>既に他社で作ったホームページの改善もできますか？</summary><p>はい。現状のサイトの URL をお送りいただければ、無料相談で改善余地を診断のうえ、必要な範囲だけ月額運用に切り替えられます。ゼロから作り直す必要はありません。</p></details>
-      <details class="card"><summary>制作費と月額の違いは？</summary><p>初期費用は 0 円、代わりに月額 5,500 円 (税込)〜のプランに含めて回収する体系です。公開後の保守・修正・SEO 対策までを月額に含みます。プラン別の詳細は「料金プラン」セクションをご覧ください。</p></details>
-      <details class="card"><summary>ライトとスタンダードの違いは？</summary><p>ライト (月 5,500 円 税込・契約 1 年) は既存 HP の保守・応急改善向け。スタンダード (月 16,500 円 税込・契約 3 年) は TOP + 固定 5 ページの新規制作 + サーバー管理・定期監査・SEO 対策 までを月額込みで提供します。プレミアム (月 34,800 円 税込・契約 3 年) はさらに MEO / AIO 対策・最新情報投稿 (月 4 本) まで含み、集客の入口を全方位でカバーします。</p></details>
-      <details class="card"><summary>大きな仕様変更 (デザイン・レイアウト変更) は追加料金がかかりますか？</summary><p>スタンダード：月 1 回まで、プレミアム：月 2 回まで、月額内で対応します。それを超える場合や新規機能開発を伴うものは、事前にお見積もりのうえ別途費用を申し受けます。</p></details>
+      <details class="card"><summary>制作費と月額の違いは？</summary><p>初期費用は 0 円、代わりに月額 9,800 円（税別）〜のサブスクプランに含めて回収する体系です。制作 + サーバー管理 + ウイルスチェック + 月 2 回までの軽微修正 までを月額に含みます。</p></details>
+      <details class="card"><summary>プランの選び方は？</summary><p>ページ数だけで選べます。1 ページ (月 9,800 円) / 2〜6 ページ (月 14,800 円) / 7〜12 ページ (月 19,800 円) の 3 プラン。すべて税別・初期費用 0 円・最低契約 6 か月。中身の機能は 全プラン共通 です。</p></details>
+      <details class="card"><summary>「忘れて OK」とはどういう意味？</summary><p>契約後は 定期打ち合わせを設けず、こちらから催促の連絡もしません。サーバー・SSL・ウイルスチェックは自動で動き、月 2 回までの軽微修正 (電話番号・営業時間・価格など) が必要な時だけご連絡いただければ OK です。営業のような月次の定例会・改善提案は「集客オプション」を付けた時だけ発生する設計です。</p></details>
+      <details class="card"><summary>MEO / AIO 対策・最新情報投稿は必ずつけないといけない？</summary><p>いいえ、すべて任意の追加オプションです。「毎月アクションを打ちたい時期だけ」1 か月単位で追加・解除できます。長期的に静かに保守だけしたい場合は制作プランのみでご利用ください。</p></details>
+      <details class="card"><summary>大幅なデザイン変更・新機能追加は追加料金がかかりますか？</summary><p>はい。月 2 回までの軽微修正 (テキスト・電話・営業時間などの変更) は月額内で対応しますが、ページ数を超える追加、レイアウト全面変更、新規機能開発を伴うものは、事前にお見積もりのうえ別途費用を申し受けます。</p></details>
       <details class="card"><summary>契約期間や解約条件は？</summary><p>最低契約期間は用意していますが、途中解約時の違約金や、公開後のデータ・ドメイン返却条件は契約書に明記します。曖昧な運用はしません。</p></details>
       <details class="card"><summary>SEO・AI 検索対策も含まれますか？</summary><p>含まれます。Google 検索での上位表示だけでなく、ChatGPT 等の AI 検索から引用されやすい構造化データ・FAQ 設計まで、月額運用に組み込みます。</p></details>
       <details class="card"><summary>大阪以外でも対応可能ですか？</summary><p>はい。ヒアリング・打ち合わせはオンラインで日本全国対応可能です。対面が必要な場合は近畿圏を中心に伺います。</p></details>
