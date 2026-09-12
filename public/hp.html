@@ -116,7 +116,7 @@
 .hp-feat-table .hp-yes { color: var(--green-700); font-weight: 700; font-size: 18px; }
 .hp-feat-table .hp-no { color: #cbd0d6; font-weight: 700; font-size: 18px; }
 .hp-mark {
-  background-image: linear-gradient(transparent 62%, rgba(210,232,215,.9) 62%, rgba(210,232,215,.9) 92%, transparent 92%);
+  background-image: linear-gradient(transparent 72%, rgba(210,232,215,.85) 72%, rgba(210,232,215,.85) 94%, transparent 94%);
   background-repeat: repeat-x;
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
@@ -256,7 +256,8 @@
 /* Hero と CTA の em を Propagate 風の緑ハイライト下線に */
 .ehero__title em, .cta-band--edit h2 em {
   font-style: normal;
-  background-image: linear-gradient(transparent 62%, rgba(210,232,215,.9) 62%, rgba(210,232,215,.9) 92%, transparent 92%);
+  /* 78% 以下は透明、78-95% だけ緑 → 明確な下線ハイライト (文字にかぶらない) */
+  background-image: linear-gradient(transparent 78%, rgba(210,232,215,.85) 78%, rgba(210,232,215,.85) 95%, transparent 95%);
   background-repeat: repeat-x;
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
@@ -272,7 +273,7 @@
   padding: 0 2px;
 }
 .short-quote .hp-mark {
-  background-image: linear-gradient(transparent 60%, rgba(210,232,215,.85) 60%, rgba(210,232,215,.85) 94%, transparent 94%);
+  background-image: linear-gradient(transparent 72%, rgba(210,232,215,.85) 72%, rgba(210,232,215,.85) 94%, transparent 94%);
 }
 </style>
 <script type="application/ld+json">
@@ -360,7 +361,7 @@
       <div class="storytell__media"><div class="storytell__media-inner" data-mask role="img" aria-label="スマホでホームページを見る様子(イメージ)" style="background-image:url('https://images.unsplash.com/photo-1616469829581-73993eb86b02?w=1200&h=900&fit=crop&q=85');"></div></div>
       <div>
         <span class="hp-eyebrow">PROBLEM</span>
-        <h2 style="margin-top:20px;" data-split>「作って公開」で止まっているホームページは、<span class="hp-mark">成果を生みません</span>。</h2>
+        <h2 style="margin-top:20px; text-wrap:pretty;" data-split>「作って公開」で止まっているホームページは、<br><span class="hp-mark">成果を生みません</span>。</h2>
         <p>スマホで見にくい・電話番号がタップできない・料金が書かれていない・更新日が古い。読者は <span class="hp-mark">3 秒</span> でその判断をして、離脱します。制作して 3 年前で止まっているホームページの <span class="hp-mark">8 割</span> は、次の 4 つのどれかに引っかかっています。</p>
         <ul class="hp-check">
           <li>スマホで見ると文字が小さい・タップしづらい</li>
