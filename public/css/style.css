@@ -885,7 +885,7 @@ body { background: var(--cream); color: var(--charcoal); font-size: 16px; letter
 }
 @media (min-width: 500px) { .storytell h2 { font-size: 26px; margin: 0 0 20px; } }
 @media (min-width: 900px) { .storytell h2 { font-size: 32px; letter-spacing: .05em; line-height: 1.6; } }
-.storytell p { color: var(--graphite); font-size: 15px; line-height: 2; margin: 0 0 24px; }
+.storytell p { color: var(--graphite); font-size: 15px; line-height: 2; margin: 0 0 24px; word-break: auto-phrase; line-break: strict; text-wrap: pretty; }
 
 /* 4サービス縦積みリスト (editorial) */
 .services-list { display: grid; gap: 0; border-top: 1px solid var(--line-2); }
@@ -1047,7 +1047,8 @@ body { background: var(--cream); color: var(--charcoal); font-size: 16px; letter
   font-family: var(--serif); font-size: 22px; font-weight: 700;
   letter-spacing: .04em; line-height: 1.5; margin: 0 0 12px;
 }
-.trio__item p { color: var(--graphite); font-size: 14.5px; line-height: 1.9; margin: 0; }
+.trio__item p { color: var(--graphite); font-size: 14.5px; line-height: 1.9; margin: 0; word-break: auto-phrase; line-break: strict; text-wrap: pretty; }
+.trio__item h3 { word-break: auto-phrase; line-break: strict; }
 
 /* 数字の縦組みシグネチャ */
 .signature {
@@ -1629,7 +1630,8 @@ textarea:focus-visible {
   font-family: var(--serif); font-size: 17px; letter-spacing: .04em;
   color: var(--charcoal); margin: 0 0 4px; font-weight: 700;
 }
-.steps__item p { color: var(--graphite); font-size: 14px; margin: 0; line-height: 1.8; }
+.steps__item p { color: var(--graphite); font-size: 14px; margin: 0; line-height: 1.8; word-break: auto-phrase; line-break: strict; text-wrap: pretty; }
+.steps__item h4 { word-break: auto-phrase; line-break: strict; }
 
 /* Use cases (3 concrete scenarios) */
 .cases {
@@ -1659,7 +1661,8 @@ textarea:focus-visible {
   font-family: var(--serif); font-size: 17px; font-weight: 700;
   color: var(--charcoal); margin: 0 0 8px; letter-spacing: .04em; line-height: 1.5;
 }
-.cases__item p { color: var(--graphite); font-size: 13.5px; margin: 0; line-height: 1.8; }
+.cases__item p { color: var(--graphite); font-size: 13.5px; margin: 0; line-height: 1.8; word-break: auto-phrase; line-break: strict; text-wrap: pretty; }
+.cases__item h4 { word-break: auto-phrase; line-break: strict; }
 
 /* Section headline with lede */
 .section-lede {
