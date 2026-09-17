@@ -310,6 +310,69 @@
   background: rgba(210,232,215,.35); font-weight: 600; color: var(--ink-900);
 }
 .hp-comp tbody tr:last-child td.hp-comp__ours { border-bottom-left-radius: 0; }
+/* 無料 HP 案 提案 のカード */
+.hp-freebox {
+  background: linear-gradient(180deg, #f2f8f4 0%, #e8f3ec 100%);
+  border: 1px solid var(--green-700);
+  border-radius: 14px;
+  padding: 32px 24px;
+  margin: 24px 0;
+  position: relative;
+  overflow: hidden;
+}
+.hp-freebox__ribbon {
+  display: inline-block;
+  background: var(--green-700); color: #fff;
+  font-size: 12px; letter-spacing: .08em; font-weight: 700;
+  padding: 6px 14px; border-radius: 999px;
+  margin-bottom: 14px;
+}
+.hp-freebox__title {
+  font-family: "Noto Serif JP", serif;
+  font-size: 22px; font-weight: 700; color: var(--ink-900);
+  margin: 0 0 8px; line-height: 1.5;
+}
+@media (min-width: 500px) { .hp-freebox__title { font-size: 26px; } }
+.hp-freebox__lede {
+  font-size: 14px; color: var(--ink-700); margin: 0 0 20px; line-height: 1.7;
+}
+.hp-freebox__steps {
+  display: grid; gap: 14px;
+  margin: 0 0 24px; padding: 0;
+  list-style: none;
+  counter-reset: freestep;
+}
+.hp-freebox__step {
+  counter-increment: freestep;
+  padding: 14px 14px 14px 52px;
+  background: #fff;
+  border-radius: 8px;
+  position: relative;
+  font-size: 14px; line-height: 1.6;
+}
+.hp-freebox__step::before {
+  content: counter(freestep);
+  position: absolute; left: 14px; top: 14px;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--green-700); color: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: "Inter", monospace; font-weight: 700; font-size: 14px;
+}
+.hp-freebox__step strong {
+  display: block; font-size: 15px; color: var(--ink-900); margin-bottom: 4px;
+}
+.hp-freebox__cta {
+  display: block; text-align: center;
+  padding: 14px 20px; border-radius: 8px;
+  background: var(--green-700); color: #fff;
+  font-weight: 700; font-size: 15px;
+  text-decoration: none;
+}
+.hp-freebox__cta:hover { background: var(--green-900); }
+.hp-freebox__note {
+  font-size: 12px; color: var(--ink-500); text-align: center;
+  margin: 12px 0 0;
+}
 /* Hero と CTA の em を Propagate 風の緑ハイライト下線に */
 .ehero__title em, .cta-band--edit h2 em {
   font-style: normal;
@@ -370,7 +433,8 @@
     {"@type": "Question", "name": "プランの選び方は？", "acceptedAnswer": {"@type": "Answer", "text": "ページ数だけで選べます。1ページ(月9,800円)・2〜6ページ(月16,500円)・7〜12ページ(月19,800円)の3プラン。すべて税別・初期費用0円・契約期間3年(36か月・自動更新)です。中身の機能は全プラン共通。運用まで丸ごと任せたい方はMEO/AIO運用代行プラン(+24,800円税込・1年契約)、LINEで再来店を促したい方はLINE公式運用(運用方法により要相談)をオプションで追加できます。"}},
     {"@type": "Question", "name": "「忘れて OK」とはどういう意味？", "acceptedAnswer": {"@type": "Answer", "text": "契約後は定期打ち合わせを設けず、こちらから催促の連絡もしません。サーバー・SSL・ウイルスチェックは自動で動き、月2回までの軽微修正が必要な時だけご連絡いただければOK。営業のような月次の定例会・改善提案は運用代行オプションを付けた時だけ発生する設計です。"}},
     {"@type": "Question", "name": "契約期間や解約条件は？", "acceptedAnswer": {"@type": "Answer", "text": "制作プランは契約期間3年(36か月・自動更新)です。契約期間中は月額固定で、更新時は1か月前までの申し出で解約可能です。中途解約時の違約金や、公開後のデータ・ドメイン返却条件は契約書に明記します。曖昧な運用はしません。"}},
-    {"@type": "Question", "name": "SEO・AI検索対策も含まれますか？", "acceptedAnswer": {"@type": "Answer", "text": "含まれます。Google検索での上位表示だけでなく、ChatGPT等のAI検索から引用されやすい構造化データ・FAQ設計まで、月額運用に組み込みます。"}}
+    {"@type": "Question", "name": "SEO・AI検索対策も含まれますか？", "acceptedAnswer": {"@type": "Answer", "text": "含まれます。Google検索での上位表示だけでなく、ChatGPT等のAI検索から引用されやすい構造化データ・FAQ設計まで、月額運用に組み込みます。"}},
+    {"@type": "Question", "name": "契約前に完成イメージを見ることはできますか？", "acceptedAnswer": {"@type": "Answer", "text": "はい。月20件限定で、お申込み前に無料で HP 案 (完成イメージ・モックアップ) をお送りしています。30秒無料診断フォームで業種・強み・希望デザインをお聞かせいただければ、2営業日以内にご提案します。合わなければ費用は一切かかりません。"}}
   ]
 }
 </script>
@@ -500,7 +564,8 @@
       <h2 class="section-title" style="margin-top:20px;" data-split>必要なページ数で選ぶ</h2>
       <p class="section-lede">
         契約後は <span class="hp-mark">「忘れて OK」</span> の運用設計。定期打ち合わせなし、こちらから催促もしません。<br>
-        運用まで丸ごとお任せしたい方や LINE を活用したい方は、下段の <span class="hp-mark">オプション</span> をお選びいただけます。
+        運用まで丸ごとお任せしたい方や LINE を活用したい方は、下段の <span class="hp-mark">オプション</span> をお選びいただけます。<br>
+        <small>※お申込み前に、<a href="#free-proposal" style="color:var(--green-700); font-weight:600;">完成イメージ (HP 案) を無料でご提案</a> しています。</small>
       </p>
     </div>
 
@@ -638,6 +703,34 @@
   </div>
 </section>
 
+<!-- 無料 HP 案の事前提案 -->
+<section id="free-proposal" class="section--edit" style="padding-top:64px;">
+  <div class="container" style="max-width:820px;">
+    <div class="section-head" data-reveal>
+      <span class="hp-eyebrow">FREE PROPOSAL</span>
+      <h2 class="section-title" style="margin-top:20px;" data-split>お申込み前に、<br>あなた専用の HP 案を無料でご提案</h2>
+      <p class="section-lede">
+        契約前に <span class="hp-mark">完成イメージ（モックアップ）</span> を無料でお送りします。合わなければ費用は一切かかりません。
+      </p>
+    </div>
+
+    <div class="hp-freebox" data-reveal>
+      <span class="hp-freebox__ribbon">＼ 月 20 件限定 ／</span>
+      <h3 class="hp-freebox__title">まず、あなたのサイト完成イメージを見てから決められます</h3>
+      <p class="hp-freebox__lede">
+        契約は不要。所要 5 分のフォーム回答だけで、あなた専用のホームページ案が届きます。
+      </p>
+      <ol class="hp-freebox__steps">
+        <li class="hp-freebox__step"><strong>30 秒無料診断でフォーム入力</strong>業種・強み・希望デザインなどを 5 分で回答。契約は不要です。</li>
+        <li class="hp-freebox__step"><strong>2 営業日以内に HP 案が届く</strong>あなた専用のホームページ完成イメージ（モックアップ）をお送りします。</li>
+        <li class="hp-freebox__step"><strong>気に入ればそのまま契約</strong>合わなければ費用は一切かかりません。オンラインで完結します。</li>
+      </ol>
+      <a href="/hearing.html" class="hp-freebox__cta">30 秒無料診断で HP 案を受け取る →</a>
+      <p class="hp-freebox__note">※月 20 件限定。定員に達し次第、翌月分の受付となります。</p>
+    </div>
+  </div>
+</section>
+
 <!-- 契約の目安 -->
 <section class="section--edit" style="padding-top:64px;">
   <div class="container" style="max-width:820px;">
@@ -734,6 +827,7 @@
       <details class="card"><summary>大幅なデザイン変更・新機能追加は追加料金がかかりますか？</summary><p>はい。月 2 回までの軽微修正 (テキスト・電話・営業時間などの変更) は月額内で対応しますが、ページ数を超える追加、レイアウト全面変更、新規機能開発を伴うものは、事前にお見積もりのうえ別途費用を申し受けます。</p></details>
       <details class="card"><summary>契約期間や解約条件は？</summary><p>制作プランは 契約期間 3 年（36 か月・自動更新）です。契約期間中は月額固定で、更新時は 1 か月前までの申し出で解約可能です。中途解約時の違約金や、公開後のデータ・ドメイン返却条件は契約書に明記します。曖昧な運用はしません。</p></details>
       <details class="card"><summary>SEO・AI 検索対策も含まれますか？</summary><p>含まれます。Google 検索での上位表示だけでなく、ChatGPT 等の AI 検索から引用されやすい構造化データ・FAQ 設計まで、月額運用に組み込みます。</p></details>
+      <details class="card"><summary>契約前に完成イメージを見ることはできますか？</summary><p>はい。<strong>月 20 件限定</strong> で、お申込み前に 無料で HP 案（完成イメージ・モックアップ）をお送りしています。<a href="/hearing.html">30 秒無料診断フォーム</a> で業種・強み・希望デザインをお聞かせいただければ、2 営業日以内にご提案します。合わなければ費用は一切かかりません。</p></details>
       <details class="card"><summary>大阪以外でも対応可能ですか？</summary><p>はい。ヒアリング・打ち合わせはオンラインで日本全国対応可能です。対面が必要な場合は近畿圏を中心に伺います。</p></details>
     </div>
   </div>
