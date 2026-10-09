@@ -788,6 +788,38 @@ body { background: var(--cream); color: var(--charcoal); font-size: 16px; letter
   content: ""; position: absolute; inset: 0;
   background: linear-gradient(180deg, rgba(10,26,16,.45) 0%, rgba(10,26,16,.85) 100%);
 }
+
+/* 近未来テック背景の自動クロスフェード (hero スタック) */
+.editorial-hero__bg-stack { position: absolute; inset: 0; }
+.editorial-hero__bg-stack .editorial-hero__bg--slide {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  opacity: 0;
+  animation: hero-bg-cycle 32s infinite;
+  will-change: opacity;
+}
+.editorial-hero__bg-stack .editorial-hero__bg--slide::after {
+  content: ""; position: absolute; inset: 0;
+  background:
+    linear-gradient(180deg, rgba(10,26,16,.45) 0%, rgba(10,26,16,.85) 100%),
+    radial-gradient(ellipse at 30% 20%, rgba(100,200,255,.08), transparent 60%);
+}
+.editorial-hero__bg-stack .editorial-hero__bg--1 { animation-delay: 0s; }
+.editorial-hero__bg-stack .editorial-hero__bg--2 { animation-delay: 8s; }
+.editorial-hero__bg-stack .editorial-hero__bg--3 { animation-delay: 16s; }
+.editorial-hero__bg-stack .editorial-hero__bg--4 { animation-delay: 24s; }
+
+@keyframes hero-bg-cycle {
+  0%   { opacity: 0; transform: scale(1.00); }
+  3%   { opacity: .55; }
+  22%  { opacity: .55; transform: scale(1.04); }
+  28%  { opacity: 0; transform: scale(1.04); }
+  100% { opacity: 0; transform: scale(1.00); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .editorial-hero__bg-stack .editorial-hero__bg--slide { animation: none; }
+  .editorial-hero__bg-stack .editorial-hero__bg--1 { opacity: .5; }
+}
 .editorial-hero__inner {
   position: relative; z-index: 2;
   min-height: clamp(420px, 72svh, 520px);
