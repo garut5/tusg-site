@@ -93,14 +93,14 @@ if (!root) {
   console.warn("[consultation] #consultation-root not found");
 }
 
+// 子ノードは必ず textNode / Element 経由で挿入 (innerHTML は使わない)
+// → エスケープ漏れによる XSS をヘルパー段階で封じる
 function el(tag, attrs, ...children) {
   const e = document.createElement(tag);
-  // attrs は null / undefined を許容 (el("li", null, "text") のような呼び方に対応)
   if (attrs) {
     for (const [k, v] of Object.entries(attrs)) {
       if (v == null || v === false) continue;
       if (k === "class") e.className = v;
-      else if (k === "html") e.innerHTML = v;
       else if (k.startsWith("on") && typeof v === "function") e.addEventListener(k.slice(2).toLowerCase(), v);
       else e.setAttribute(k, v === true ? "" : v);
     }
@@ -612,7 +612,7 @@ function renderComplete() {
 // ---- Render dispatcher ----
 function render() {
   if (!root) return;
-  root.innerHTML = "";
+  while (root.firstChild) root.removeChild(root.firstChild);
   const wrapper = el("div", { class: "wiz-shell" });
   const currentStepForProgress = {
     start: null, issue: "issue", common: "common",
@@ -635,21 +635,43 @@ function render() {
 }
 
 // 初回描画 — 失敗しても真っ白にならないようフォールバック
+// innerHTML を使わず DOM API のみで組み立てる (CSP / XSS 両面で安全)
 try {
   render();
 } catch (err) {
   console.error("[consultation] init failed:", err);
   if (root) {
-    root.innerHTML = "";
+    while (root.firstChild) root.removeChild(root.firstChild);
+
     const fallback = document.createElement("div");
     fallback.className = "wiz-card";
-    fallback.innerHTML =
-      '<h2 class="wiz-h">画面の読み込みに問題が発生しました。</h2>' +
-      '<p class="wiz-lede">お手数ですが、以下のいずれかでお問い合わせください。</p>' +
-      '<div class="wiz-actions">' +
-      '<a class="btn btn--primary" href="/contact.html">通常のお問い合わせフォームへ</a>' +
-      '<a class="btn btn--ghost" href="mailto:info@tusg.site">info@tusg.siteへメール</a>' +
-      '</div>';
+
+    const h = document.createElement("h2");
+    h.className = "wiz-h";
+    h.textContent = "画面の読み込みに問題が発生しました。";
+
+    const p = document.createElement("p");
+    p.className = "wiz-lede";
+    p.textContent = "お手数ですが、以下のいずれかでお問い合わせください。";
+
+    const actions = document.createElement("div");
+    actions.className = "wiz-actions";
+
+    const a1 = document.createElement("a");
+    a1.className = "btn btn--primary";
+    a1.href = "/contact.html";
+    a1.textContent = "通常のお問い合わせフォームへ";
+
+    const a2 = document.createElement("a");
+    a2.className = "btn btn--ghost";
+    a2.href = "mailto:info@tusg.site";
+    a2.textContent = "info@tusg.siteへメール";
+
+    actions.appendChild(a1);
+    actions.appendChild(a2);
+    fallback.appendChild(h);
+    fallback.appendChild(p);
+    fallback.appendChild(actions);
     root.appendChild(fallback);
   }
 }

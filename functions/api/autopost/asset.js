@@ -21,7 +21,8 @@
 //   story/<slug>.jpg         (ストーリーズ用)
 
 const MAX_UPLOAD_BYTES = 50 * 1024 * 1024; // 50MB
-const KEY_PATTERN = /^[a-z0-9][a-z0-9._/-]{0,199}$/i;
+// パストラバーサル (..) を含まない、大文字許容なし、記号は . _ - / のみ
+const KEY_PATTERN = /^(?!.*\.\.)[a-z0-9][a-z0-9._/-]{0,199}$/;
 const ALLOWED_CONTENT_TYPES = new Set([
   "image/jpeg", "image/jpg", "image/png", "image/webp",
   "video/mp4", "video/quicktime",
@@ -34,16 +35,27 @@ function json(body, status = 200) {
   });
 }
 
+// 長さに依存しない定数時間比較 (タイミング攻撃対策)
+function timingSafeEqual(a, b) {
+  const la = a.length;
+  const lb = b.length;
+  const maxLen = Math.max(la, lb, 1);
+  let diff = la ^ lb; // 長さが違えば必ず 0 以外に (比較は最後まで実行)
+  for (let i = 0; i < maxLen; i++) {
+    const ca = i < la ? a.charCodeAt(i) : 0;
+    const cb = i < lb ? b.charCodeAt(i) : 0;
+    diff |= ca ^ cb;
+  }
+  return diff === 0;
+}
+
 function checkAuth(request, env) {
   const expected = env.AUTOPOST_TRIGGER_TOKEN;
   if (!expected) return false;
   const header = request.headers.get("Authorization") || "";
   const m = header.match(/^Bearer\s+(.+)$/);
   if (!m) return false;
-  if (m[1].length !== expected.length) return false;
-  let diff = 0;
-  for (let i = 0; i < m[1].length; i++) diff |= m[1].charCodeAt(i) ^ expected.charCodeAt(i);
-  return diff === 0;
+  return timingSafeEqual(m[1], expected);
 }
 
 function siteUrl(request, env) {

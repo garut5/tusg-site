@@ -102,46 +102,51 @@ export class ThreadsClient {
     return await this._publishContainer(parentId);
   }
 
+  // トークンは Authorization ヘッダーに載せる (URL クエリ/body に入れるとログに残るため)
+  _authHeaders() {
+    return { Authorization: `Bearer ${this.token}` };
+  }
+
   async _createContainer(params) {
     const url = `${this.base}/${this._userPath()}/threads`;
-    const body = new URLSearchParams({ access_token: this.token });
+    const body = new URLSearchParams();
     for (const [k, v] of Object.entries(params)) {
       if (v === undefined || v === null || v === "") continue;
       body.set(k, typeof v === "boolean" ? String(v) : String(v));
     }
-    const res = await fetch(url, { method: "POST", body });
+    const res = await fetch(url, { method: "POST", body, headers: this._authHeaders() });
     const data = await res.json().catch(() => ({}));
     if (!res.ok || !data.id) {
-      throw new Error(`Threads create container failed: ${res.status} ${JSON.stringify(data).slice(0, 300)}`);
+      console.error(`Threads create container failed: ${res.status}`, JSON.stringify(data).slice(0, 300));
+      throw new Error(`threads_create_container_failed:${res.status}`);
     }
     return data.id;
   }
 
   async _waitContainerReady(containerId, timeoutMs) {
-    const url = `${this.base}/${containerId}?fields=status,error_message&access_token=${encodeURIComponent(this.token)}`;
+    const url = `${this.base}/${containerId}?fields=status,error_message`;
     const deadline = Date.now() + timeoutMs;
     while (Date.now() < deadline) {
-      const res = await fetch(url);
+      const res = await fetch(url, { headers: this._authHeaders() });
       const data = await res.json().catch(() => ({}));
       if (data.status === "FINISHED") return;
       if (data.status === "ERROR" || data.status === "EXPIRED") {
-        throw new Error(`Threads container failed: ${JSON.stringify(data).slice(0, 300)}`);
+        console.error("Threads container failed:", JSON.stringify(data).slice(0, 300));
+        throw new Error(`threads_container_${String(data.status).toLowerCase()}`);
       }
       await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
     }
-    throw new Error(`Threads container did not finish within ${timeoutMs}ms`);
+    throw new Error(`threads_container_timeout_${timeoutMs}ms`);
   }
 
   async _publishContainer(creationId) {
     const url = `${this.base}/${this._userPath()}/threads_publish`;
-    const body = new URLSearchParams({
-      creation_id: creationId,
-      access_token: this.token,
-    });
-    const res = await fetch(url, { method: "POST", body });
+    const body = new URLSearchParams({ creation_id: creationId });
+    const res = await fetch(url, { method: "POST", body, headers: this._authHeaders() });
     const data = await res.json().catch(() => ({}));
     if (!res.ok || !data.id) {
-      throw new Error(`Threads publish failed: ${res.status} ${JSON.stringify(data).slice(0, 300)}`);
+      console.error(`Threads publish failed: ${res.status}`, JSON.stringify(data).slice(0, 300));
+      throw new Error(`threads_publish_failed:${res.status}`);
     }
     return { media_id: data.id };
   }
@@ -151,11 +156,12 @@ export class ThreadsClient {
   }
 
   async me() {
-    const url = `${this.base}/me?fields=id,username&access_token=${encodeURIComponent(this.token)}`;
-    const res = await fetch(url);
+    const url = `${this.base}/me?fields=id,username`;
+    const res = await fetch(url, { headers: this._authHeaders() });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-      throw new Error(`Threads me() failed: ${res.status} ${JSON.stringify(data).slice(0, 300)}`);
+      console.error(`Threads me() failed: ${res.status}`, JSON.stringify(data).slice(0, 300));
+      throw new Error(`threads_me_failed:${res.status}`);
     }
     return data;
   }

@@ -138,56 +138,63 @@ export class InstagramClient {
   }
 
   // --- 内部ヘルパー ---
+  // トークンは Authorization ヘッダーに載せる (URL クエリ/body に入れるとログに残るため)
+  _authHeaders() {
+    return { Authorization: `Bearer ${this.token}` };
+  }
+
   async _createContainer(params) {
     const url = `${this.base}${this.selfPath}/media`;
-    const body = new URLSearchParams({ access_token: this.token });
+    const body = new URLSearchParams();
     for (const [k, v] of Object.entries(params)) {
       if (v === undefined || v === null || v === "") continue;
       body.set(k, typeof v === "boolean" ? String(v) : String(v));
     }
-    const res = await fetch(url, { method: "POST", body });
+    const res = await fetch(url, { method: "POST", body, headers: this._authHeaders() });
     const data = await res.json().catch(() => ({}));
     if (!res.ok || !data.id) {
-      throw new Error(`IG create container failed: ${res.status} ${JSON.stringify(data).slice(0, 300)}`);
+      // 内部ログには詳細、throw 側は上流が握りつぶす
+      console.error(`IG create container failed: ${res.status}`, JSON.stringify(data).slice(0, 300));
+      throw new Error(`ig_create_container_failed:${res.status}`);
     }
     return data.id;
   }
 
   async _waitContainerReady(containerId, timeoutMs) {
-    const url = `${this.base}/${containerId}?fields=status_code,status&access_token=${encodeURIComponent(this.token)}`;
+    const url = `${this.base}/${containerId}?fields=status_code,status`;
     const deadline = Date.now() + timeoutMs;
     while (Date.now() < deadline) {
-      const res = await fetch(url);
+      const res = await fetch(url, { headers: this._authHeaders() });
       const data = await res.json().catch(() => ({}));
       if (data.status_code === "FINISHED") return;
       if (data.status_code === "ERROR" || data.status_code === "EXPIRED") {
-        throw new Error(`IG container failed: ${JSON.stringify(data).slice(0, 300)}`);
+        console.error("IG container failed:", JSON.stringify(data).slice(0, 300));
+        throw new Error(`ig_container_${String(data.status_code).toLowerCase()}`);
       }
       await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
     }
-    throw new Error(`IG container did not finish within ${timeoutMs}ms`);
+    throw new Error(`ig_container_timeout_${timeoutMs}ms`);
   }
 
   async _publishContainer(creationId) {
     const url = `${this.base}${this.selfPath}/media_publish`;
-    const body = new URLSearchParams({
-      creation_id: creationId,
-      access_token: this.token,
-    });
-    const res = await fetch(url, { method: "POST", body });
+    const body = new URLSearchParams({ creation_id: creationId });
+    const res = await fetch(url, { method: "POST", body, headers: this._authHeaders() });
     const data = await res.json().catch(() => ({}));
     if (!res.ok || !data.id) {
-      throw new Error(`IG publish failed: ${res.status} ${JSON.stringify(data).slice(0, 300)}`);
+      console.error(`IG publish failed: ${res.status}`, JSON.stringify(data).slice(0, 300));
+      throw new Error(`ig_publish_failed:${res.status}`);
     }
     return { media_id: data.id };
   }
 
   async me() {
-    const url = `${this.base}${this.selfPath}?fields=id,username,name&access_token=${encodeURIComponent(this.token)}`;
-    const res = await fetch(url);
+    const url = `${this.base}${this.selfPath}?fields=id,username,name`;
+    const res = await fetch(url, { headers: this._authHeaders() });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-      throw new Error(`IG me() failed: ${res.status} ${JSON.stringify(data).slice(0, 300)}`);
+      console.error(`IG me() failed: ${res.status}`, JSON.stringify(data).slice(0, 300));
+      throw new Error(`ig_me_failed:${res.status}`);
     }
     return data;
   }

@@ -39,31 +39,45 @@ function checkAuth(request, env) {
   const header = request.headers.get("Authorization") || "";
   const m = header.match(/^Bearer\s+(.+)$/);
   if (!m) return false;
-  if (m[1].length !== expected.length) return false;
-  let diff = 0;
-  for (let i = 0; i < m[1].length; i++) diff |= m[1].charCodeAt(i) ^ expected.charCodeAt(i);
+  return timingSafeEqual(m[1], expected);
+}
+
+function timingSafeEqual(a, b) {
+  if (typeof a !== "string" || typeof b !== "string") return false;
+  const la = a.length;
+  const lb = b.length;
+  const maxLen = Math.max(la, lb, 1);
+  let diff = la ^ lb; // 長さが違えば必ず 0 以外に (比較は最後まで実行)
+  for (let i = 0; i < maxLen; i++) {
+    const ca = i < la ? a.charCodeAt(i) : 0;
+    const cb = i < lb ? b.charCodeAt(i) : 0;
+    diff |= ca ^ cb;
+  }
   return diff === 0;
 }
 
-// R2 にジャンル別テンプレ画像が上がっていればそれを使う、なければ placehold.co フォールバック
+// R2 のジャンル別テンプレ画像を解決。
+// 外部 placeholder 画像サービスへのフォールバックは意図的に廃止:
+//   - 外部サイトが落ちると cron ごと静かに失敗する
+//   - 外部サイトの挙動変化 (redirect / content type) で IG 側がブロックされうる
+//   - ブランド保護の観点でも、意図しない画像を投稿する余地を残さない
+// R2 にテンプレがない場合は明示的にエラーを返す。
 async function resolveTemplateImageUrl(genreKey, env, request) {
-  const key = `genre/${genreKey}.jpg`;
-  if (env.AUTOPOST_ASSETS) {
-    try {
-      const head = await env.AUTOPOST_ASSETS.head(key);
-      if (head) {
-        const base = env.SITE_URL || `${new URL(request.url).protocol}//${new URL(request.url).host}`;
-        return `${base.replace(/\/$/, "")}/assets/${key}`;
-      }
-    } catch {
-      // R2 head 失敗時は placehold へフォールバック
-    }
+  if (!env.AUTOPOST_ASSETS) {
+    throw new Error("R2 binding (AUTOPOST_ASSETS) not configured");
   }
-  const asciiLabel = ({
-    meo: "MEO", aio: "AIO", operation_tech: "SHOP+TECH", web_dev: "WEB",
-    hp_growth: "HP", pitfalls: "PITFALLS", tusg_way: "TUSG",
-  })[genreKey] || "TUSG";
-  return `https://placehold.co/1080x1080/0F3D2E/FFFFFF/png?text=${asciiLabel}`;
+  const key = `genre/${genreKey}.jpg`;
+  let head;
+  try {
+    head = await env.AUTOPOST_ASSETS.head(key);
+  } catch (e) {
+    throw new Error(`R2 head failed for ${key}`);
+  }
+  if (!head) {
+    throw new Error(`genre template not found in R2: ${key} (upload via /api/autopost/asset)`);
+  }
+  const base = env.SITE_URL || `${new URL(request.url).protocol}//${new URL(request.url).host}`;
+  return `${base.replace(/\/$/, "")}/assets/${key}`;
 }
 
 export async function onRequestPost({ request, env }) {
@@ -92,7 +106,13 @@ export async function onRequestPost({ request, env }) {
     return json({ ok: false, message: `caption error: ${e.message}` }, 500);
   }
 
-  const image_url = await resolveTemplateImageUrl(genre.key, env, request);
+  let image_url;
+  try {
+    image_url = await resolveTemplateImageUrl(genre.key, env, request);
+  } catch (e) {
+    console.error("scheduled: template resolve failed:", e.message);
+    return json({ ok: false, message: `template_unavailable: ${e.message}`, genre }, 500);
+  }
 
   if (body.dry_run) {
     return json({
@@ -109,7 +129,8 @@ export async function onRequestPost({ request, env }) {
   try {
     client = new InstagramClient(env);
   } catch (e) {
-    return json({ ok: false, message: e.message }, 500);
+    console.error("scheduled: ig client init failed:", e.message);
+    return json({ ok: false, message: "instagram_client_init_failed" }, 500);
   }
 
   try {
@@ -123,6 +144,7 @@ export async function onRequestPost({ request, env }) {
       media_id: result.media_id,
     });
   } catch (e) {
+    console.error("scheduled: publish failed:", e.message);
     return json({ ok: false, message: e.message, genre, image_url }, 502);
   }
 }

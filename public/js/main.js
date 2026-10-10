@@ -135,7 +135,7 @@
           frag.appendChild(node.cloneNode(true));
         }
       });
-      el.innerHTML = "";
+      while (el.firstChild) el.removeChild(el.firstChild);
       el.appendChild(frag);
       el.dataset.splitDone = "true";
     });

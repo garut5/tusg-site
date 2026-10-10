@@ -59,9 +59,15 @@ function checkAuth(request, env) {
 
 function timingSafeEqual(a, b) {
   if (typeof a !== "string" || typeof b !== "string") return false;
-  if (a.length !== b.length) return false;
-  let diff = 0;
-  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  const la = a.length;
+  const lb = b.length;
+  const maxLen = Math.max(la, lb, 1);
+  let diff = la ^ lb; // 長さが違えば必ず 0 以外に (比較は最後まで実行)
+  for (let i = 0; i < maxLen; i++) {
+    const ca = i < la ? a.charCodeAt(i) : 0;
+    const cb = i < lb ? b.charCodeAt(i) : 0;
+    diff |= ca ^ cb;
+  }
   return diff === 0;
 }
 

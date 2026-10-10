@@ -41,9 +41,20 @@ function checkAuth(request, env) {
   const header = request.headers.get("Authorization") || "";
   const m = header.match(/^Bearer\s+(.+)$/);
   if (!m) return false;
-  if (m[1].length !== expected.length) return false;
-  let diff = 0;
-  for (let i = 0; i < m[1].length; i++) diff |= m[1].charCodeAt(i) ^ expected.charCodeAt(i);
+  return timingSafeEqual(m[1], expected);
+}
+
+function timingSafeEqual(a, b) {
+  if (typeof a !== "string" || typeof b !== "string") return false;
+  const la = a.length;
+  const lb = b.length;
+  const maxLen = Math.max(la, lb, 1);
+  let diff = la ^ lb; // 長さが違えば必ず 0 以外に (比較は最後まで実行)
+  for (let i = 0; i < maxLen; i++) {
+    const ca = i < la ? a.charCodeAt(i) : 0;
+    const cb = i < lb ? b.charCodeAt(i) : 0;
+    diff |= ca ^ cb;
+  }
   return diff === 0;
 }
 

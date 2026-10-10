@@ -21,12 +21,15 @@ function json(body, status = 200) {
   });
 }
 
+// 長さプリフィックス/サフィックス自体がトークン絞り込みのヒントになるため、
+// 認証後でもレスポンスには出さない (「設定済み / 未設定」のみ)。
+// 内部ロジック向けのざっくり分類だけ返す。
 function guessTokenType(token) {
   if (!token) return "empty";
-  if (token.startsWith("IGAA") || token.startsWith("IGQV")) return "instagram_business_login (graph.instagram.com 用)";
-  if (token.startsWith("EAAB") || token.startsWith("EAAG") || token.startsWith("EAA")) return "facebook_graph (graph.facebook.com 用)";
-  if (token.length < 50) return "short (トークンではない可能性)";
-  return "unknown (フォーマット判定不能)";
+  if (token.startsWith("IGAA") || token.startsWith("IGQV")) return "instagram_business_login";
+  if (token.startsWith("EAA")) return "facebook_graph";
+  if (token.length < 50) return "short";
+  return "unknown";
 }
 
 function checkAuth(request, env) {
@@ -35,9 +38,20 @@ function checkAuth(request, env) {
   const header = request.headers.get("Authorization") || "";
   const m = header.match(/^Bearer\s+(.+)$/);
   if (!m) return false;
-  if (m[1].length !== expected.length) return false;
-  let diff = 0;
-  for (let i = 0; i < m[1].length; i++) diff |= m[1].charCodeAt(i) ^ expected.charCodeAt(i);
+  return timingSafeEqual(m[1], expected);
+}
+
+function timingSafeEqual(a, b) {
+  if (typeof a !== "string" || typeof b !== "string") return false;
+  const la = a.length;
+  const lb = b.length;
+  const maxLen = Math.max(la, lb, 1);
+  let diff = la ^ lb; // 長さが違えば必ず 0 以外に (比較は最後まで実行)
+  for (let i = 0; i < maxLen; i++) {
+    const ca = i < la ? a.charCodeAt(i) : 0;
+    const cb = i < lb ? b.charCodeAt(i) : 0;
+    diff |= ca ^ cb;
+  }
   return diff === 0;
 }
 
@@ -55,14 +69,11 @@ export async function onRequestGet({ request, env }) {
     has_INSTAGRAM_APP_SECRET: Boolean(env.INSTAGRAM_APP_SECRET),
     has_INSTAGRAM_BUSINESS_ACCOUNT_ID: Boolean(env.INSTAGRAM_BUSINESS_ACCOUNT_ID),
     has_INSTAGRAM_ACCESS_TOKEN: Boolean(token),
-    token_length: token.length,
-    token_prefix: token.slice(0, 5),
     token_type_guess: guessTokenType(token),
     graph_host: env.INSTAGRAM_GRAPH_HOST || "https://graph.instagram.com (default)",
     // Threads
     has_THREADS_ACCESS_TOKEN: Boolean(threadsToken),
-    threads_token_length: threadsToken.length,
-    threads_token_prefix: threadsToken.slice(0, 5),
+    threads_token_type_guess: guessTokenType(threadsToken),
     // Autopost 共通
     has_AUTOPOST_TRIGGER_TOKEN: Boolean(env.AUTOPOST_TRIGGER_TOKEN),
     has_R2_AUTOPOST_ASSETS: Boolean(env.AUTOPOST_ASSETS),
