@@ -30,6 +30,7 @@ const MIN_ELAPSED_MS = 3000;
 const MAX_ELAPSED_MS = 6 * 60 * 60 * 1000; // 6h (窓を広め)
 
 const PRIMARY_ISSUES = new Set([
+  "hp_create", "hp_leads",
   "reduce_paper_excel", "internal_efficiency", "build_saas",
   "customer_management", "document_management", "workforce",
   "multi_tenant", "reservation", "sns_map", "dashboard",
@@ -38,6 +39,8 @@ const PRIMARY_ISSUES = new Set([
 ]);
 
 const PRIMARY_LABELS = {
+  hp_create: "ホームページを作りたい／作り替えたい",
+  hp_leads: "ホームページの問い合わせを増やしたい",
   reduce_paper_excel: "紙・Excel・LINEでの管理を減らしたい",
   internal_efficiency: "社内業務を効率化・自動化したい",
   build_saas: "自社専用のWebシステムやSaaSを作りたい",
@@ -46,7 +49,7 @@ const PRIMARY_LABELS = {
   workforce: "シフト・勤怠・スタッフ管理を改善したい",
   multi_tenant: "店舗・拠点・代理店ごとに情報を管理したい",
   reservation: "予約・問い合わせ対応を自動化したい",
-  sns_map: "InstagramやGoogleマップなどを活用したい",
+  sns_map: "MEO・Google マップ・SNS で集客したい",
   dashboard: "データを集計して経営状況を見えるようにしたい",
   existing_maintenance: "既存システムを改善・保守してほしい",
   security: "セキュリティや情報管理を改善したい",
@@ -323,6 +326,20 @@ function validate(payload) {
   }
   if (c.preferredContactTime && (typeof c.preferredContactTime !== "string" || c.preferredContactTime.length > 60)) {
     errors.push("preferredContactTime is too long");
+  }
+
+  // common フィールドの長さ検証 (email 本文に出力されるため)
+  const common = payload.common || {};
+  for (const [k, max] of [["industry", 40], ["desired_timing", 40], ["budget", 60]]) {
+    if (common[k] !== undefined && (typeof common[k] !== "string" || common[k].length > max)) {
+      errors.push(`common.${k} is invalid`);
+    }
+  }
+
+  // result フィールドの長さ検証 (email 本文に出力されるため)
+  const result = payload.result || {};
+  if (result.category_title !== undefined && (typeof result.category_title !== "string" || result.category_title.length > 100)) {
+    errors.push("result.category_title is invalid");
   }
 
   if (!payload.consent || payload.consent.privacy !== true) {
