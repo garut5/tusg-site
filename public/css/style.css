@@ -777,8 +777,8 @@ body { background: var(--cream); color: var(--charcoal); font-size: 16px; letter
 }
 
 /* エディトリアルヒーロー */
-.editorial-hero { position: relative; min-height: clamp(420px, 72svh, 520px); overflow: hidden; background: #141924; color: #fff; }
-@media (min-width: 900px) { .editorial-hero { min-height: 640px; } }
+.editorial-hero { position: relative; min-height: clamp(360px, 56svh, 460px); overflow: hidden; background: #141924; color: #fff; }
+@media (min-width: 900px) { .editorial-hero { min-height: 560px; } }
 .editorial-hero__bg {
   position: absolute; inset: 0;
   background-size: cover; background-position: center;
@@ -822,12 +822,12 @@ body { background: var(--cream); color: var(--charcoal); font-size: 16px; letter
 }
 .editorial-hero__inner {
   position: relative; z-index: 2;
-  min-height: clamp(420px, 72svh, 520px);
+  min-height: clamp(360px, 56svh, 460px);
   display: flex; flex-direction: column; justify-content: flex-end;
-  padding-top: 56px; padding-bottom: 40px;
+  padding-top: 40px; padding-bottom: 32px;
 }
 @media (min-width: 900px) {
-  .editorial-hero__inner { min-height: 640px; padding-top: 100px; padding-bottom: 80px; }
+  .editorial-hero__inner { min-height: 560px; padding-top: 80px; padding-bottom: 64px; }
 }
 .editorial-hero__label {
   font-family: var(--sans);
@@ -873,8 +873,8 @@ body { background: var(--cream); color: var(--charcoal); font-size: 16px; letter
   .editorial-hero__cta .btn { min-width: 240px; }
 }
 @media (min-width: 900px) {
-  .editorial-hero { min-height: 640px; }
-  .editorial-hero__inner { min-height: 640px; padding-top: 100px; padding-bottom: 80px; }
+  .editorial-hero { min-height: 560px; }
+  .editorial-hero__inner { min-height: 560px; padding-top: 80px; padding-bottom: 64px; }
   .editorial-hero__title { font-size: 46px; line-height: 1.5; }
   .editorial-hero__sub { font-size: 15px; }
 }
@@ -1023,7 +1023,7 @@ body { background: var(--cream); color: var(--charcoal); font-size: 16px; letter
 
 /* editorial page-hero (photo + minimal) */
 .ehero {
-  position: relative; min-height: clamp(380px, 62svh, 460px); overflow: hidden; background: #141924; color: #fff;
+  position: relative; min-height: clamp(320px, 48svh, 420px); overflow: hidden; background: #141924; color: #fff;
 }
 .ehero__bg {
   position: absolute; inset: 0; background-size: cover; background-position: center; opacity: .7;
@@ -1058,9 +1058,9 @@ body { background: var(--cream); color: var(--charcoal); font-size: 16px; letter
 }
 .ehero__inner {
   position: relative; z-index: 2;
-  min-height: clamp(380px, 62svh, 460px);
+  min-height: clamp(320px, 48svh, 420px);
   display: flex; flex-direction: column; justify-content: flex-end;
-  padding-top: 56px; padding-bottom: 40px;
+  padding-top: 40px; padding-bottom: 32px;
 }
 .ehero .breadcrumb { color: rgba(255,255,255,.65); padding: 0 0 24px; }
 .ehero .breadcrumb a { color: rgba(255,255,255,.8); }
@@ -1083,8 +1083,8 @@ body { background: var(--cream); color: var(--charcoal); font-size: 16px; letter
 }
 .ehero__sub .p { display: inline-block; }
 @media (min-width: 900px) {
-  .ehero { min-height: 520px; }
-  .ehero__inner { min-height: 520px; padding-top: 80px; padding-bottom: 64px; }
+  .ehero { min-height: 480px; }
+  .ehero__inner { min-height: 480px; padding-top: 72px; padding-bottom: 56px; }
   .ehero__title { font-size: 40px; }
   .ehero__sub { font-size: 15px; }
 }
