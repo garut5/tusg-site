@@ -1604,8 +1604,18 @@ textarea:focus-visible {
   color: var(--charcoal); font-weight: 700;
 }
 @media (max-width: 767px) {
-  .trust-strip { padding: 14px 0; }
-  .trust-strip__inner { gap: 8px 20px; font-size: 12px; }
+  .trust-strip { padding: 16px 0; }
+  /* モバイルは 1 項目 1 行の縦積みに。半端な中央寄せの折返しで
+     「で着手」「初期費用0円」が孤立して見える現象を回避する。 */
+  .trust-strip__inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13px;
+    padding: 0 4px;
+  }
+  .trust-strip__item { white-space: normal; }
+  .trust-strip__item strong { margin-right: 2px; }
 }
 
 /* Trust bar (in footer) */
