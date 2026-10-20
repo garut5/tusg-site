@@ -22,14 +22,19 @@
 | Search Console 認証 | `google-site-verification=…`（DNS・ドメインプロパティ） | 無し |
 | Resend 送信ドメイン | `mail.tusg.site`（DKIM・`send.` MX あり） | 無し |
 
+🔴 **2026-10-20 追記（同日・Cloudflare API で確認）: 下の 1. は間違い。**
+`tusg.site` と `tusg.co.jp` は**どちらも Goandgoing53 の Cloudflare アカウント**にある
+（NS の組が違っても同じアカウントだった）。Workers / Pages ともそのまま tusg.co.jp を付けられる。
+API で取ったゾーンの全レコードは `cf-zones-20261020.txt`。
+
 読み取れること:
 
-1. **NS の組が違う → 2つのゾーンは別の Cloudflare アカウントにある可能性が高い**（推定。
+1. ~~**NS の組が違う → 2つのゾーンは別の Cloudflare アカウントにある可能性が高い**（推定。
    Cloudflare は NS の組をアカウントごとに割り当てる）。fanmap の記録では tusg.site は
    **Goandgoing53 のアカウント**（`fanmap/docs/OFF_VERCEL_2026-08.md:197`）。
    **Workers の Custom Domain はゾーンが同じアカウントに無いと付けられない**
    → fanmap / foodtap（Workers）を tusg.co.jp に載せるなら、tusg.co.jp のゾーンが
-   Goandgoing53 側に要る。どちらのアカウントにあるかをまずダッシュボードで確認する。
+   Goandgoing53 側に要る。どちらのアカウントにあるかをまずダッシュボードで確認する。~~
 2. **tusg.co.jp はすでに同じサイトを返している**が、canonical が tusg.site なので
    Google は tusg.site を正として扱う。今は重複扱いで実害は小さいが、切り替えでは逆にする。
 3. 🔴 **tusg.site に MX が無い。** `info@tusg.site`・`help@fanmap.tusg.site`・
@@ -174,3 +179,44 @@ aburiya は PWA の入れ直しも要る。
 4. **順番**: 影響の小さい順（tusg-site → fansales → aburiya → aim-rose → foodtap → fanmap）か、まとめてか。
 5. **fuloco.tusg.site** の持ち主リポジトリ（このセッションには無い）。
 6. **MX が無い件**を先に直すか（info@tusg.site が受信できていない可能性）。
+
+---
+
+## 6. 追記（2026-10-20）: tusg.site を解約できる状態にする
+
+> tusg.site は解約してもいいようにしておきたい。aburiya.tusg.site も切り替えておきたい。
+
+### リポジトリに無かった tusg.site のホスト（Cloudflare API で見つけた）
+
+| ホスト | 行き先 | 備考 |
+|---|---|---|
+| `magonote.tusg.site` | Pages `magonote` | リポジトリはこのセッションに無い |
+| `saleshub.tusg.site` | Pages `saleshub` | `garut5/saleshub`。コードには tusg.site が無い（ダッシュボードで付けている） |
+| `fuloco.tusg.site` | Pages `fuloco`（Goandgoing53） | camomile 側にも別の `fuloco` Pages（`fuloco.camomile.co.jp`）がある |
+| `kuchikomi.tusg.site` / `tusmy.tusg.site` | A `210.131.237.245`（外部サーバー） | 中身未確認 |
+| `app.` / `platform.` / `tusgreach.tusg.site` | Vercel | 中身未確認 |
+| `fanmap-agency.tusg.site` | Vercel `76.76.21.21` | 残骸 |
+
+### 解約の前に片付けないといけないもの
+
+解約した瞬間に、tusg.site を指しているものは**すべて開けなくなる**（301 も効かなくなる）。
+
+1. **印刷物・配った URL を刷り直す**: foodtap のテーブル QR、fanmap の POP / QR、aim-rose の会員案内、
+   aburiya の PDF マニュアル、SNS 投稿画像。**ここが一番時間がかかる。** 刷り直しが終わるまで解約しない。
+2. **ホーム画面アプリの入れ直し**（aburiya・aim-rose ほか）。
+3. **Google OAuth「ストアコネクト」**: 承認済みドメインから tusg.site を外せる状態にする
+   ＝ fanmap の Google リダイレクト URI を tusg.co.jp に移し、ホーム／プライバシー／規約の URL も
+   tusg.co.jp に変える。**ページ URL の変更は再審査の対象**なので、解約するならここは避けられない。
+   先に Search Console で tusg.co.jp を認証してから、1回にまとめて出す。
+4. **Search Console のアドレス変更**（301 を入れてから。アドレス変更は約180日の転送維持が推奨）。
+5. **Meta**: アプリドメイン・リダイレクト URI・プライバシー／データ削除 URL・連絡先メール。
+6. **Webhook**: Stripe（fanmap-crm / foodtap）、LINE（aim-rose）、Clerk。
+7. **メール**: Resend の `mail.tusg.site` → `mail.tusg.co.jp`。各ツールの From と、`info@` などの受信先。
+8. **上の表の、リポジトリに無いホスト**の持ち主を確認して移すか捨てる。
+
+### 進み具合
+
+| サイト | 新アドレス | 状態 |
+|---|---|---|
+| aburiya | `aburiya.tusg.co.jp` | ✅ 2026-10-20 に開通（両方で使える）。旧からの 301 は未（`garut5/aburiya` の `docs/2026-10-20_ドメインをtusg.co.jpへ移す.md`） |
+| 他 | — | 未着手 |

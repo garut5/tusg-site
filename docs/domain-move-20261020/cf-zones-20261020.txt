@@ -1,0 +1,37 @@
+== zone tusg.site (account: Goandgoing53)
+A	fanmap-agency.tusg.site	76.76.21.21	
+A	kuchikomi.tusg.site	210.131.237.245	
+A	tusmy.tusg.site	210.131.237.245	
+CNAME	aburiya.tusg.site	aburiya.pages.dev	proxied
+CNAME	aim-rose.tusg.site	aim-rose-c4k.pages.dev	proxied
+CNAME	app.tusg.site	dd803bfa1dad44c0.vercel-dns-017.com	
+CNAME	fansales.tusg.site	fansales-3vl.pages.dev	proxied
+CNAME	fuloco.tusg.site	fuloco.pages.dev	proxied
+CNAME	magonote.tusg.site	magonote-afj.pages.dev	proxied
+CNAME	platform.tusg.site	c9af6581664b530d.vercel-dns-017.com	
+CNAME	saleshub.tusg.site	saleshub-37t.pages.dev	proxied
+CNAME	tusgreach.tusg.site	c9af6581664b530d.vercel-dns-017.com	
+CNAME	tusg.site	tusg-site.pages.dev	proxied
+CNAME	www.tusg.site	tusg.site	
+MX	send.mail.tusg.site	feedback-smtp.ap-northeast-1.amazonses.com	
+TXT	_dmarc.tusg.site	"v=DMARC1; p=none;"	
+TXT	resend._domainkey.mail.tusg.site	"p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDJrPNhKevHMeifZ5EyjSGKnAKs55E	
+TXT	send.mail.tusg.site	"v=spf1 include:amazonses.com ~all"	
+TXT	tusg.site	"google-site-verification=b4kfL9TGHJ2RfGsDL9a9e-qm37B0GUtZUWX6ifWLiSE"	
+TXT	_vercel.tusg.site	"vc-domain-verify=app.tusg.site,2a9bfc9be1ed6b9e9001,dc"	
+TXT	_vercel.tusg.site	"vc-domain-verify=tusgreach.tusg.site,24784aa3f1b41002aad2,dc"	
+TXT	_vercel.tusg.site	"vc-domain-verify=www.tusg.site,3c7756d641842d74e4e8,dc"	
+TXT	_vercel.tusg.site	"vc-domain-verify=tusg.site,a15eccd115a556ece88e,dc"	
+AAAA	fanmap-crm.tusg.site	100::	proxied
+AAAA	fanmap.tusg.site	100::	proxied
+AAAA	foodtap.tusg.site	100::	proxied
+== zone tusg.co.jp (account: Goandgoing53)
+CNAME	aburiya.tusg.co.jp	aburiya.pages.dev	proxied
+CNAME	tusg.co.jp	tusg-site.pages.dev	proxied
+CNAME	www.tusg.co.jp	tusg-site.pages.dev	proxied
+MX	tusg.co.jp	route3.mx.cloudflare.net	
+MX	tusg.co.jp	route2.mx.cloudflare.net	
+MX	tusg.co.jp	route1.mx.cloudflare.net	
+TXT	cf2024-1._domainkey.tusg.co.jp	"v=DKIM1; h=sha256; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCA	
+TXT	tusg.co.jp	"v=spf1 include:_spf.mx.cloudflare.net ~all"	
+AAAA	shikoku88.tusg.co.jp	100::	proxied
