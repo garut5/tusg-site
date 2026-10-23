@@ -11,6 +11,6 @@
     "test": "node tests/consultation.test.mjs"
   },
   "devDependencies": {
-    "wrangler": "^3.90.0"
+    "wrangler": "^4.112.0"
   }
 }
