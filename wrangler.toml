@@ -26,6 +26,11 @@ STRIPE_API_VERSION = "2024-12-18.acacia"
 # 多重防御として Pages Function 側でも email を照合する
 ADMIN_ALLOWED_EMAILS = "goandgoing53@gmail.com"
 
+# Pay Forward LP / API のパスワード保護 (Stripe 本番決済 検証中のみ有効化)
+# 空にすると公開モードになる (= 本番顧客受付開始)
+# functions/_middleware.js で HTTP Basic 認証をかける
+PAY_FORWARD_BASIC_AUTH_PASSWORD = "1234"
+
 # 30秒無料診断 の秘密情報 (Cloudflare Dashboard または wrangler pages secret put で設定):
 #   RESEND_API_KEY
 
