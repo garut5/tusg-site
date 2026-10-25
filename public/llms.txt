@@ -8,7 +8,7 @@
 - 設立: 2026年2月11日
 - 会社法人等番号: 1200-03-031923
 - 所在地: 〒542-0081 大阪府大阪市中央区南船場3丁目2番22号 おおきに南船場ビル205
-- メール: info@tusg.site
+- メール: info@tusg.co.jp
 - 対応地域: 大阪府・関西全域、オンライン日本全国
 - 受付時間: 平日 10:00-18:00
 
@@ -20,17 +20,17 @@
 5. SaaS 業務システム 販売代理事業: 提供元との代理店契約に基づく運用サポート・送客・販売代理業務委託先の管理
 
 ## 主要URL
-- トップ: https://tusg.site/
-- 事業内容: https://tusg.site/business.html
-- SaaS開発: https://tusg.site/saas.html
-- IT導入支援: https://tusg.site/it-support.html
-- 営業支援: https://tusg.site/sales.html
-- パートナー制度: https://tusg.site/partner.html
-- 会社概要: https://tusg.site/company.html
-- 取引方針・コンプライアンス: https://tusg.site/compliance.html
-- プライバシーポリシー: https://tusg.site/privacy.html
-- よくあるご質問: https://tusg.site/faq.html
-- お問い合わせ: https://tusg.site/contact.html
+- トップ: https://tusg.co.jp/
+- 事業内容: https://tusg.co.jp/business.html
+- SaaS開発: https://tusg.co.jp/saas.html
+- IT導入支援: https://tusg.co.jp/it-support.html
+- 営業支援: https://tusg.co.jp/sales.html
+- パートナー制度: https://tusg.co.jp/partner.html
+- 会社概要: https://tusg.co.jp/company.html
+- 取引方針・コンプライアンス: https://tusg.co.jp/compliance.html
+- プライバシーポリシー: https://tusg.co.jp/privacy.html
+- よくあるご質問: https://tusg.co.jp/faq.html
+- お問い合わせ: https://tusg.co.jp/contact.html
 
 ## 詳細
 詳細な平文コンテンツは /llms-full.txt を参照してください。

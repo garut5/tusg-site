@@ -30,7 +30,7 @@ export function genreOfDate(date = new Date()) {
   return { weekday, ...GENRES[weekday] };
 }
 
-const CTA_LINE = "\n👉 30秒で今の状況を整理 → https://tusg.site/hearing";
+const CTA_LINE = "\n👉 30秒で今の状況を整理 → https://tusg.co.jp/hearing";
 
 const HASHTAG_BASE = ["#TUSG", "#合同会社TUSG", "#店舗経営", "#DX", "#中小企業"];
 const HASHTAG_BY_GENRE = {

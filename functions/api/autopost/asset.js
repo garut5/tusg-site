@@ -13,7 +13,7 @@
 //     -H "Authorization: Bearer $TOKEN" \
 //     -H "Content-Type: image/jpeg" \
 //     --data-binary "@/path/to/image.jpg" \
-//     "https://tusg.site/api/autopost/asset?key=genre/meo.jpg"
+//     "https://tusg.co.jp/api/autopost/asset?key=genre/meo.jpg"
 //
 // 命名規則の推奨:
 //   genre/<key>.jpg          (曜日別テンプレ、7 種)

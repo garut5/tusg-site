@@ -5,7 +5,7 @@ pages_build_output_dir = "public"
 # 環境変数 (秘密でない値のみ。秘密は `wrangler pages secret put` で設定)
 [vars]
 # 既存のお問い合わせフォーム (contact.php.js)
-CONTACT_TO_EMAIL = "info@tusg.site"
+CONTACT_TO_EMAIL = "info@tusg.co.jp"
 CONTACT_FROM_EMAIL = "no-reply@mail.tusg.site"
 CONTACT_FROM_NAME = "TUSGコーポレートサイト"
 CONTACT_REDIRECT = "/thanks.html"
@@ -13,9 +13,13 @@ CONTACT_REDIRECT = "/thanks.html"
 # 30秒無料診断 (functions/api/consultations.js)
 RESEND_FROM_EMAIL = "no-reply@mail.tusg.site"
 RESEND_FROM_NAME = "TUSGコーポレートサイト"
-CONSULTATION_NOTIFICATION_TO = "info@tusg.site"
+CONSULTATION_NOTIFICATION_TO = "info@tusg.co.jp"
 # CONSULTATION_NOTIFICATION_CC = ""  # 必要時のみ設定
-SITE_URL = "https://tusg.site"
+SITE_URL = "https://tusg.co.jp"
+
+# Pay Forward 公開値
+PAY_FORWARD_ENABLED = "false"           # Stripe & D1 設定完了後に "true" に変更
+STRIPE_API_VERSION = "2024-12-18.acacia"
 
 # 30秒無料診断 の秘密情報 (Cloudflare Dashboard または wrangler pages secret put で設定):
 #   RESEND_API_KEY
@@ -35,6 +39,37 @@ SITE_URL = "https://tusg.site"
 # 自動投稿の Bearer 認証トークン (Cron / manual トリガーで使用):
 #   AUTOPOST_TRIGGER_TOKEN
 
+# ----------------------------------------------------------------
+# Pay Forward System (functions/api/pay-forward/*.js)
+# 詳細は docs/pay-forward/README.md 参照
+#
+# 利用者が月額料金を決定するサブスクリプション基盤。
+# Stripe は TUSG 専用アカウントのみ使用 (camomile 社の Stripe とは完全分離)。
+#
+# 以下の Secret を Cloudflare Dashboard または wrangler pages secret put で設定:
+#   TUSG_STRIPE_SECRET_KEY            # sk_live_... (本番) / sk_test_... (テスト)
+#   TUSG_STRIPE_WEBHOOK_SECRET        # whsec_...  (Webhook 署名検証)
+#   TUSG_STRIPE_PUBLISHABLE_KEY       # pk_live_... / pk_test_... (フロント公開用)
+#   ADMIN_ALERT_EMAIL                 # 管理者通知先 (決済失敗、quote 発行通知等)
+#
+# [vars] の公開値 (PAY_FORWARD_ENABLED / STRIPE_API_VERSION) は [vars] ブロックに追記済み
+
+# ----------------------------------------------------------------
+# D1 データベース (Pay Forward 本番データ用)
+# 作成手順:
+#   1) wrangler d1 create tusg-main
+#   2) 返却された database_id を下記 database_id に貼る
+#   3) wrangler d1 execute tusg-main --remote --file=migrations/pay-forward/0001_init.sql
+#   4) wrangler d1 execute tusg-main --remote --file=migrations/pay-forward/0002_seed_assumptions.sql
+#   5) wrangler d1 execute tusg-main --remote --file=migrations/pay-forward/0003_seed_services.sql
+#   6) 下記ブロックのコメントアウトを外して deploy
+#
+# [[d1_databases]]
+# binding = "TUSG_DB"
+# database_name = "tusg-main"
+# database_id = "<ここに wrangler d1 create が返した UUID を貼る>"
+
+# ----------------------------------------------------------------
 # R2 バケット (テンプレ画像 / リール動画 のホスティング)
 [[r2_buckets]]
 binding = "AUTOPOST_ASSETS"

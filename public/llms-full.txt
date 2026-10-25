@@ -8,7 +8,7 @@
 - 会社法人等番号: 1200-03-031923
 - 所在地: 〒542-0081 大阪府大阪市中央区南船場3丁目2番22号 おおきに南船場ビル205
 - 最寄駅: Osaka Metro 長堀鶴見緑地線 / 堺筋線 長堀橋駅 3番出口 徒歩3分、御堂筋線 / 長堀鶴見緑地線 心斎橋駅 徒歩7分
-- メール: info@tusg.site
+- メール: info@tusg.co.jp
 - 受付時間: 平日 10:00-18:00
 - 対応地域: 大阪府・関西全域、オンライン日本全国
 
@@ -48,19 +48,19 @@
 - 営業目的の電話・訪問営業は行っておりません
 
 ## お問い合わせ
-- フォーム: https://tusg.site/contact.html
-- メール: info@tusg.site
+- フォーム: https://tusg.co.jp/contact.html
+- メール: info@tusg.co.jp
 - 初回30分の相談は無料。最短当日、遅くとも翌営業日にご連絡します。
 
 ## サイト内リンク
-- トップページ: https://tusg.site/
-- 事業内容: https://tusg.site/business.html
-- SaaS開発: https://tusg.site/saas.html
-- IT導入支援: https://tusg.site/it-support.html
-- 営業支援: https://tusg.site/sales.html
-- パートナー制度: https://tusg.site/partner.html
-- 会社概要: https://tusg.site/company.html
-- 取引方針・コンプライアンス: https://tusg.site/compliance.html
-- プライバシーポリシー: https://tusg.site/privacy.html
-- よくあるご質問: https://tusg.site/faq.html
-- お問い合わせ: https://tusg.site/contact.html
+- トップページ: https://tusg.co.jp/
+- 事業内容: https://tusg.co.jp/business.html
+- SaaS開発: https://tusg.co.jp/saas.html
+- IT導入支援: https://tusg.co.jp/it-support.html
+- 営業支援: https://tusg.co.jp/sales.html
+- パートナー制度: https://tusg.co.jp/partner.html
+- 会社概要: https://tusg.co.jp/company.html
+- 取引方針・コンプライアンス: https://tusg.co.jp/compliance.html
+- プライバシーポリシー: https://tusg.co.jp/privacy.html
+- よくあるご質問: https://tusg.co.jp/faq.html
+- お問い合わせ: https://tusg.co.jp/contact.html

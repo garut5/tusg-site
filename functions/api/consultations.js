@@ -9,18 +9,18 @@
 //
 // 環境変数:
 //   RESEND_API_KEY               (secret)
-//   RESEND_FROM_EMAIL            例: no-reply@mail.tusg.site
+//   RESEND_FROM_EMAIL            例: no-reply@mail.tusg.co.jp
 //   RESEND_FROM_NAME             例: TUSGコーポレートサイト
-//   CONSULTATION_NOTIFICATION_TO 例: info@tusg.site
+//   CONSULTATION_NOTIFICATION_TO 例: info@tusg.co.jp
 //   CONSULTATION_NOTIFICATION_CC 例: (空でも可)
-//   SITE_URL                     例: https://tusg.site
+//   SITE_URL                     例: https://tusg.co.jp
 //
 // D1・Turnstile・管理画面は次PRで追加。MVP はメール通知のみ。
 
 // ---- 定数 ----
 const ALLOWED_ORIGINS = new Set([
-  "https://tusg.site",
-  "https://www.tusg.site",
+  "https://tusg.co.jp",
+  "https://www.tusg.co.jp",
   "https://tusg.co.jp",
   "https://www.tusg.co.jp",
   "https://tusg-site.pages.dev",
@@ -201,7 +201,7 @@ function buildCustomerMail(payload, ref, env) {
   const c = payload.contact || {};
   const primaryLabel = PRIMARY_LABELS[payload.primary_issue] || "参考情報";
   const resultTitle = payload.result?.category_title || "参考情報 (未分類)";
-  const siteUrl = env.SITE_URL || "https://tusg.site";
+  const siteUrl = env.SITE_URL || "https://tusg.co.jp";
   const industry = payload.common?.industry;
   const timing = payload.common?.desired_timing;
   const budget = payload.common?.budget;
@@ -252,7 +252,7 @@ ${textRows}
 
 合同会社TUSG
 公式サイト: ${siteUrl}
-お問い合わせ: info@tusg.site
+お問い合わせ: info@tusg.co.jp
 
 このメールは自動送信されています。
 `;
@@ -293,7 +293,7 @@ ${freeBlockHtml}
 <hr>
 <p><strong>合同会社TUSG</strong><br>
 公式サイト: <a href="${escapeHtml(siteUrl)}">${escapeHtml(siteUrl)}</a><br>
-お問い合わせ: <a href="mailto:info@tusg.site">info@tusg.site</a></p>
+お問い合わせ: <a href="mailto:info@tusg.co.jp">info@tusg.co.jp</a></p>
 <p style="font-size:12px;color:#666;">このメールは自動送信されています。</p>
 </div>`;
 
@@ -379,7 +379,7 @@ export async function onRequestPost({ request, env }) {
     if (!env.RESEND_API_KEY || !env.RESEND_FROM_EMAIL) {
       return json({ ok: false, message: "Mail service is not configured." }, 500);
     }
-    const to = env.CONSULTATION_NOTIFICATION_TO || env.CONTACT_TO_EMAIL || "info@tusg.site";
+    const to = env.CONSULTATION_NOTIFICATION_TO || env.CONTACT_TO_EMAIL || "info@tusg.co.jp";
     const cc = env.CONSULTATION_NOTIFICATION_CC ? [env.CONSULTATION_NOTIFICATION_CC] : undefined;
 
     // Content-Type

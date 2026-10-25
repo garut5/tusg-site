@@ -603,7 +603,7 @@ function renderComplete() {
     el("p", { class: "wiz-hint" }, "内容を確認後、担当者よりご連絡いたします。"),
     el("div", { class: "wiz-actions" },
       el("a", { href: "/", class: "btn btn--primary" }, "トップページへ戻る"),
-      el("a", { href: "mailto:info@tusg.site", class: "btn btn--ghost" }, "追加のご連絡はこちら"),
+      el("a", { href: "mailto:info@tusg.co.jp", class: "btn btn--ghost" }, "追加のご連絡はこちら"),
     ),
     el("button", { type: "button", class: "wiz-textbtn", onClick: reset }, "新しく整理を始める")
   );
@@ -664,8 +664,8 @@ try {
 
     const a2 = document.createElement("a");
     a2.className = "btn btn--ghost";
-    a2.href = "mailto:info@tusg.site";
-    a2.textContent = "info@tusg.siteへメール";
+    a2.href = "mailto:info@tusg.co.jp";
+    a2.textContent = "info@tusg.co.jpへメール";
 
     actions.appendChild(a1);
     actions.appendChild(a2);

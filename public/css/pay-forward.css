@@ -1,0 +1,179 @@
+/* Pay Forward 専用スタイル
+ * 既存 style.css の変数・ユーティリティに依存。
+ * ブランド基調 (ネイビー × 白 × アクセントグリーン) を維持。
+ */
+
+.pf-hero {
+  padding: clamp(56px, 10vh, 120px) 0 clamp(40px, 8vh, 80px);
+  background:
+    radial-gradient(1200px 500px at 10% -20%, rgba(14, 61, 33, 0.08), transparent 60%),
+    linear-gradient(180deg, #f7f8fa 0%, #ffffff 100%);
+  text-align: center;
+}
+.pf-hero__eyebrow {
+  font-size: 12px;
+  letter-spacing: .22em;
+  color: var(--forest, #0e3d21);
+  text-transform: uppercase;
+  margin: 0 0 16px;
+  font-weight: 600;
+}
+.pf-hero__title {
+  font-family: var(--serif, "Noto Serif JP", serif);
+  font-size: clamp(28px, 5.4vw, 52px);
+  line-height: 1.3;
+  margin: 0 0 22px;
+  color: var(--charcoal, #141924);
+  letter-spacing: .02em;
+  word-break: auto-phrase;
+  text-wrap: pretty;
+}
+.pf-hero__lede {
+  font-size: clamp(14px, 2.6vw, 17px);
+  line-height: 1.9;
+  color: var(--ink-700, #4a5668);
+  max-width: 640px;
+  margin: 0 auto 28px;
+}
+.pf-hero__actions {
+  display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.pf-hero__note {
+  margin-top: 20px;
+}
+
+.pf-section {
+  padding: clamp(48px, 8vh, 96px) 0;
+}
+.pf-section--muted {
+  background: #f7f8fa;
+}
+.pf-section__h {
+  font-family: var(--serif, "Noto Serif JP", serif);
+  font-size: clamp(22px, 3.4vw, 32px);
+  line-height: 1.4;
+  margin: 0 0 20px;
+  color: var(--charcoal, #141924);
+}
+.pf-section__h--center { text-align: center; }
+.pf-section__sub {
+  text-align: center;
+  margin: -10px 0 32px;
+  font-size: 14px;
+}
+.pf-section p {
+  line-height: 1.9;
+  color: var(--ink-700, #4a5668);
+  margin: 0 0 18px;
+}
+.container--narrow { max-width: 760px; margin: 0 auto; }
+
+/* 3 ステップ */
+.pf-steps {
+  list-style: none;
+  padding: 0; margin: 32px 0 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+.pf-steps__item {
+  background: #fff;
+  border: 1px solid var(--line, #e5e7eb);
+  border-radius: 12px;
+  padding: 28px 24px;
+  position: relative;
+}
+.pf-steps__num {
+  display: inline-block;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--forest, #0e3d21);
+  opacity: .35;
+  letter-spacing: .02em;
+  margin-bottom: 8px;
+  font-family: var(--serif, "Noto Serif JP", serif);
+}
+.pf-steps__h {
+  font-size: 18px;
+  margin: 0 0 10px;
+  color: var(--charcoal, #141924);
+}
+.pf-steps__item p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+/* サービス一覧 */
+.pf-services {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin-top: 32px;
+}
+.pf-service-card {
+  background: #fff;
+  border: 1px solid var(--line, #e5e7eb);
+  border-radius: 12px;
+  padding: 28px 24px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.pf-service-card--placeholder {
+  background: #fff;
+  border: 1px dashed var(--line, #e5e7eb);
+  text-align: center;
+  grid-column: 1 / -1;
+  padding: 36px 24px;
+}
+.pf-service-card--placeholder h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  color: var(--charcoal, #141924);
+}
+.pf-service-card--placeholder p {
+  color: var(--ink-700, #4a5668);
+  margin: 0 0 20px;
+}
+.pf-service-card__actions {
+  display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+}
+
+/* FAQ */
+.pf-faq {
+  margin: 24px 0 0;
+}
+.pf-faq__item {
+  border-bottom: 1px solid var(--line, #e5e7eb);
+  padding: 20px 0;
+}
+.pf-faq__item dt {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--charcoal, #141924);
+  margin-bottom: 10px;
+  line-height: 1.6;
+}
+.pf-faq__item dd {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.9;
+  color: var(--ink-700, #4a5668);
+}
+
+/* 法的表示リンク */
+.pf-legal-links {
+  list-style: none; padding: 0; margin: 20px 0 24px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.pf-legal-links a {
+  color: var(--forest, #0e3d21);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 599px) {
+  .pf-hero { padding: 44px 0 32px; }
+  .pf-hero__title br { display: none; }
+  .pf-hero__lede br { display: none; }
+}
