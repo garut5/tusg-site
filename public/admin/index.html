@@ -6,7 +6,7 @@
 <title>TUSG 管理画面｜Pay Forward</title>
 <meta name="robots" content="noindex,nofollow,noarchive">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="stylesheet" href="/admin/admin.css?v=2">
+<link rel="stylesheet" href="/admin/admin.css?v=3">
 </head>
 <body>
 
@@ -354,8 +354,19 @@
   </div>
 </dialog>
 
+<!-- 右下に常駐する契約サマリ (全タブで表示) -->
+<aside id="subsCorner" class="adm-corner" aria-label="契約サマリ">
+  <div class="adm-corner__head">
+    <strong>📋 契約</strong>
+    <button type="button" id="subsCornerToggle" title="折りたたみ">−</button>
+  </div>
+  <div class="adm-corner__body" id="subsCornerBody">
+    <div class="muted small">loading…</div>
+  </div>
+</aside>
+
 <div id="toast" class="adm-toast" aria-live="polite" hidden></div>
 
-<script src="/admin/admin.js?v=2" defer></script>
+<script src="/admin/admin.js?v=3" defer></script>
 </body>
 </html>

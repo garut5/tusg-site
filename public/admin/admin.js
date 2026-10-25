@@ -673,6 +673,75 @@ npx wrangler pages deploy public --project-name=tusg-site --branch=main</pre>
     custSearchTimer = setTimeout(loadCustomers, 300);
   });
 
+  // -------------------- Corner subscription widget (全タブ常駐) --------------------
+  async function loadCornerSummary() {
+    const body = $("#subsCornerBody");
+    const { ok, data } = await api("/api/admin/subscriptions?status=all&limit=5");
+    while (body.firstChild) body.removeChild(body.firstChild);
+    if (!ok) {
+      body.appendChild(el("div", { class: "muted small" }, data.message || "取得失敗"));
+      return;
+    }
+    const summary = data.summary || [];
+    const activeCount = summary
+      .filter((s) => ["active", "trialing"].includes(s.status))
+      .reduce((a, s) => a + Number(s.count || 0), 0);
+    const mrr = summary
+      .filter((s) => ["active", "trialing"].includes(s.status))
+      .reduce((a, s) => a + Number(s.total_mrr || 0), 0);
+    const canceledCount = summary
+      .filter((s) => s.status === "canceled")
+      .reduce((a, s) => a + Number(s.count || 0), 0);
+
+    const sumBox = el("div", { class: "adm-corner__summary" },
+      el("div", { class: "adm-corner__stat" }, "稼働", el("b", {}, activeCount + " 件")),
+      el("div", { class: "adm-corner__stat" }, "MRR", el("b", {}, yen(mrr))),
+      el("div", { class: "adm-corner__stat" }, "解約", el("b", {}, canceledCount + " 件")),
+    );
+    body.appendChild(sumBox);
+
+    const subs = data.subscriptions || [];
+    if (subs.length === 0) {
+      body.appendChild(el("div", { class: "muted small" }, "契約はまだありません"));
+      return;
+    }
+    for (const s of subs.slice(0, 5)) {
+      const stripeUrl = `https://dashboard.stripe.com/customers/${s.stripe_customer_id}`;
+      const statusTag = el("span", { class: `adm-tag adm-tag--${s.status === "active" ? "ok" : s.status === "canceled" ? "muted" : "warn"}` }, s.status);
+      body.appendChild(el("div", { class: "adm-corner__item" },
+        el("div", { class: "adm-corner__item__name" }, s.customer_name || s.customer_email || "(無名)", " ", statusTag),
+        el("div", { class: "adm-corner__item__meta" },
+          `${s.service_name || s.service_slug || "-"} / ${yen(s.current_amount)}/月`
+        ),
+        el("div", {},
+          el("a", { class: "stripe-link", href: `#`, onClick: (ev) => { ev.preventDefault(); showSubDetail(s.id); } },
+            "詳細"
+          ),
+          el("span", { class: "muted small" }, " · "),
+          el("a", { class: "stripe-link", href: stripeUrl, target: "_blank", rel: "noopener" }, "Stripe で管理 / 解約 →"),
+        ),
+      ));
+    }
+  }
+  // 折りたたみトグル (localStorage で状態保持)
+  const cornerBody = $("#subsCornerBody");
+  const cornerToggle = $("#subsCornerToggle");
+  const COLLAPSE_KEY = "tusg_adm_corner_collapsed";
+  try {
+    if (localStorage.getItem(COLLAPSE_KEY) === "1") {
+      cornerBody.classList.add("collapsed");
+      cornerToggle.textContent = "+";
+    }
+  } catch {}
+  cornerToggle.addEventListener("click", () => {
+    const collapsed = cornerBody.classList.toggle("collapsed");
+    cornerToggle.textContent = collapsed ? "+" : "−";
+    try { localStorage.setItem(COLLAPSE_KEY, collapsed ? "1" : "0"); } catch {}
+  });
+  // 60 秒ごとに自動更新
+  setInterval(loadCornerSummary, 60000);
+
   // -------------------- Init --------------------
   loadStatus();
+  loadCornerSummary();
 })();

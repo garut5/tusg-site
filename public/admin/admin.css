@@ -242,6 +242,55 @@ a { color: var(--adm-primary); }
 .adm-table th, .adm-table td { padding: 6px 10px; text-align: left; border-bottom: 1px solid var(--adm-line); }
 .adm-table th { color: var(--adm-ink-500); font-weight: 500; background: #fafafa; }
 
+/* Corner subscription widget (always visible, bottom-right) */
+.adm-corner {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  width: 300px;
+  max-width: calc(100vw - 32px);
+  background: #fff;
+  border: 1px solid var(--adm-line);
+  border-radius: 10px;
+  box-shadow: 0 6px 24px rgba(0,0,0,.1);
+  font-size: 12px;
+  z-index: 50;
+}
+.adm-corner__head {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--adm-line);
+  background: #f8f9fa;
+  border-radius: 10px 10px 0 0;
+}
+.adm-corner__head button {
+  background: transparent; border: 0; cursor: pointer; font-size: 16px; padding: 0 6px;
+  color: var(--adm-ink-500);
+}
+.adm-corner__body { padding: 10px 12px; max-height: 320px; overflow-y: auto; }
+.adm-corner__body.collapsed { display: none; }
+.adm-corner__summary {
+  display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap;
+}
+.adm-corner__stat {
+  flex: 1 1 auto; background: #f1f3f5; padding: 6px 10px; border-radius: 6px; min-width: 80px;
+}
+.adm-corner__stat b { display: block; font-size: 14px; margin-top: 2px; }
+.adm-corner__item {
+  padding: 8px 0;
+  border-top: 1px dashed #eee;
+}
+.adm-corner__item:first-child { border-top: 0; }
+.adm-corner__item__name { font-weight: 600; }
+.adm-corner__item__meta { color: var(--adm-ink-500); font-size: 11px; margin-top: 2px; }
+.adm-corner__item a.stripe-link {
+  display: inline-block; margin-top: 4px; font-size: 11px; color: #635bff; text-decoration: none;
+}
+.adm-corner__item a.stripe-link:hover { text-decoration: underline; }
+@media (max-width: 640px) {
+  .adm-corner { bottom: 8px; right: 8px; width: calc(100vw - 16px); }
+}
+
 /* Guidance when D1 is not ready */
 .adm-guidance {
   background: #fff8e1; border: 1px solid #ffcc80; color: var(--adm-warn);
