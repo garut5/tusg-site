@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TUSG 管理画面｜Pay Forward</title>
+<meta name="robots" content="noindex,nofollow,noarchive">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="stylesheet" href="/admin/admin.css?v=1">
+</head>
+<body>
+
+<header class="adm-header">
+  <div class="adm-header__inner">
+    <div class="adm-brand">
+      <strong>TUSG 管理</strong><span class="adm-brand__sub">Pay Forward Backoffice</span>
+    </div>
+    <div class="adm-header__meta" id="hdrMeta"><span class="muted">loading…</span></div>
+  </div>
+  <nav class="adm-tabs" role="tablist">
+    <button role="tab" data-tab="dashboard" aria-selected="true">ダッシュボード</button>
+    <button role="tab" data-tab="services" aria-selected="false">サービス</button>
+    <button role="tab" data-tab="assumptions" aria-selected="false">原価前提値</button>
+    <button role="tab" data-tab="pricing" aria-selected="false">料金計算</button>
+    <button role="tab" data-tab="quotes" aria-selected="false">個別見積</button>
+  </nav>
+</header>
+
+<main class="adm-main">
+
+  <!-- Dashboard -->
+  <section id="tab-dashboard" class="adm-tab" aria-labelledby="hdr-dashboard">
+    <h2 id="hdr-dashboard">現在の状態</h2>
+    <div id="statusCards" class="adm-status-grid">
+      <div class="adm-card adm-card--placeholder">loading…</div>
+    </div>
+    <div class="adm-card">
+      <h3>はじめに</h3>
+      <p>この管理画面は Pay Forward サブスクリプションの基盤です。以下の順で設定してください。</p>
+      <ol class="adm-steps">
+        <li><strong>原価前提値</strong>タブで時給レート・粗利目標率等を確定</li>
+        <li><strong>サービス</strong>タブで各サービスの原価項目を登録</li>
+        <li><strong>料金計算</strong>タブで最低料金を計算 → 公開</li>
+        <li>個別見積のサービス (HP 制作等) は<strong>個別見積</strong>タブで顧客ごとに発行</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section id="tab-services" class="adm-tab" hidden aria-labelledby="hdr-services">
+    <div class="adm-section-head">
+      <h2 id="hdr-services">サービス管理</h2>
+      <button type="button" class="btn btn--primary" id="btnNewService">+ 新規サービス</button>
+    </div>
+    <div id="servicesList" class="adm-list">
+      <div class="muted">loading…</div>
+    </div>
+  </section>
+
+  <!-- Assumptions -->
+  <section id="tab-assumptions" class="adm-tab" hidden aria-labelledby="hdr-assumptions">
+    <h2 id="hdr-assumptions">原価算出の前提値 (全サービス共通)</h2>
+    <p class="muted small">
+      これらの値を元に、各サービスの最低料金が算出されます。
+      変更すると以後の料金計算に反映されます (既存の pricing_rules には影響しません)。
+    </p>
+    <form id="assumptionsForm" class="adm-form">
+      <div class="adm-form__row">
+        <label for="a_hourly_rate_jpy">時給レート (円/h) *</label>
+        <input id="a_hourly_rate_jpy" name="hourly_rate_jpy" type="number" min="0" step="100" required>
+        <small>税抜。TUSG 代表者・担当者の時間価値を金額換算</small>
+      </div>
+      <div class="adm-form__row">
+        <label for="a_profit_margin">粗利目標率 (0.0〜1.0) *</label>
+        <input id="a_profit_margin" name="profit_margin" type="number" min="0" max="1" step="0.01" required>
+        <small>例: 0.40 = 40% の粗利を乗せる</small>
+      </div>
+      <div class="adm-form__row">
+        <label for="a_churn_rate_monthly">想定月間解約率 (0.0〜1.0)</label>
+        <input id="a_churn_rate_monthly" name="churn_rate_monthly" type="number" min="0" max="1" step="0.001">
+        <small>例: 0.03 = 月 3% が解約</small>
+      </div>
+      <div class="adm-form__row">
+        <label for="a_expected_customers_year1">想定初年度顧客数</label>
+        <input id="a_expected_customers_year1" name="expected_customers_year1" type="number" min="1" step="1">
+        <small>共通インフラ原価の按分計算に使用</small>
+      </div>
+      <div class="adm-form__row">
+        <label for="a_cost_buffer">原価上昇リスクバッファ (0.0〜1.0)</label>
+        <input id="a_cost_buffer" name="cost_buffer" type="number" min="0" max="1" step="0.01">
+        <small>例: 0.10 = +10% のバッファを乗せる</small>
+      </div>
+      <div class="adm-form__row">
+        <label for="a_stripe_fee_jp_card">Stripe 決済手数料 (日本カード)</label>
+        <input id="a_stripe_fee_jp_card" name="stripe_fee_jp_card" type="number" min="0" max="1" step="0.001">
+        <small>Visa/MC/Amex は 0.0325、JCB は 0.036</small>
+      </div>
+      <div class="adm-form__row">
+        <label for="a_stripe_fee_billing">Stripe Billing 追加手数料</label>
+        <input id="a_stripe_fee_billing" name="stripe_fee_billing" type="number" min="0" max="1" step="0.001">
+        <small>Billing 使用時に加算 (通常 0.005)</small>
+      </div>
+      <div class="adm-form__row">
+        <label for="a_contract_amortization_months">初期費用の按分期間 (月)</label>
+        <input id="a_contract_amortization_months" name="contract_amortization_months" type="number" min="1" step="1">
+        <small>例: 36 = 3 年契約で初期費用を 36 ヶ月に按分</small>
+      </div>
+      <div class="adm-form__row">
+        <label for="a_infra_monthly_base_jpy">月額共通インフラ原価 (円)</label>
+        <input id="a_infra_monthly_base_jpy" name="infra_monthly_base_jpy" type="number" min="0" step="100">
+        <small>ドメイン + CF + Resend 等。想定顧客数で按分</small>
+      </div>
+      <div class="adm-form__row">
+        <label for="a_tax_rate">消費税率</label>
+        <input id="a_tax_rate" name="tax_rate" type="number" min="0" max="1" step="0.01">
+        <small>表示時のみ使用 (保存は税抜)</small>
+      </div>
+      <div class="adm-form__actions">
+        <button type="submit" class="btn btn--primary">保存</button>
+        <span id="assumptionsStatus" class="muted"></span>
+      </div>
+    </form>
+  </section>
+
+  <!-- Pricing -->
+  <section id="tab-pricing" class="adm-tab" hidden aria-labelledby="hdr-pricing">
+    <h2 id="hdr-pricing">最低料金の計算と公開</h2>
+    <p class="muted small">サービスごとに原価と前提値から最低料金を計算し、公開 (pricing_rules に保存) します。</p>
+
+    <div class="adm-form__row">
+      <label for="pricingServiceSelect">対象サービス</label>
+      <select id="pricingServiceSelect">
+        <option value="">loading…</option>
+      </select>
+    </div>
+
+    <div class="adm-pricing-grid">
+      <div class="adm-card">
+        <h3>計算プレビュー</h3>
+        <div id="pricingPreview" class="muted">サービスを選択してください</div>
+        <div class="adm-form__actions">
+          <button type="button" class="btn btn--primary" id="btnPricingCalc" disabled>計算する</button>
+          <button type="button" class="btn btn--primary" id="btnPricingPublish" disabled>この最低料金で公開</button>
+        </div>
+      </div>
+      <div class="adm-card">
+        <h3>公開履歴</h3>
+        <div id="pricingHistory" class="muted">サービスを選択してください</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quotes -->
+  <section id="tab-quotes" class="adm-tab" hidden aria-labelledby="hdr-quotes">
+    <div class="adm-section-head">
+      <h2 id="hdr-quotes">個別見積の発行と管理</h2>
+      <button type="button" class="btn btn--primary" id="btnNewQuote">+ 新規発行</button>
+    </div>
+    <p class="muted small">
+      quote_required 分類のサービス (HP 制作等) で、顧客ごとに最低額付きトークンを発行します。
+      顧客はこのトークン付き URL でのみ申込画面にアクセスできます (= 下振れ赤字防止)。
+    </p>
+    <div id="quotesList" class="adm-list">
+      <div class="muted">loading…</div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ Modal: Service editor ============ -->
+<dialog id="serviceModal" class="adm-modal">
+  <form method="dialog" id="serviceForm" class="adm-form">
+    <h3 id="serviceModalTitle">サービス</h3>
+    <input type="hidden" id="svc_id">
+    <div class="adm-form__row">
+      <label for="svc_slug">slug (URL 用、作成後変更不可) *</label>
+      <input id="svc_slug" name="slug" required pattern="[a-z0-9][a-z0-9-]{0,49}" placeholder="hp-starter">
+    </div>
+    <div class="adm-form__row">
+      <label for="svc_name">サービス名 *</label>
+      <input id="svc_name" name="name" required maxlength="100">
+    </div>
+    <div class="adm-form__row">
+      <label for="svc_service_type">タイプ *</label>
+      <select id="svc_service_type" name="service_type" required>
+        <option value="instant">instant (ユーザー自由入力)</option>
+        <option value="quote_required">quote_required (管理者発行トークン必須)</option>
+      </select>
+    </div>
+    <div class="adm-form__row">
+      <label for="svc_short_description">説明 (短)</label>
+      <input id="svc_short_description" name="short_description" maxlength="500">
+    </div>
+    <div class="adm-form__row">
+      <label for="svc_long_description">説明 (長、Markdown 可)</label>
+      <textarea id="svc_long_description" name="long_description" rows="4" maxlength="5000"></textarea>
+    </div>
+    <div class="adm-form__row">
+      <label for="svc_recommended_amount">推奨月額 (円、表示用)</label>
+      <input id="svc_recommended_amount" name="recommended_amount" type="number" min="0" step="100">
+    </div>
+    <div class="adm-form__row">
+      <label for="svc_default_min_amount">暫定最低額 (円、pricing_rules 未公開時のフォールバック)</label>
+      <input id="svc_default_min_amount" name="default_min_amount" type="number" min="0" step="100">
+    </div>
+    <div class="adm-form__row">
+      <label><input type="checkbox" id="svc_is_published"> 公開中</label>
+    </div>
+    <div class="adm-form__actions">
+      <button type="button" class="btn btn--ghost" id="svcCancel">キャンセル</button>
+      <button type="submit" class="btn btn--primary" id="svcSave">保存</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- ============ Modal: Quote issuance ============ -->
+<dialog id="quoteModal" class="adm-modal">
+  <form method="dialog" id="quoteForm" class="adm-form">
+    <h3>個別見積の発行</h3>
+    <div class="adm-form__row">
+      <label for="q_service_id">対象サービス (quote_required のみ) *</label>
+      <select id="q_service_id" required></select>
+    </div>
+    <div class="adm-form__row">
+      <label for="q_customer_email">顧客 email *</label>
+      <input id="q_customer_email" type="email" required maxlength="254">
+    </div>
+    <div class="adm-form__row">
+      <label for="q_customer_name">顧客氏名</label>
+      <input id="q_customer_name" maxlength="100">
+    </div>
+    <div class="adm-form__row">
+      <label for="q_customer_company">会社名</label>
+      <input id="q_customer_company" maxlength="100">
+    </div>
+    <div class="adm-form__row">
+      <label for="q_min_amount">最低月額 (円、税抜) *</label>
+      <input id="q_min_amount" type="number" min="100" max="10000000" step="100" required>
+    </div>
+    <div class="adm-form__row">
+      <label for="q_recommended_amount">推奨月額 (円、任意)</label>
+      <input id="q_recommended_amount" type="number" min="100" max="10000000" step="100">
+    </div>
+    <div class="adm-form__row">
+      <label for="q_scope_description">見積範囲の説明</label>
+      <textarea id="q_scope_description" rows="4" maxlength="5000"></textarea>
+    </div>
+    <div class="adm-form__row">
+      <label for="q_expires_days">有効期限 (日)</label>
+      <input id="q_expires_days" type="number" min="1" max="180" value="30">
+    </div>
+    <div class="adm-form__actions">
+      <button type="button" class="btn btn--ghost" id="quoteCancel">キャンセル</button>
+      <button type="submit" class="btn btn--primary">発行</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- ============ Modal: Service cost items ============ -->
+<dialog id="costsModal" class="adm-modal adm-modal--wide">
+  <div class="adm-form">
+    <h3>原価項目 — <span id="costsTitle"></span></h3>
+    <div id="costsList" class="muted">loading…</div>
+    <h4>新規追加</h4>
+    <form id="costForm" class="adm-form">
+      <input type="hidden" id="cost_service_id">
+      <div class="adm-form__grid">
+        <div>
+          <label for="cost_category">分類 *</label>
+          <select id="cost_category" required>
+            <option value="labor_initial">labor_initial (初期制作工数)</option>
+            <option value="labor_monthly">labor_monthly (月次保守工数)</option>
+            <option value="infra_monthly">infra_monthly (月額固定インフラ)</option>
+            <option value="variable">variable (変動原価)</option>
+            <option value="payment_fee">payment_fee (決済手数料。前提値側で計算されるため通常不要)</option>
+            <option value="other">other</option>
+          </select>
+        </div>
+        <div>
+          <label for="cost_item_name">項目名 *</label>
+          <input id="cost_item_name" required maxlength="100">
+        </div>
+        <div>
+          <label for="cost_hours">工数 (h)</label>
+          <input id="cost_hours" type="number" min="0" step="0.1">
+        </div>
+        <div>
+          <label for="cost_amount">金額 (円)</label>
+          <input id="cost_amount" type="number" min="0" step="1">
+        </div>
+        <div>
+          <label for="cost_unit">単位</label>
+          <select id="cost_unit">
+            <option value="">(none)</option>
+            <option value="monthly">monthly</option>
+            <option value="per_customer_month">per_customer_month</option>
+            <option value="one_time">one_time</option>
+          </select>
+        </div>
+        <div>
+          <label for="cost_source">出典 (任意)</label>
+          <input id="cost_source" maxlength="500">
+        </div>
+      </div>
+      <div class="adm-form__actions">
+        <button type="button" class="btn btn--ghost" id="costsClose">閉じる</button>
+        <button type="submit" class="btn btn--primary">追加</button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
+<div id="toast" class="adm-toast" aria-live="polite" hidden></div>
+
+<script src="/admin/admin.js?v=1" defer></script>
+</body>
+</html>
