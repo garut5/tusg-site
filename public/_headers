@@ -16,6 +16,10 @@
 /
   Cache-Control: no-cache, no-store, must-revalidate
 
+# Pay Forward 配下の pretty URL (/pay-forward/apply 等) もキャッシュ無効化
+/pay-forward/*
+  Cache-Control: no-cache, no-store, must-revalidate
+
 # 静的アセットは1日キャッシュ (デバッグ容易性を優先)
 /css/*
   Cache-Control: public, max-age=86400, must-revalidate

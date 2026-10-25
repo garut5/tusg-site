@@ -142,13 +142,18 @@
   }
 
   async function loadServices() {
+    serviceSel.innerHTML = '<option value="">読み込み中…</option>';
     try {
-      const r = await fetch("/api/pay-forward/services", { credentials: "include", cache: "no-store" });
+      const url = `/api/pay-forward/services?_=${Date.now()}`;
+      console.log("[pay-forward] fetching", url);
+      const r = await fetch(url, { credentials: "include", cache: "no-store" });
+      console.log("[pay-forward] response", r.status, r.statusText);
       if (!r.ok) {
         const txt = await r.text().catch(() => "");
         throw new Error(`API ${r.status}: ${txt.slice(0, 200) || r.statusText}`);
       }
       const data = await r.json();
+      console.log("[pay-forward] data", data);
       if (!data.ok) throw new Error(data.message || "読み込みに失敗しました");
       services = data.services || [];
       if (services.length === 0) {
@@ -160,7 +165,10 @@
         services.map((s) => `<option value="${s.slug}">${s.name}</option>`).join("");
       serviceSel.addEventListener("change", updateMinDisplay);
     } catch (e) {
-      showError(`サービス読み込みエラー: ${e.message}`);
+      console.error("[pay-forward] loadServices failed:", e);
+      serviceSel.innerHTML = `<option value="">エラー: 読み込み失敗</option>`;
+      submitBtn.disabled = true;
+      showError(`サービス読み込みエラー: ${e.message} / F12で詳細確認`);
     }
   }
 
