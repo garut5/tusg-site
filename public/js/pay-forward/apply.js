@@ -49,11 +49,9 @@
       minEl.textContent = fmt(minAmount);
       amountInput.min = minAmount;
       amountInput.placeholder = `例: ${minAmount}`;
-      if (svc.recommended_amount) {
-        recEl.textContent = `推奨: ${fmt(svc.recommended_amount)}`;
-      } else {
-        recEl.textContent = "";
-      }
+      // Pay Forward 理念 (利用者が自由に価値を決める) に反するため
+      // 「推奨額」はユーザー画面では表示しない。
+      recEl.textContent = "";
       minBox.style.display = "block";
     } else {
       minBox.style.display = "none";
