@@ -158,6 +158,49 @@ function timingSafeEqualHex(a, b) {
 }
 
 // -----------------------------------------------------------------------------
+// Shape helpers: Stripe API 2024-12-18.acacia (旧) と 2025+ 以降の両方に対応
+//   - invoice.subscription (string) → invoice.parent.subscription_details.subscription
+//   - invoice.charge (string)        → removed → payment_intent 系から参照
+//   - subscription.current_period_end → subscription.items.data[0].current_period_end
+// -----------------------------------------------------------------------------
+function extractIdOrString(v) {
+  if (v == null) return null;
+  if (typeof v === "string") return v;
+  if (typeof v === "object" && typeof v.id === "string") return v.id;
+  return null;
+}
+function invoiceSubscriptionId(inv) {
+  return extractIdOrString(inv?.subscription)
+    || extractIdOrString(inv?.parent?.subscription_details?.subscription)
+    || extractIdOrString(inv?.lines?.data?.[0]?.subscription)
+    || extractIdOrString(inv?.lines?.data?.[0]?.parent?.subscription_item_details?.subscription)
+    || null;
+}
+function invoiceChargeId(inv) {
+  return extractIdOrString(inv?.charge)
+    || extractIdOrString(inv?.payments?.data?.[0]?.payment?.payment_intent)
+    || null;
+}
+function subscriptionCurrentPeriodEnd(sub) {
+  if (!sub) return null;
+  if (sub.current_period_end) return Number(sub.current_period_end);
+  const items = sub.items?.data || [];
+  for (const it of items) {
+    if (it?.current_period_end) return Number(it.current_period_end);
+  }
+  return null;
+}
+function subscriptionCurrentPeriodStart(sub) {
+  if (!sub) return null;
+  if (sub.current_period_start) return Number(sub.current_period_start);
+  const items = sub.items?.data || [];
+  for (const it of items) {
+    if (it?.current_period_start) return Number(it.current_period_start);
+  }
+  return null;
+}
+
+// -----------------------------------------------------------------------------
 // Handlers
 // -----------------------------------------------------------------------------
 
@@ -193,7 +236,8 @@ async function upsertCustomer(db, stripeCustomerId, email, name, company) {
 async function handleCheckoutCompleted(db, event, env) {
   const session = event.data.object;
   if (session.mode !== "subscription") return;
-  if (!session.subscription) return; // Stripe 側で未確定ならスキップ
+  const subscriptionId = extractIdOrString(session.subscription);
+  if (!subscriptionId) return; // Stripe 側で未確定ならスキップ
 
   const md = session.metadata || {};
   const subMd = session.subscription_data?.metadata || {};
@@ -205,18 +249,19 @@ async function handleCheckoutCompleted(db, event, env) {
   // customer upsert
   const customerLocalId = await upsertCustomer(
     db,
-    session.customer,
+    extractIdOrString(session.customer),
     customer_email,
     session.customer_details?.name,
     null
   );
 
   // Stripe から subscription 詳細を取得 (price_id / current_amount / status / current_period_end)
-  const sub = await fetchStripeSubscription(env, session.subscription);
+  const sub = await fetchStripeSubscription(env, subscriptionId);
   const stripePriceId = sub.items?.data?.[0]?.price?.id || "";
   const unitAmount = Number(sub.items?.data?.[0]?.price?.unit_amount || 0);
   const now = Date.now();
-  const nextBilling = sub.current_period_end ? sub.current_period_end * 1000 : null;
+  const cpeSec = subscriptionCurrentPeriodEnd(sub);
+  const nextBilling = cpeSec ? cpeSec * 1000 : null;
 
   // subscriptions INSERT (ユニークインデックス重複は無視)
   try {
@@ -264,7 +309,8 @@ async function handleSubscriptionUpdated(db, event) {
   const sub = event.data.object;
   const now = Date.now();
   const unitAmount = Number(sub.items?.data?.[0]?.price?.unit_amount || 0);
-  const nextBilling = sub.current_period_end ? sub.current_period_end * 1000 : null;
+  const cpeSec = subscriptionCurrentPeriodEnd(sub);
+  const nextBilling = cpeSec ? cpeSec * 1000 : null;
   const canceled = sub.canceled_at ? sub.canceled_at * 1000 : null;
   const cape = sub.cancel_at_period_end ? 1 : 0;
 
@@ -305,7 +351,7 @@ async function handleSubscriptionDeleted(db, event) {
 async function handleInvoicePaid(db, event, status) {
   const inv = event.data.object;
   const now = Date.now();
-  const stripeSubId = inv.subscription;
+  const stripeSubId = invoiceSubscriptionId(inv);
   let subLocalId = null;
   if (stripeSubId) {
     const r = await db
@@ -322,7 +368,7 @@ async function handleInvoicePaid(db, event, status) {
   const failureReason = inv.last_finalization_error?.message
     || inv.last_payment_error?.message
     || null;
-  const chargeId = inv.charge || null;
+  const chargeId = invoiceChargeId(inv);
 
   // UNIQUE(stripe_invoice_id) に INSERT; 重複時は UPDATE
   try {
