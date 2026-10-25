@@ -18,6 +18,12 @@
 
 const PROTECTED_PREFIX_RE = /^\/(pay-forward(\.html)?(\/|$)|api\/pay-forward\/)/;
 const WEBHOOK_PATH = "/api/pay-forward/webhook";
+// サービスカタログ (公開中サービスの読み取り) は認証対象外にする。
+// 理由: Chrome の fetch API は Basic 認証の cached credentials を自動送信
+//      しないケースがあり、apply.html の services 読込が 401 で詰まる。
+//      内容は「公開中のサービス一覧 + 最低料金」のみで、申込 (checkout)
+//      エンドポイントは引き続き Basic 認証で保護されるため実害なし。
+const PUBLIC_GET_PATHS = new Set(["/api/pay-forward/services"]);
 
 export const onRequest = async (context) => {
   const { request, env, next } = context;
@@ -30,6 +36,11 @@ export const onRequest = async (context) => {
 
   // Stripe webhook は Basic 認証対象外 (署名検証で保護)
   if (url.pathname === WEBHOOK_PATH && request.method === "POST") {
+    return next();
+  }
+
+  // 公開カタログ GET は Basic 認証対象外 (Chrome の fetch 認証伝播問題回避)
+  if (request.method === "GET" && PUBLIC_GET_PATHS.has(url.pathname)) {
     return next();
   }
 
