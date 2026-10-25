@@ -28,9 +28,6 @@
   <a href="/pay-forward.html" class="cta">Pay Forward について</a>
   <p class="meta" id="session-meta"></p>
 </main>
-<script>
-  const sid = new URL(location.href).searchParams.get("session_id");
-  if (sid) document.getElementById("session-meta").textContent = "セッション ID: " + sid.slice(0, 20) + "…";
-</script>
+<script src="/js/pay-forward/thanks.js?v=1" defer></script>
 </body>
 </html>
