@@ -6,7 +6,7 @@
 <title>TUSG 管理画面｜Pay Forward</title>
 <meta name="robots" content="noindex,nofollow,noarchive">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="stylesheet" href="/admin/admin.css?v=1">
+<link rel="stylesheet" href="/admin/admin.css?v=2">
 </head>
 <body>
 
@@ -23,6 +23,8 @@
     <button role="tab" data-tab="assumptions" aria-selected="false">原価前提値</button>
     <button role="tab" data-tab="pricing" aria-selected="false">料金計算</button>
     <button role="tab" data-tab="quotes" aria-selected="false">個別見積</button>
+    <button role="tab" data-tab="subscriptions" aria-selected="false">契約</button>
+    <button role="tab" data-tab="customers" aria-selected="false">顧客</button>
   </nav>
 </header>
 
@@ -165,7 +167,49 @@
     </div>
   </section>
 
+  <!-- Subscriptions -->
+  <section id="tab-subscriptions" class="adm-tab" hidden aria-labelledby="hdr-subs">
+    <div class="adm-section-head">
+      <h2 id="hdr-subs">契約 (サブスクリプション)</h2>
+      <div>
+        <label class="muted small">状態:
+          <select id="subsStatus">
+            <option value="active">稼働中のみ</option>
+            <option value="all">すべて</option>
+            <option value="canceled">解約済</option>
+            <option value="past_due">支払遅延</option>
+          </select>
+        </label>
+      </div>
+    </div>
+    <div id="subsSummary" class="adm-status-grid"></div>
+    <div id="subsList" class="adm-list">
+      <div class="muted">loading…</div>
+    </div>
+  </section>
+
+  <!-- Customers -->
+  <section id="tab-customers" class="adm-tab" hidden aria-labelledby="hdr-customers">
+    <div class="adm-section-head">
+      <h2 id="hdr-customers">顧客</h2>
+      <input id="custSearch" type="search" placeholder="email / 名前 / 会社名で検索…" style="min-width:260px;padding:6px 10px;">
+    </div>
+    <div id="customersList" class="adm-list">
+      <div class="muted">loading…</div>
+    </div>
+  </section>
+
 </main>
+
+<!-- ============ Modal: Subscription detail ============ -->
+<dialog id="subDetailModal" class="adm-modal adm-modal--wide">
+  <div style="padding:4px;">
+    <div class="adm-form__actions" style="justify-content:flex-end;">
+      <button type="button" class="btn btn--ghost" id="subDetailClose">閉じる</button>
+    </div>
+    <div id="subDetailBody">loading…</div>
+  </div>
+</dialog>
 
 <!-- ============ Modal: Service editor ============ -->
 <dialog id="serviceModal" class="adm-modal">
@@ -312,6 +356,6 @@
 
 <div id="toast" class="adm-toast" aria-live="polite" hidden></div>
 
-<script src="/admin/admin.js?v=1" defer></script>
+<script src="/admin/admin.js?v=2" defer></script>
 </body>
 </html>

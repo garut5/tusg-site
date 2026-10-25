@@ -55,6 +55,8 @@
     if (name === "assumptions") loadAssumptions();
     if (name === "pricing") loadPricingSetup();
     if (name === "quotes") loadQuotes();
+    if (name === "subscriptions") loadSubscriptions();
+    if (name === "customers") loadCustomers();
   }
   $$(".adm-tabs button").forEach((b) => b.addEventListener("click", () => switchTab(b.dataset.tab)));
 
@@ -500,6 +502,175 @@ npx wrangler pages deploy public --project-name=tusg-site --branch=main</pre>
     } else {
       toast(res.data.message || "発行失敗", "err");
     }
+  });
+
+  // -------------------- Subscriptions --------------------
+  async function loadSubscriptions() {
+    const status = $("#subsStatus").value || "active";
+    const { ok, data } = await api(`/api/admin/subscriptions?status=${encodeURIComponent(status)}&limit=200`);
+    const summaryBox = $("#subsSummary");
+    const list = $("#subsList");
+    while (summaryBox.firstChild) summaryBox.removeChild(summaryBox.firstChild);
+    while (list.firstChild) list.removeChild(list.firstChild);
+
+    if (!ok) {
+      list.appendChild(el("div", { class: "muted" }, data.message || "取得失敗"));
+      return;
+    }
+    // サマリ
+    const summary = data.summary || [];
+    const active = summary.find((s) => ["active", "trialing"].includes(s.status));
+    const canceled = summary.find((s) => s.status === "canceled");
+    const total = summary.reduce((a, s) => a + Number(s.total_mrr || 0), 0);
+    const activeMrr = summary
+      .filter((s) => ["active", "trialing"].includes(s.status))
+      .reduce((a, s) => a + Number(s.total_mrr || 0), 0);
+    summaryBox.appendChild(statCard("稼働中契約", (active?.count || 0) + " 件"));
+    summaryBox.appendChild(statCard("解約済", (canceled?.count || 0) + " 件"));
+    summaryBox.appendChild(statCard("月次売上 (MRR)", yen(activeMrr)));
+    summaryBox.appendChild(statCard("累計契約数", summary.reduce((a, s) => a + Number(s.count || 0), 0) + " 件"));
+
+    const subs = data.subscriptions || [];
+    if (subs.length === 0) {
+      list.appendChild(el("div", { class: "muted" }, "該当なし"));
+      return;
+    }
+    for (const s of subs) {
+      const typeTag = el("span", { class: `adm-tag adm-tag--${s.service_type === "instant" ? "instant" : "quote"}` }, s.service_type || "-");
+      const statusTag = el("span", { class: `adm-tag adm-tag--${s.status === "active" ? "ok" : s.status === "canceled" ? "muted" : "warn"}` }, s.status);
+      const card = el("div", { class: "adm-list__item" },
+        el("div", { class: "adm-list__main" },
+          el("div", { class: "adm-list__title" },
+            s.customer_name || s.customer_email || "(顧客不明)", " ",
+            typeTag, " ", statusTag
+          ),
+          el("div", { class: "adm-list__sub" },
+            `${s.service_name || s.service_slug || "-"} / 月額 ${yen(s.current_amount)} (契約時最低 ${yen(s.min_amount_at_contract)}) / 開始 ${s.started_at ? fmtDate(s.started_at) : "-"}`
+          ),
+          el("div", { class: "muted small" }, `sub: ${s.stripe_subscription_id}`)
+        ),
+        el("div", { class: "adm-list__actions" },
+          el("button", { class: "btn", onClick: () => showSubDetail(s.id) }, "詳細")
+        ),
+      );
+      list.appendChild(card);
+    }
+  }
+  $("#subsStatus").addEventListener("change", loadSubscriptions);
+
+  async function showSubDetail(id) {
+    const body = $("#subDetailBody");
+    while (body.firstChild) body.removeChild(body.firstChild);
+    body.appendChild(el("div", { class: "muted" }, "loading…"));
+    $("#subDetailModal").showModal();
+    const { ok, data } = await api(`/api/admin/subscriptions?id=${encodeURIComponent(id)}`);
+    while (body.firstChild) body.removeChild(body.firstChild);
+    if (!ok) {
+      body.appendChild(el("div", { class: "muted" }, data.message || "取得失敗"));
+      return;
+    }
+    const s = data.subscription;
+    body.appendChild(el("h3", {}, `契約 #${s.id}`));
+    body.appendChild(kv("Stripe Subscription", s.stripe_subscription_id));
+    body.appendChild(kv("顧客", `${s.customer_name || "-"} <${s.customer_email || "-"}>${s.customer_company ? " / " + s.customer_company : ""}`));
+    body.appendChild(kv("Stripe Customer", s.stripe_customer_id));
+    body.appendChild(kv("サービス", `${s.service_name || "-"} (${s.service_slug || "-"}, ${s.service_type || "-"})`));
+    body.appendChild(kv("契約時最低額 (snapshot)", yen(s.min_amount_at_contract)));
+    body.appendChild(kv("現在月額", yen(s.current_amount)));
+    body.appendChild(kv("ステータス", s.status));
+    body.appendChild(kv("開始", s.started_at ? fmtDate(s.started_at) : "-"));
+    body.appendChild(kv("次回請求", s.next_billing_at ? fmtDate(s.next_billing_at) : "-"));
+    body.appendChild(kv("期間末解約予約", s.cancel_at_period_end ? "はい" : "いいえ"));
+    body.appendChild(kv("解約日時", s.canceled_at ? fmtDate(s.canceled_at) : "-"));
+    if (data.quote) {
+      body.appendChild(el("h4", {}, "見積 (quote_required)"));
+      body.appendChild(kv("quote.id", data.quote.id));
+      body.appendChild(kv("発行者", data.quote.issued_by));
+      body.appendChild(kv("最低額", yen(data.quote.min_amount)));
+      body.appendChild(kv("ステータス", data.quote.status));
+    }
+    body.appendChild(el("h4", {}, "支払履歴"));
+    if ((data.payments || []).length === 0) {
+      body.appendChild(el("div", { class: "muted small" }, "支払いなし"));
+    } else {
+      const tbl = el("table", { class: "adm-table" });
+      tbl.appendChild(el("thead", {}, el("tr", {},
+        el("th", {}, "日付"), el("th", {}, "金額"), el("th", {}, "ステータス"), el("th", {}, "Invoice"))));
+      const tb = el("tbody");
+      for (const p of data.payments) {
+        tb.appendChild(el("tr", {},
+          el("td", {}, p.paid_at ? fmtDate(p.paid_at) : fmtDate(p.created_at)),
+          el("td", {}, yen(p.amount)),
+          el("td", {}, p.status + (p.failure_reason ? ` (${p.failure_reason})` : "")),
+          el("td", { class: "muted small" }, p.stripe_invoice_id || "-")));
+      }
+      tbl.appendChild(tb);
+      body.appendChild(tbl);
+    }
+    if ((data.pricing_history || []).length > 0) {
+      body.appendChild(el("h4", {}, "料金改定履歴"));
+      const tbl = el("table", { class: "adm-table" });
+      tbl.appendChild(el("thead", {}, el("tr", {},
+        el("th", {}, "日時"), el("th", {}, "旧→新"), el("th", {}, "変更者"), el("th", {}, "理由"))));
+      const tb = el("tbody");
+      for (const h of data.pricing_history) {
+        tb.appendChild(el("tr", {},
+          el("td", {}, fmtDate(h.changed_at)),
+          el("td", {}, `${yen(h.old_amount)} → ${yen(h.new_amount)}`),
+          el("td", {}, h.changed_by || "-"),
+          el("td", { class: "muted small" }, h.reason || "")));
+      }
+      tbl.appendChild(tb);
+      body.appendChild(tbl);
+    }
+  }
+  $("#subDetailClose").addEventListener("click", () => $("#subDetailModal").close());
+
+  function kv(label, value) {
+    return el("div", { class: "adm-kv" },
+      el("div", { class: "adm-kv__k" }, label),
+      el("div", { class: "adm-kv__v" }, value || "-"));
+  }
+  function statCard(label, value) {
+    return el("div", { class: "adm-card" },
+      el("div", { class: "muted small" }, label),
+      el("div", { style: "font-size:1.4rem;font-weight:600;margin-top:4px;" }, value));
+  }
+
+  // -------------------- Customers --------------------
+  let custSearchTimer = null;
+  async function loadCustomers() {
+    const q = $("#custSearch").value.trim();
+    const { ok, data } = await api(`/api/admin/customers${q ? "?q=" + encodeURIComponent(q) : ""}`);
+    const list = $("#customersList");
+    while (list.firstChild) list.removeChild(list.firstChild);
+    if (!ok) {
+      list.appendChild(el("div", { class: "muted" }, data.message || "取得失敗"));
+      return;
+    }
+    const customers = data.customers || [];
+    if (customers.length === 0) {
+      list.appendChild(el("div", { class: "muted" }, "顧客がまだいません"));
+      return;
+    }
+    for (const c of customers) {
+      list.appendChild(el("div", { class: "adm-list__item" },
+        el("div", { class: "adm-list__main" },
+          el("div", { class: "adm-list__title" },
+            c.name || "(無名)", " ",
+            el("span", { class: "muted small" }, `<${c.email}>`),
+            c.company ? el("span", { class: "muted small" }, ` / ${c.company}`) : null,
+          ),
+          el("div", { class: "adm-list__sub" },
+            `契約: 稼働 ${c.active_count} 件 / 累計 ${c.sub_count} 件 / 登録 ${fmtDate(c.created_at)}`
+          ),
+          el("div", { class: "muted small" }, `cus: ${c.stripe_customer_id}`),
+        )));
+    }
+  }
+  $("#custSearch").addEventListener("input", () => {
+    clearTimeout(custSearchTimer);
+    custSearchTimer = setTimeout(loadCustomers, 300);
   });
 
   // -------------------- Init --------------------

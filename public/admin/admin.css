@@ -215,6 +215,33 @@ a { color: var(--adm-primary); }
 .adm-toast--err { background: var(--adm-danger); }
 .adm-toast--ok { background: var(--adm-ok); }
 
+/* Tags (used in subscriptions/customers list) */
+.adm-tag {
+  display: inline-block; padding: 2px 8px; border-radius: 999px;
+  font-size: 11px; font-weight: 600; letter-spacing: .04em;
+  background: #eef0f3; color: var(--adm-ink-500); margin-left: 6px;
+}
+.adm-tag--ok { background: #e8f5e9; color: #2e7d32; }
+.adm-tag--warn { background: #fff7e6; color: var(--adm-warn); }
+.adm-tag--muted { background: #eef0f3; color: var(--adm-ink-500); }
+.adm-tag--instant { background: #e3f2fd; color: #1565c0; }
+.adm-tag--quote { background: #fff3e0; color: #e65100; }
+
+.adm-list__main { flex: 1 1 auto; min-width: 0; }
+.adm-list__title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+.adm-list__sub { font-size: 13px; color: var(--adm-ink-500); }
+.adm-list__actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+/* Key-value pairs (modal detail) */
+.adm-kv { display: grid; grid-template-columns: 180px 1fr; gap: 8px; padding: 6px 0; font-size: 13px; border-bottom: 1px dashed #eee; }
+.adm-kv__k { color: var(--adm-ink-500); }
+.adm-kv__v { word-break: break-all; }
+
+/* Table */
+.adm-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
+.adm-table th, .adm-table td { padding: 6px 10px; text-align: left; border-bottom: 1px solid var(--adm-line); }
+.adm-table th { color: var(--adm-ink-500); font-weight: 500; background: #fafafa; }
+
 /* Guidance when D1 is not ready */
 .adm-guidance {
   background: #fff8e1; border: 1px solid #ffcc80; color: var(--adm-warn);
