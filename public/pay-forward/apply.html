@@ -143,7 +143,11 @@
 
   async function loadServices() {
     try {
-      const r = await fetch("/api/pay-forward/services", { credentials: "same-origin" });
+      const r = await fetch("/api/pay-forward/services", { credentials: "include", cache: "no-store" });
+      if (!r.ok) {
+        const txt = await r.text().catch(() => "");
+        throw new Error(`API ${r.status}: ${txt.slice(0, 200) || r.statusText}`);
+      }
       const data = await r.json();
       if (!data.ok) throw new Error(data.message || "読み込みに失敗しました");
       services = data.services || [];
@@ -186,7 +190,8 @@
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
-        credentials: "same-origin",
+        credentials: "include",
+        cache: "no-store",
       });
       const data = await r.json();
       if (!data.ok) {
