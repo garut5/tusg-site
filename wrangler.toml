@@ -18,7 +18,7 @@ CONSULTATION_NOTIFICATION_TO = "info@tusg.co.jp"
 SITE_URL = "https://tusg.co.jp"
 
 # Pay Forward 公開値
-PAY_FORWARD_ENABLED = "false"           # Stripe & D1 設定完了後に "true" に変更
+PAY_FORWARD_ENABLED = "true"            # D1 作成済・Pay Forward 公開 (Stripe は Phase 4b で接続)
 STRIPE_API_VERSION = "2024-12-18.acacia"
 
 # 管理画面 (/admin/) の API 側 allowlist
@@ -69,10 +69,10 @@ ADMIN_ALLOWED_EMAILS = "goandgoing53@gmail.com"
 #   5) wrangler d1 execute tusg-main --remote --file=migrations/pay-forward/0003_seed_services.sql
 #   6) 下記ブロックのコメントアウトを外して deploy
 #
-# [[d1_databases]]
-# binding = "TUSG_DB"
-# database_name = "tusg-main"
-# database_id = "<ここに wrangler d1 create が返した UUID を貼る>"
+[[d1_databases]]
+binding = "TUSG_DB"
+database_name = "tusg-main"
+database_id = "093411f0-548e-472e-b60b-ffde91c29bd8"
 
 # ----------------------------------------------------------------
 # R2 バケット (テンプレ画像 / リール動画 のホスティング)
