@@ -39,11 +39,20 @@ export function dbRequired(env) {
 export function requireAdmin(request, env) {
   const email = request.headers.get("Cf-Access-Authenticated-User-Email");
   if (!email) {
+    // 診断用: どんな Cf-* / X-Access-* ヘッダが届いているかをレスポンスに含める
+    const cfHeaders = {};
+    for (const [k, v] of request.headers) {
+      if (k.toLowerCase().startsWith("cf-") || k.toLowerCase().startsWith("x-access-")) {
+        cfHeaders[k] = v.length > 60 ? v.slice(0, 60) + "...(" + v.length + " bytes)" : v;
+      }
+    }
     return {
       error: json({
         ok: false,
         status: "no_access_headers",
         message: "Cloudflare Access headers not present. Admin area must be protected by Access.",
+        received_cf_headers: cfHeaders,
+        hostname: new URL(request.url).hostname,
       }, 401),
     };
   }
