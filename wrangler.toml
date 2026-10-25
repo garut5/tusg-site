@@ -21,6 +21,11 @@ SITE_URL = "https://tusg.co.jp"
 PAY_FORWARD_ENABLED = "false"           # Stripe & D1 設定完了後に "true" に変更
 STRIPE_API_VERSION = "2024-12-18.acacia"
 
+# 管理画面 (/admin/) の API 側 allowlist
+# Cloudflare Access で /admin/* を保護しているので一次ガードは Access が担うが
+# 多重防御として Pages Function 側でも email を照合する
+ADMIN_ALLOWED_EMAILS = "goandgoing53@gmail.com"
+
 # 30秒無料診断 の秘密情報 (Cloudflare Dashboard または wrangler pages secret put で設定):
 #   RESEND_API_KEY
 
