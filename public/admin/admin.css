@@ -291,6 +291,23 @@ a { color: var(--adm-primary); }
   .adm-corner { bottom: 8px; right: 8px; width: calc(100vw - 16px); }
 }
 
+/* Breakdown panel (used in assumptions tab for infra cost) */
+.adm-breakdown {
+  margin-top: 10px;
+  background: #fafbfc;
+  border: 1px solid var(--adm-line);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 12px;
+}
+.adm-breakdown summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--adm-ink-500);
+  user-select: none;
+}
+.adm-breakdown__body { margin-top: 8px; }
+
 /* Guidance when D1 is not ready */
 .adm-guidance {
   background: #fff8e1; border: 1px solid #ffcc80; color: var(--adm-warn);

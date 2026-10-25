@@ -288,6 +288,52 @@ npx wrangler pages deploy public --project-name=tusg-site --branch=main</pre>
       const input = form.querySelector(`[name="${key}"]`);
       if (input && obj?.value != null) input.value = obj.value;
     }
+    // インフラ原価の内訳 (notes に JSON で保存されている場合に描画)
+    renderInfraBreakdown(a.infra_monthly_base_jpy);
+  }
+
+  function renderInfraBreakdown(obj) {
+    const body = $("#infraBreakdown .adm-breakdown__body");
+    if (!body) return;
+    while (body.firstChild) body.removeChild(body.firstChild);
+    if (!obj) {
+      body.appendChild(el("div", { class: "muted small" }, "値未設定"));
+      return;
+    }
+    let parsed = null;
+    try { parsed = obj.notes ? JSON.parse(obj.notes) : null; } catch {}
+    if (!parsed || !Array.isArray(parsed.items)) {
+      body.appendChild(el("div", { class: "muted small" },
+        obj.notes || "内訳情報なし (notes に JSON がない)"));
+      return;
+    }
+    const sum = parsed.items.reduce((a, i) => a + Number(i.amount || 0), 0);
+    const surplus = Number(obj.value || 0) - sum;
+    const tbl = el("table", { class: "adm-table" });
+    tbl.appendChild(el("thead", {}, el("tr", {},
+      el("th", {}, "項目"), el("th", {}, "月額"), el("th", {}, "備考"))));
+    const tb = el("tbody");
+    for (const it of parsed.items) {
+      tb.appendChild(el("tr", {},
+        el("td", {}, it.name),
+        el("td", { style: "text-align:right;" }, yen(it.amount)),
+        el("td", { class: "muted small" }, it.note || "")));
+    }
+    if (surplus !== 0) {
+      tb.appendChild(el("tr", {},
+        el("td", { class: "muted" }, surplus > 0 ? "余剰 (将来の値上がり吸収バッファ)" : "⚠ 内訳超過"),
+        el("td", { style: "text-align:right;" + (surplus < 0 ? "color:#c0392b;" : "") }, yen(surplus)),
+        el("td", { class: "muted small" }, "")));
+    }
+    tb.appendChild(el("tr", {},
+      el("td", { style: "font-weight:600;" }, "合計 (入力値)"),
+      el("td", { style: "text-align:right;font-weight:600;" }, yen(obj.value || 0)),
+      el("td", { class: "muted small" }, parsed.as_of ? `as of ${parsed.as_of}` : "")));
+    tbl.appendChild(tb);
+    body.appendChild(tbl);
+    if (parsed.notes) {
+      body.appendChild(el("div", { class: "muted small", style: "margin-top:8px;" }, parsed.notes));
+    }
   }
   $("#assumptionsForm").addEventListener("submit", async (ev) => {
     ev.preventDefault();

@@ -6,7 +6,7 @@
 <title>TUSG 管理画面｜Pay Forward</title>
 <meta name="robots" content="noindex,nofollow,noarchive">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="stylesheet" href="/admin/admin.css?v=3">
+<link rel="stylesheet" href="/admin/admin.css?v=4">
 </head>
 <body>
 
@@ -69,7 +69,7 @@
     <form id="assumptionsForm" class="adm-form">
       <div class="adm-form__row">
         <label for="a_hourly_rate_jpy">時給レート (円/h) *</label>
-        <input id="a_hourly_rate_jpy" name="hourly_rate_jpy" type="number" min="0" step="100" required>
+        <input id="a_hourly_rate_jpy" name="hourly_rate_jpy" type="number" min="0" step="1" required>
         <small>税抜。TUSG 代表者・担当者の時間価値を金額換算</small>
       </div>
       <div class="adm-form__row">
@@ -109,8 +109,12 @@
       </div>
       <div class="adm-form__row">
         <label for="a_infra_monthly_base_jpy">月額共通インフラ原価 (円)</label>
-        <input id="a_infra_monthly_base_jpy" name="infra_monthly_base_jpy" type="number" min="0" step="100">
+        <input id="a_infra_monthly_base_jpy" name="infra_monthly_base_jpy" type="number" min="0" step="1">
         <small>ドメイン + CF + Resend 等。想定顧客数で按分</small>
+        <details id="infraBreakdown" class="adm-breakdown" open>
+          <summary>内訳を表示</summary>
+          <div class="adm-breakdown__body">loading…</div>
+        </details>
       </div>
       <div class="adm-form__row">
         <label for="a_tax_rate">消費税率</label>
@@ -241,11 +245,11 @@
     </div>
     <div class="adm-form__row">
       <label for="svc_recommended_amount">推奨月額 (円、表示用)</label>
-      <input id="svc_recommended_amount" name="recommended_amount" type="number" min="0" step="100">
+      <input id="svc_recommended_amount" name="recommended_amount" type="number" min="0" step="1">
     </div>
     <div class="adm-form__row">
       <label for="svc_default_min_amount">暫定最低額 (円、pricing_rules 未公開時のフォールバック)</label>
-      <input id="svc_default_min_amount" name="default_min_amount" type="number" min="0" step="100">
+      <input id="svc_default_min_amount" name="default_min_amount" type="number" min="0" step="1">
     </div>
     <div class="adm-form__row">
       <label><input type="checkbox" id="svc_is_published"> 公開中</label>
@@ -279,11 +283,11 @@
     </div>
     <div class="adm-form__row">
       <label for="q_min_amount">最低月額 (円、税抜) *</label>
-      <input id="q_min_amount" type="number" min="100" max="10000000" step="100" required>
+      <input id="q_min_amount" type="number" min="100" max="10000000" step="1" required>
     </div>
     <div class="adm-form__row">
       <label for="q_recommended_amount">推奨月額 (円、任意)</label>
-      <input id="q_recommended_amount" type="number" min="100" max="10000000" step="100">
+      <input id="q_recommended_amount" type="number" min="100" max="10000000" step="1">
     </div>
     <div class="adm-form__row">
       <label for="q_scope_description">見積範囲の説明</label>
@@ -367,6 +371,6 @@
 
 <div id="toast" class="adm-toast" aria-live="polite" hidden></div>
 
-<script src="/admin/admin.js?v=3" defer></script>
+<script src="/admin/admin.js?v=4" defer></script>
 </body>
 </html>
