@@ -20,7 +20,7 @@ const VALID_UNITS = new Set([
 ]);
 
 export async function onRequestGet({ request, env }) {
-  const auth = requireAdmin(request, env);
+  const auth = await requireAdmin(request, env);
   if (auth.error) return auth.error;
   const dbErr = dbRequired(env);
   if (dbErr) return dbErr;
@@ -57,7 +57,7 @@ export async function onRequestGet({ request, env }) {
 }
 
 export async function onRequestPost({ request, env }) {
-  const auth = requireAdmin(request, env);
+  const auth = await requireAdmin(request, env);
   if (auth.error) return auth.error;
   const dbErr = dbRequired(env);
   if (dbErr) return dbErr;
@@ -123,7 +123,7 @@ export async function onRequestPost({ request, env }) {
 }
 
 export async function onRequestPatch({ request, env }) {
-  const auth = requireAdmin(request, env);
+  const auth = await requireAdmin(request, env);
   if (auth.error) return auth.error;
   const dbErr = dbRequired(env);
   if (dbErr) return dbErr;
@@ -180,7 +180,7 @@ export async function onRequestPatch({ request, env }) {
 }
 
 export async function onRequestDelete({ request, env }) {
-  const auth = requireAdmin(request, env);
+  const auth = await requireAdmin(request, env);
   if (auth.error) return auth.error;
   const dbErr = dbRequired(env);
   if (dbErr) return dbErr;

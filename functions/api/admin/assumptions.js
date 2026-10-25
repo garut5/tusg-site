@@ -27,7 +27,7 @@ const KNOWN_KEYS = new Set([
 ]);
 
 export async function onRequestGet({ request, env }) {
-  const auth = requireAdmin(request, env);
+  const auth = await requireAdmin(request, env);
   if (auth.error) return auth.error;
   const dbErr = dbRequired(env);
   if (dbErr) return dbErr;
@@ -56,7 +56,7 @@ export async function onRequestGet({ request, env }) {
 }
 
 export async function onRequestPut({ request, env }) {
-  const auth = requireAdmin(request, env);
+  const auth = await requireAdmin(request, env);
   if (auth.error) return auth.error;
   const dbErr = dbRequired(env);
   if (dbErr) return dbErr;

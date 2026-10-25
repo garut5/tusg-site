@@ -35,35 +35,156 @@ export function dbRequired(env) {
   return null;
 }
 
-// 管理者 email を取得。ない / allowlist 外なら 401/403 を返す。
-export function requireAdmin(request, env) {
-  const email = request.headers.get("Cf-Access-Authenticated-User-Email");
-  if (!email) {
-    // 診断用: どんな Cf-* / X-Access-* ヘッダが届いているかをレスポンスに含める
+// Cloudflare Access JWT の完全検証
+// 参考: https://developers.cloudflare.com/cloudflare-one/identity/authorization-cookie/validating-json/
+//
+// 検証項目:
+//   1. 署名 (JWKS で RSASSA-PKCS1-v1_5 / RS256)
+//   2. aud が本 Access app の AUD と一致
+//   3. iss が team domain と一致
+//   4. exp (有効期限) が未来
+//   5. nbf (not before) が過去
+//
+// 1 時間 isolate 内キャッシュ
+
+const ACCESS_TEAM_DOMAIN = "https://tusgreach.cloudflareaccess.com";
+const ACCESS_APP_AUD     = "8235c40c3592d77e0a0d0752dc4b182c0adee51443653f36aca10db18019aba4";
+const JWKS_TTL_MS        = 60 * 60 * 1000;
+
+let _jwksCache = null;
+let _jwksAt = 0;
+
+async function fetchJwks() {
+  const now = Date.now();
+  if (_jwksCache && (now - _jwksAt) < JWKS_TTL_MS) return _jwksCache;
+  const res = await fetch(`${ACCESS_TEAM_DOMAIN}/cdn-cgi/access/certs`);
+  if (!res.ok) throw new Error(`jwks fetch failed: ${res.status}`);
+  _jwksCache = await res.json();
+  _jwksAt = now;
+  return _jwksCache;
+}
+
+function b64urlToBytes(s) {
+  const bin = atob(s.replace(/-/g, "+").replace(/_/g, "/") + "===".slice((s.length + 3) % 4));
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes;
+}
+function b64urlToJson(s) {
+  const bin = atob(s.replace(/-/g, "+").replace(/_/g, "/") + "===".slice((s.length + 3) % 4));
+  return JSON.parse(bin);
+}
+
+// JWT を検証し payload を返す。失敗時は null。
+async function verifyAccessJwt(jwt) {
+  if (!jwt || typeof jwt !== "string") return null;
+  const parts = jwt.split(".");
+  if (parts.length !== 3) return null;
+  const [headerB64, payloadB64, sigB64] = parts;
+
+  let header, payload;
+  try {
+    header = b64urlToJson(headerB64);
+    payload = b64urlToJson(payloadB64);
+  } catch { return null; }
+
+  // 時刻検証
+  const now = Math.floor(Date.now() / 1000);
+  if (payload.exp && payload.exp < now) return null;
+  if (payload.nbf && payload.nbf > now + 60) return null;
+
+  // aud / iss
+  const auds = Array.isArray(payload.aud) ? payload.aud : [payload.aud];
+  if (!auds.includes(ACCESS_APP_AUD)) return null;
+  if (payload.iss && payload.iss !== ACCESS_TEAM_DOMAIN) return null;
+
+  // 署名検証
+  let jwks;
+  try { jwks = await fetchJwks(); } catch { return null; }
+  const jwk = (jwks.keys || []).find((k) => k.kid === header.kid);
+  if (!jwk) return null;
+
+  let publicKey;
+  try {
+    publicKey = await crypto.subtle.importKey(
+      "jwk",
+      { kty: jwk.kty, n: jwk.n, e: jwk.e, alg: "RS256", ext: true },
+      { name: "RSASSA-PKCS1-v1_5", hash: { name: "SHA-256" } },
+      false,
+      ["verify"]
+    );
+  } catch { return null; }
+
+  const data = new TextEncoder().encode(`${headerB64}.${payloadB64}`);
+  const signature = b64urlToBytes(sigB64);
+  const ok = await crypto.subtle.verify(
+    { name: "RSASSA-PKCS1-v1_5" },
+    publicKey,
+    signature,
+    data
+  );
+  if (!ok) return null;
+
+  return payload;
+}
+
+const ADMIN_ALLOWED_HOSTS = new Set([
+  "tusg.co.jp",
+  "www.tusg.co.jp",
+]);
+
+// 管理者認証 (async)。Pages Function 側で await してからエラー分岐してください。
+export async function requireAdmin(request, env) {
+  const url = new URL(request.url);
+  if (!ADMIN_ALLOWED_HOSTS.has(url.hostname)) {
+    return {
+      error: json({
+        ok: false,
+        status: "wrong_host",
+        message: `Admin API is only accessible via https://tusg.co.jp/ (seen: ${url.hostname}).`,
+      }, 403),
+    };
+  }
+
+  // JWT 検証 (Cloudflare Access edge は既に検証済みだが、二重防御)
+  const jwt = request.headers.get("Cf-Access-Jwt-Assertion");
+  const payload = await verifyAccessJwt(jwt);
+  if (!payload) {
+    // 診断情報: 届いているヘッダのサマリ (値は切り詰め)
     const cfHeaders = {};
     for (const [k, v] of request.headers) {
-      if (k.toLowerCase().startsWith("cf-") || k.toLowerCase().startsWith("x-access-")) {
-        cfHeaders[k] = v.length > 60 ? v.slice(0, 60) + "...(" + v.length + " bytes)" : v;
+      if (k.toLowerCase().startsWith("cf-access-") || k.toLowerCase() === "cf-ray") {
+        cfHeaders[k] = v.length > 80 ? v.slice(0, 80) + `...(${v.length}b)` : v;
       }
     }
     return {
       error: json({
         ok: false,
-        status: "no_access_headers",
-        message: "Cloudflare Access headers not present. Admin area must be protected by Access.",
-        received_cf_headers: cfHeaders,
-        hostname: new URL(request.url).hostname,
+        status: "no_access_identity",
+        message: "Cloudflare Access JWT missing or invalid. Please re-login via https://tusg.co.jp/admin/",
+        received: cfHeaders,
       }, 401),
     };
   }
+
+  const email = payload.email || payload.custom?.email;
+  if (!email) {
+    return {
+      error: json({ ok: false, status: "no_email_in_jwt", message: "JWT has no email claim" }, 401),
+    };
+  }
+
   const allowList = (env.ADMIN_ALLOWED_EMAILS || "")
     .split(",")
     .map((s) => s.trim().toLowerCase())
     .filter(Boolean);
-  // allowList が空なら「Access ポリシーに任せる (= 来た人を全員許可)」モード
   if (allowList.length > 0 && !allowList.includes(email.toLowerCase())) {
     return {
-      error: json({ ok: false, status: "not_allowed", message: "This admin is not in ADMIN_ALLOWED_EMAILS." }, 403),
+      error: json({
+        ok: false,
+        status: "not_allowed",
+        message: `Admin "${email}" is not in ADMIN_ALLOWED_EMAILS.`,
+      }, 403),
     };
   }
   return { email };

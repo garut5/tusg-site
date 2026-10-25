@@ -6,7 +6,7 @@
 import { json, requireAdmin } from "./_auth.js";
 
 export async function onRequestGet({ request, env }) {
-  const auth = requireAdmin(request, env);
+  const auth = await requireAdmin(request, env);
   if (auth.error) return auth.error;
 
   return json({

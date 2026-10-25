@@ -189,7 +189,7 @@ function calculateMinimumPrice(assumptions, costs) {
 }
 
 export async function onRequestPost({ request, env }) {
-  const auth = requireAdmin(request, env);
+  const auth = await requireAdmin(request, env);
   if (auth.error) return auth.error;
   const dbErr = dbRequired(env);
   if (dbErr) return dbErr;
@@ -240,7 +240,7 @@ export async function onRequestPost({ request, env }) {
 }
 
 export async function onRequestGet({ request, env }) {
-  const auth = requireAdmin(request, env);
+  const auth = await requireAdmin(request, env);
   if (auth.error) return auth.error;
   const dbErr = dbRequired(env);
   if (dbErr) return dbErr;
