@@ -23,7 +23,10 @@ const WEBHOOK_PATH = "/api/pay-forward/webhook";
 //      しないケースがあり、apply.html の services 読込が 401 で詰まる。
 //      内容は「公開中のサービス一覧 + 最低料金」のみで、申込 (checkout)
 //      エンドポイントは引き続き Basic 認証で保護されるため実害なし。
-const PUBLIC_GET_PATHS = new Set(["/api/pay-forward/services"]);
+const PUBLIC_GET_PATHS = new Set([
+  "/api/pay-forward/services",
+  "/api/pay-forward/quote",
+]);
 
 export const onRequest = async (context) => {
   const { request, env, next } = context;
