@@ -6,7 +6,7 @@
 <title>TUSG 管理画面｜Pay Forward</title>
 <meta name="robots" content="noindex,nofollow,noarchive">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
-<link rel="stylesheet" href="/admin/admin.css?v=4">
+<link rel="stylesheet" href="/admin/admin.css?v=5">
 </head>
 <body>
 
@@ -22,6 +22,7 @@
     <button role="tab" data-tab="services" aria-selected="false">サービス</button>
     <button role="tab" data-tab="assumptions" aria-selected="false">原価前提値</button>
     <button role="tab" data-tab="pricing" aria-selected="false">料金計算</button>
+    <button role="tab" data-tab="inquiries" aria-selected="false">見積依頼</button>
     <button role="tab" data-tab="quotes" aria-selected="false">個別見積</button>
     <button role="tab" data-tab="subscriptions" aria-selected="false">契約</button>
     <button role="tab" data-tab="customers" aria-selected="false">顧客</button>
@@ -171,6 +172,31 @@
     </div>
   </section>
 
+  <!-- Inquiries -->
+  <section id="tab-inquiries" class="adm-tab" hidden aria-labelledby="hdr-inquiries">
+    <div class="adm-section-head">
+      <h2 id="hdr-inquiries">見積依頼</h2>
+      <div>
+        <label class="muted small">状態:
+          <select id="inqStatus">
+            <option value="open">未対応・対応中</option>
+            <option value="all">すべて</option>
+            <option value="new">新着</option>
+            <option value="in_progress">対応中</option>
+            <option value="quoted">見積発行済</option>
+            <option value="rejected">辞退</option>
+          </select>
+        </label>
+      </div>
+    </div>
+    <p class="muted small">
+      /pay-forward/request-quote から送信された見積依頼です。
+      内容を確認して「見積発行」で customer_quotes を作成し、顧客にお申込みリンクを送付します。
+    </p>
+    <div id="inqSummary" class="adm-status-grid"></div>
+    <div id="inqList" class="adm-list"><div class="muted">loading…</div></div>
+  </section>
+
   <!-- Subscriptions -->
   <section id="tab-subscriptions" class="adm-tab" hidden aria-labelledby="hdr-subs">
     <div class="adm-section-head">
@@ -212,6 +238,21 @@
       <button type="button" class="btn btn--ghost" id="subDetailClose">閉じる</button>
     </div>
     <div id="subDetailBody">loading…</div>
+  </div>
+</dialog>
+
+<!-- ============ Modal: Inquiry detail ============ -->
+<dialog id="inqDetailModal" class="adm-modal adm-modal--wide">
+  <div style="padding:4px;">
+    <div class="adm-form__actions" style="justify-content:space-between;">
+      <div>
+        <button type="button" class="btn btn--primary" id="inqIssueQuote">このまま見積発行 →</button>
+        <button type="button" class="btn btn--ghost" id="inqMarkInProgress">対応中にする</button>
+        <button type="button" class="btn btn--ghost" id="inqReject">辞退にする</button>
+      </div>
+      <button type="button" class="btn btn--ghost" id="inqDetailClose">閉じる</button>
+    </div>
+    <div id="inqDetailBody">loading…</div>
   </div>
 </dialog>
 
@@ -297,9 +338,13 @@
       <label for="q_expires_days">有効期限 (日)</label>
       <input id="q_expires_days" type="number" min="1" max="180" value="30">
     </div>
+    <input type="hidden" id="q_inquiry_id">
+    <div class="adm-form__row" id="q_inquiry_hint" hidden>
+      <small class="muted">依頼 ID と連動: 発行時に見積依頼のステータスを「見積発行済」に更新します</small>
+    </div>
     <div class="adm-form__actions">
       <button type="button" class="btn btn--ghost" id="quoteCancel">キャンセル</button>
-      <button type="submit" class="btn btn--primary">発行</button>
+      <button type="submit" class="btn btn--primary">発行 (顧客へ自動メール)</button>
     </div>
   </form>
 </dialog>
@@ -371,6 +416,6 @@
 
 <div id="toast" class="adm-toast" aria-live="polite" hidden></div>
 
-<script src="/admin/admin.js?v=5" defer></script>
+<script src="/admin/admin.js?v=6" defer></script>
 </body>
 </html>

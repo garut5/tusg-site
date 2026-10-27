@@ -47,6 +47,12 @@ export const onRequest = async (context) => {
     return next();
   }
 
+  // 見積依頼 POST は Basic 認証対象外 (顧客がパスワード無しで送信できる必要がある)
+  // Origin チェック + honeypot + rate limit (将来) で保護
+  if (request.method === "POST" && url.pathname === "/api/pay-forward/inquiry") {
+    return next();
+  }
+
   // パスワード未設定 = 公開モード (本番公開時にこの変数を unset する)
   const password = env.PAY_FORWARD_BASIC_AUTH_PASSWORD;
   if (!password) {

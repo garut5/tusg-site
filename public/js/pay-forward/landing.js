@@ -47,7 +47,7 @@
       actions.appendChild(a);
     } else {
       const a = document.createElement("a");
-      a.href = `/contact.html?inquiry=pay-forward&service=${encodeURIComponent(s.slug)}`;
+      a.href = `/pay-forward/request-quote?service=${encodeURIComponent(s.slug)}`;
       a.className = "btn btn--primary";
       a.textContent = "個別見積を依頼";
       actions.appendChild(a);

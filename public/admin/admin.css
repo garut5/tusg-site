@@ -214,6 +214,7 @@ a { color: var(--adm-primary); }
 }
 .adm-toast--err { background: var(--adm-danger); }
 .adm-toast--ok { background: var(--adm-ok); }
+.adm-toast--warn { background: var(--adm-warn); color: #fff; }
 
 /* Tags (used in subscriptions/customers list) */
 .adm-tag {

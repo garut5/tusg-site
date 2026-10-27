@@ -55,6 +55,7 @@
     if (name === "assumptions") loadAssumptions();
     if (name === "pricing") loadPricingSetup();
     if (name === "quotes") loadQuotes();
+    if (name === "inquiries") loadInquiries();
     if (name === "subscriptions") loadSubscriptions();
     if (name === "customers") loadCustomers();
   }
@@ -542,13 +543,178 @@ npx wrangler pages deploy public --project-name=tusg-site --branch=main</pre>
       scope_description: $("#q_scope_description").value,
       expires_days: Number($("#q_expires_days").value),
     };
+    const inqId = $("#q_inquiry_id").value;
+    if (inqId) body.inquiry_id = inqId;
     const res = await api("/api/admin/quotes", { method: "POST", body });
     if (res.ok) {
       $("#quoteModal").close();
-      toast("発行しました — 一覧から URL をコピーできます", "ok");
+      $("#q_inquiry_id").value = "";
+      $("#q_inquiry_hint").hidden = true;
+      const emailSent = res.data.email_sent;
+      toast(emailSent ? "発行完了 — 顧客にメール送信済み" : "発行完了 — メール送信失敗、customer_url を手動送付", emailSent ? "ok" : "warn");
       loadQuotes();
     } else {
       toast(res.data.message || "発行失敗", "err");
+    }
+  });
+
+  // -------------------- Inquiries --------------------
+  const BUDGET_LABEL = {
+    unknown: "指定なし",
+    under_5000: "〜5,000円",
+    "5000_15000": "5,000〜15,000円",
+    "15000_30000": "15,000〜30,000円",
+    over_30000: "30,000円〜",
+  };
+  const INQ_STATUS_LABEL = {
+    new: "新着", in_progress: "対応中", quoted: "見積発行済", rejected: "辞退",
+  };
+  let currentInquiry = null;
+
+  async function loadInquiries() {
+    const status = $("#inqStatus").value || "open";
+    const { ok, data } = await api(`/api/admin/inquiries?status=${encodeURIComponent(status)}&limit=200`);
+    const list = $("#inqList");
+    const summaryBox = $("#inqSummary");
+    while (summaryBox.firstChild) summaryBox.removeChild(summaryBox.firstChild);
+    while (list.firstChild) list.removeChild(list.firstChild);
+    if (!ok) {
+      list.appendChild(el("div", { class: "muted" }, data.message || "取得失敗"));
+      return;
+    }
+    const summary = data.summary || [];
+    const by = (st) => summary.find((s) => s.status === st)?.count || 0;
+    summaryBox.appendChild(statCard("新着", by("new") + " 件"));
+    summaryBox.appendChild(statCard("対応中", by("in_progress") + " 件"));
+    summaryBox.appendChild(statCard("見積発行済", by("quoted") + " 件"));
+    summaryBox.appendChild(statCard("辞退", by("rejected") + " 件"));
+
+    const inquiries = data.inquiries || [];
+    if (inquiries.length === 0) {
+      list.appendChild(el("div", { class: "muted" }, "該当なし"));
+      return;
+    }
+    for (const i of inquiries) {
+      const statusTag = el("span", { class: `adm-tag adm-tag--${i.status === "new" ? "warn" : i.status === "quoted" ? "ok" : i.status === "rejected" ? "muted" : "instant"}` }, INQ_STATUS_LABEL[i.status] || i.status);
+      const svcTag = el("span", { class: "adm-tag adm-tag--muted" }, i.service_name || i.service_slug_at_submit || "(サービス未指定)");
+      list.appendChild(el("div", { class: "adm-list__item" },
+        el("div", { class: "adm-list__main" },
+          el("div", { class: "adm-list__title" },
+            i.customer_name || "(無名)", " ", statusTag, " ", svcTag
+          ),
+          el("div", { class: "adm-list__sub" },
+            `${i.customer_email}${i.customer_company ? " / " + i.customer_company : ""} / 予算: ${BUDGET_LABEL[i.budget_feel] || i.budget_feel} / 受信 ${fmtDate(i.created_at)}`
+          ),
+        ),
+        el("div", { class: "adm-list__actions" },
+          el("button", { class: "btn", onClick: () => showInquiryDetail(i.id) }, "詳細")
+        ),
+      ));
+    }
+  }
+  $("#inqStatus").addEventListener("change", loadInquiries);
+
+  async function showInquiryDetail(id) {
+    const body = $("#inqDetailBody");
+    while (body.firstChild) body.removeChild(body.firstChild);
+    body.appendChild(el("div", { class: "muted" }, "loading…"));
+    $("#inqDetailModal").showModal();
+    const { ok, data } = await api(`/api/admin/inquiries?id=${encodeURIComponent(id)}`);
+    while (body.firstChild) body.removeChild(body.firstChild);
+    if (!ok) {
+      body.appendChild(el("div", { class: "muted" }, data.message || "取得失敗"));
+      return;
+    }
+    const i = data.inquiry;
+    currentInquiry = i;
+    body.appendChild(el("h3", {}, `見積依頼 ${INQ_STATUS_LABEL[i.status] || i.status}`));
+    body.appendChild(kv("依頼 ID", i.id));
+    body.appendChild(kv("対象サービス", `${i.service_name || "(未リンク)"} ${i.service_slug_at_submit ? "/ " + i.service_slug_at_submit : ""} ${i.service_type ? "(" + i.service_type + ")" : ""}`));
+    body.appendChild(kv("顧客", `${i.customer_name} <${i.customer_email}>${i.customer_company ? " / " + i.customer_company : ""}`));
+    if (i.customer_phone) body.appendChild(kv("電話", i.customer_phone));
+    if (i.desired_pages) body.appendChild(kv("希望ページ数", i.desired_pages));
+    if (i.desired_deadline) body.appendChild(kv("希望納期", i.desired_deadline));
+    body.appendChild(kv("予算感", BUDGET_LABEL[i.budget_feel] || i.budget_feel));
+    body.appendChild(el("h4", {}, "ご要件"));
+    body.appendChild(el("div", { style: "white-space:pre-wrap;background:#fafafa;padding:12px;border-radius:6px;font-size:13px;" }, i.requirements || "(未入力)"));
+    if (i.admin_notes) {
+      body.appendChild(el("h4", {}, "管理者メモ"));
+      body.appendChild(el("div", { style: "white-space:pre-wrap;background:#fff8e1;padding:12px;border-radius:6px;font-size:13px;" }, i.admin_notes));
+    }
+    body.appendChild(kv("受信", fmtDate(i.created_at)));
+    body.appendChild(kv("最終更新", fmtDate(i.updated_at)));
+    if (i.quote_id) body.appendChild(kv("発行済 Quote ID", i.quote_id));
+    if (i.assigned_to) body.appendChild(kv("担当", i.assigned_to));
+
+    // 「見積発行」ボタンの表示切替
+    $("#inqIssueQuote").disabled = !i.service_id || i.status === "quoted" || i.status === "rejected";
+    $("#inqMarkInProgress").disabled = i.status === "quoted" || i.status === "in_progress" || i.status === "rejected";
+    $("#inqReject").disabled = i.status === "rejected" || i.status === "quoted";
+  }
+  $("#inqDetailClose").addEventListener("click", () => $("#inqDetailModal").close());
+
+  $("#inqIssueQuote").addEventListener("click", async () => {
+    if (!currentInquiry) return;
+    // ステータスを対応中に更新 (まだ new の場合)
+    if (currentInquiry.status === "new") {
+      await api(`/api/admin/inquiries?id=${encodeURIComponent(currentInquiry.id)}`,
+        { method: "PATCH", body: { status: "in_progress" } });
+    }
+    // quote 発行モーダルを prefill して開く
+    $("#inqDetailModal").close();
+    // サービス一覧を quote モーダル用に再ロード (まだ loadQuotes 呼ばれていない可能性)
+    await ensureQuoteServiceOptions();
+    $("#q_service_id").value = String(currentInquiry.service_id || "");
+    $("#q_customer_email").value = currentInquiry.customer_email || "";
+    $("#q_customer_name").value = currentInquiry.customer_name || "";
+    $("#q_customer_company").value = currentInquiry.customer_company || "";
+    $("#q_min_amount").value = "";
+    $("#q_recommended_amount").value = "";
+    $("#q_scope_description").value = [
+      currentInquiry.desired_pages ? `希望ページ数: ${currentInquiry.desired_pages}` : null,
+      currentInquiry.desired_deadline ? `希望納期: ${currentInquiry.desired_deadline}` : null,
+      "", "顧客ご要件:", currentInquiry.requirements,
+    ].filter((l) => l != null).join("\n");
+    $("#q_expires_days").value = "30";
+    $("#q_inquiry_id").value = currentInquiry.id;
+    $("#q_inquiry_hint").hidden = false;
+    $("#quoteModal").showModal();
+  });
+
+  // quote モーダルのサービス select を確実に populate
+  async function ensureQuoteServiceOptions() {
+    const sel = $("#q_service_id");
+    if (sel.options.length > 0) return;
+    const r = await api("/api/admin/services");
+    if (!r.ok) return;
+    const quoteRequired = (r.data.services || []).filter((s) => s.service_type === "quote_required");
+    sel.innerHTML = quoteRequired.map((s) => `<option value="${s.id}">${s.name} (${s.slug})</option>`).join("");
+  }
+
+  $("#inqMarkInProgress").addEventListener("click", async () => {
+    if (!currentInquiry) return;
+    const r = await api(`/api/admin/inquiries?id=${encodeURIComponent(currentInquiry.id)}`,
+      { method: "PATCH", body: { status: "in_progress" } });
+    if (r.ok) {
+      toast("対応中に更新しました", "ok");
+      $("#inqDetailModal").close();
+      loadInquiries();
+    } else {
+      toast(r.data.message || "更新失敗", "err");
+    }
+  });
+
+  $("#inqReject").addEventListener("click", async () => {
+    if (!currentInquiry) return;
+    if (!confirm("この見積依頼を辞退扱いにしますか？")) return;
+    const r = await api(`/api/admin/inquiries?id=${encodeURIComponent(currentInquiry.id)}`,
+      { method: "PATCH", body: { status: "rejected" } });
+    if (r.ok) {
+      toast("辞退に更新しました", "ok");
+      $("#inqDetailModal").close();
+      loadInquiries();
+    } else {
+      toast(r.data.message || "更新失敗", "err");
     }
   });
 
