@@ -375,6 +375,8 @@ npx wrangler pages deploy public --project-name=tusg-site --branch=main</pre>
       $("#pricingPreview").textContent = id ? "「計算する」で現在の原価から最低料金を算出" : "サービスを選択してください";
       if (id) loadPricingHistory(id);
     };
+    // ブラウザが select の値を復元した場合に備えてボタン状態を同期
+    sel.dispatchEvent(new Event("change"));
   }
   async function loadPricingHistory(serviceId) {
     const el2 = $("#pricingHistory");
@@ -403,7 +405,7 @@ npx wrangler pages deploy public --project-name=tusg-site --branch=main</pre>
   $("#btnPricingCalc").addEventListener("click", async () => {
     const id = $("#pricingServiceSelect").value;
     if (!id) return;
-    const res = await api(`/api/admin/pricing/calculate?service_id=${id}`, { method: "POST" });
+    const res = await api(`/api/admin/pricing?service_id=${id}&action=calculate`, { method: "POST" });
     const prev = $("#pricingPreview");
     if (!res.ok) { prev.textContent = res.data.message; return; }
     lastCalcBreakdown = res.data.breakdown;
@@ -442,7 +444,7 @@ npx wrangler pages deploy public --project-name=tusg-site --branch=main</pre>
   $("#btnPricingPublish").addEventListener("click", async () => {
     if (!lastCalcServiceId || !lastCalcBreakdown) return;
     if (!confirm(`最低料金 ${yen(lastCalcBreakdown.min_price_jpy)} で公開します。よろしいですか？`)) return;
-    const res = await api(`/api/admin/pricing/publish?service_id=${lastCalcServiceId}`, { method: "POST" });
+    const res = await api(`/api/admin/pricing?service_id=${lastCalcServiceId}&action=publish`, { method: "POST" });
     if (res.ok) {
       toast(`公開しました (${yen(res.data.min_amount)})`, "ok");
       loadPricingHistory(lastCalcServiceId);
