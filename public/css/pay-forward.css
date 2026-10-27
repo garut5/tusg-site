@@ -137,6 +137,42 @@
 }
 .pf-service-card__actions {
   display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+  margin-top: auto;
+}
+.pf-service-card h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--charcoal, #141924);
+}
+.pf-service-card p {
+  color: var(--ink-700, #4a5668);
+  font-size: 0.9rem;
+  margin: 0;
+  line-height: 1.6;
+}
+.pf-service-card__price {
+  background: #f5f7fb;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: var(--ink-700, #4a5668);
+}
+.pf-service-card__price strong {
+  color: #c0392b;
+  font-size: 1.1rem;
+  margin: 0 4px;
+}
+.pf-service-card__note {
+  font-size: 0.78rem;
+  color: var(--ink-600, #6b7280);
+  text-align: center;
+  margin-top: 4px;
+}
+.pf-services {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
 }
 
 /* FAQ */

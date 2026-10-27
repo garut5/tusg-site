@@ -20,7 +20,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;700&family=Noto+Serif+JP:wght@700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/style.css?v=1786600000">
-<link rel="stylesheet" href="/css/pay-forward.css?v=1">
+<link rel="stylesheet" href="/css/pay-forward.css?v=2">
 
 <script type="application/ld+json">
 {
@@ -160,18 +160,14 @@
     </p>
 
     <div class="pf-services" id="pf-services-list">
-      <!-- 公開準備中プレースホルダ -->
+      <!-- 読み込み中プレースホルダ (JS で置き換え) -->
       <div class="pf-service-card pf-service-card--placeholder">
-        <h3>サービス一覧は準備中です</h3>
-        <p>Pay Forward の正式公開に向けて、最低料金の算出と Stripe 連携を進めています。公開までの間は、以下の方法でご相談ください。</p>
-        <div class="pf-service-card__actions">
-          <a href="/contact.html?inquiry=pay-forward" class="btn btn--primary">お問い合わせから相談する</a>
-          <a href="/hearing.html" class="btn btn--ghost">30秒無料診断を試す</a>
-        </div>
+        <h3>サービス一覧を読み込み中…</h3>
       </div>
     </div>
   </div>
 </section>
+<script src="/js/pay-forward/landing.js?v=1" defer></script>
 
 <!-- ============ FAQ ============ -->
 <section class="pf-section pf-section--muted" id="faq">

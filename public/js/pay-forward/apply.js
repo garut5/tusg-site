@@ -81,6 +81,12 @@
       serviceSel.innerHTML = '<option value="">選択してください</option>' +
         services.map((s) => `<option value="${s.slug}">${s.name}</option>`).join("");
       serviceSel.addEventListener("change", updateMinDisplay);
+      // ?service=slug で指定された場合は自動選択
+      const preselect = url.searchParams.get("service");
+      if (preselect && services.some((s) => s.slug === preselect)) {
+        serviceSel.value = preselect;
+        updateMinDisplay();
+      }
     } catch (e) {
       console.error("[pay-forward] loadServices failed:", e);
       serviceSel.innerHTML = `<option value="">エラー: 読み込み失敗</option>`;
