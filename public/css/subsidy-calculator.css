@@ -1,0 +1,103 @@
+/* 補助金試算ツール (/subsidy-calculator.html) 専用スタイル
+   モバイルファースト。既存の style.css / pay-forward.css と干渉しないよう .sc- 接頭辞で分離。 */
+
+.sc-wrap {
+  max-width: 920px;
+  margin: 24px auto 60px;
+  padding: 0 16px;
+  color: #141924;
+}
+.sc-head { margin-bottom: 20px; }
+.sc-head h1 { font-size: 1.6rem; margin: 0 0 8px; }
+.sc-head p { color: #4a5668; font-size: 0.95rem; line-height: 1.7; margin: 0; }
+
+.sc-meta {
+  background: #eef5ff; border: 1px solid #c3d9f5; color: #1a4d7a;
+  padding: 10px 14px; border-radius: 6px; font-size: 0.78rem; line-height: 1.6;
+  margin-bottom: 20px;
+}
+.sc-meta b { color: #141924; }
+
+.sc-tabs {
+  display: flex; gap: 0; margin-bottom: 20px; border-bottom: 2px solid #e5e7eb;
+}
+.sc-tabs button {
+  flex: 1 1 50%; padding: 12px 10px; background: transparent; border: 0;
+  border-bottom: 3px solid transparent; margin-bottom: -2px;
+  cursor: pointer; font-size: 0.95rem; font-weight: 600; color: #4a5668;
+  font-family: inherit;
+}
+.sc-tabs button[aria-selected="true"] {
+  color: #141924; border-bottom-color: #141924;
+}
+.sc-panel[hidden] { display: none !important; }
+
+.sc-form { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+.sc-form h2 { font-size: 1.1rem; margin: 0 0 14px; }
+.sc-row { margin-bottom: 14px; }
+.sc-row label { display: block; font-weight: 600; font-size: 0.88rem; margin-bottom: 4px; }
+.sc-row .hint { color: #6b7280; font-size: 0.78rem; margin-top: 4px; line-height: 1.5; }
+.sc-row input[type="number"],
+.sc-row input[type="text"],
+.sc-row select {
+  width: 100%; padding: 10px 12px; border: 1px solid #ccc; border-radius: 6px;
+  font-size: 1rem; box-sizing: border-box; font-family: inherit;
+}
+.sc-row input:focus, .sc-row select:focus { border-color: #141924; outline: none; }
+.sc-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.sc-grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+@media (max-width: 560px) {
+  .sc-grid2, .sc-grid3 { grid-template-columns: 1fr; }
+}
+
+.sc-radio { display: inline-flex; align-items: center; gap: 6px; margin-right: 14px; font-size: 0.9rem; }
+.sc-radio input { margin: 0; }
+
+.sc-btn {
+  width: 100%; padding: 14px; background: #141924; color: #fff; border: 0; border-radius: 6px;
+  font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 8px;
+}
+.sc-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.sc-results { display: grid; gap: 12px; margin-top: 20px; }
+.sc-card {
+  background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px 18px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+.sc-card .label { font-size: 0.78rem; color: #6b7280; margin-bottom: 4px; letter-spacing: 0.02em; }
+.sc-card .value { font-size: 1.3rem; font-weight: 700; color: #141924; }
+.sc-card .sub { font-size: 0.8rem; color: #4a5668; margin-top: 4px; line-height: 1.5; }
+.sc-card.sc-card--warn { background: #fff8e1; border-color: #ffcc80; }
+.sc-card.sc-card--danger { background: #fdecea; border-color: #f5c2c0; }
+.sc-card.sc-card--ok { background: #e8f5e9; border-color: #a9dfbf; }
+.sc-card.sc-card--neutral { background: #f5f7fb; }
+
+.sc-note {
+  background: #fff; border-left: 3px solid #4a5668; padding: 10px 14px;
+  font-size: 0.82rem; color: #4a5668; line-height: 1.6; margin-top: 12px; border-radius: 2px;
+}
+.sc-note.sc-note--warn { border-color: #c08b1a; background: #fff8e1; color: #7a5a00; }
+.sc-note.sc-note--danger { border-color: #c0392b; background: #fdecea; color: #8a1b0d; }
+
+.sc-disclaimer {
+  margin-top: 24px; background: #fafafa; border: 1px solid #e5e7eb; border-radius: 8px;
+  padding: 14px 18px; font-size: 0.78rem; color: #4a5668; line-height: 1.7;
+}
+.sc-disclaimer ul { margin: 8px 0 0; padding-left: 20px; }
+.sc-disclaimer li { margin-bottom: 4px; }
+.sc-disclaimer a { color: #141924; }
+
+.sc-contact {
+  margin-top: 20px; text-align: center;
+}
+.sc-contact a {
+  display: inline-block; padding: 10px 24px; background: #141924; color: #fff;
+  border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.9rem;
+}
+
+/* 入力をリセットする小ボタン */
+.sc-reset {
+  background: transparent; border: 1px solid #ccc; padding: 4px 10px;
+  border-radius: 4px; cursor: pointer; font-size: 0.78rem; color: #4a5668;
+  font-family: inherit;
+}

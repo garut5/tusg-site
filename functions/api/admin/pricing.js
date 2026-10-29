@@ -198,7 +198,11 @@ export async function onRequestPost({ request, env }) {
   const serviceId = url.searchParams.get("service_id");
   if (!serviceId) return json({ ok: false, message: "service_id required" }, 400);
 
-  const action = url.pathname.endsWith("/publish") ? "publish" : "calculate";
+  // action: query param or path suffix (旧 URL /pricing/calculate 互換)
+  const action = url.searchParams.get("action")
+    || (url.pathname.endsWith("/publish") ? "publish"
+      : url.pathname.endsWith("/calculate") ? "calculate"
+      : "calculate");
 
   const svc = await env.TUSG_DB.prepare("SELECT * FROM services WHERE id = ?")
     .bind(serviceId).first();

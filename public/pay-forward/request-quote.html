@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>個別見積のご依頼｜Pay Forward｜合同会社TUSG</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="stylesheet" href="/css/style.css?v=1786600000">
+<link rel="stylesheet" href="/css/pay-forward.css?v=2">
+<style>
+  .pf-rq { max-width: 720px; margin: 40px auto; padding: 24px; background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+  .pf-rq__back { display: inline-flex; align-items: center; gap: 6px; color: #141924; text-decoration: none; font-size: 0.9rem; margin-bottom: 16px; padding: 6px 12px; border: 1px solid #ddd; border-radius: 6px; background: #fff; }
+  .pf-rq__back:hover { background: #f5f7fb; }
+  .pf-rq h1 { font-size: 1.6rem; margin-bottom: 8px; }
+  .pf-rq .lead { color: #555; margin-bottom: 24px; font-size: 0.9rem; line-height: 1.7; }
+  .pf-rq__svc { background: #eef5ff; border: 1px solid #c3d9f5; padding: 14px 18px; border-radius: 8px; margin-bottom: 24px; }
+  .pf-rq__svc b { color: #141924; font-size: 1.05rem; }
+  .pf-rq__svc .desc { color: #4a5668; font-size: 0.85rem; margin-top: 4px; }
+  .pf-rq label { display: block; margin-top: 16px; font-weight: 600; font-size: 0.9rem; }
+  .pf-rq label .req { color: #c0392b; margin-left: 4px; }
+  .pf-rq input, .pf-rq select, .pf-rq textarea { width: 100%; padding: 10px 12px; border: 1px solid #ccc; border-radius: 6px; margin-top: 4px; font-size: 1rem; box-sizing: border-box; font-family: inherit; }
+  .pf-rq input:focus, .pf-rq select:focus, .pf-rq textarea:focus { border-color: #141924; outline: none; }
+  .pf-rq textarea { min-height: 140px; resize: vertical; }
+  .pf-rq .hint { color: #888; font-size: 0.8rem; margin-top: 4px; }
+  .pf-rq .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 540px) { .pf-rq .grid-2 { grid-template-columns: 1fr; } }
+  .pf-rq .submit { margin-top: 24px; width: 100%; padding: 14px; background: #141924; color: #fff; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+  .pf-rq .submit:disabled { opacity: 0.5; cursor: not-allowed; }
+  .pf-rq .error { background: #fdecea; border: 1px solid #f5c2c0; color: #a0220f; padding: 12px; border-radius: 6px; margin-top: 16px; font-size: 0.9rem; display: none; }
+  .pf-rq .success { background: #e9f7ef; border: 1px solid #a9dfbf; color: #1e6e42; padding: 20px; border-radius: 8px; text-align: center; display: none; }
+  .pf-rq .success h2 { color: #1e6e42; margin-bottom: 10px; }
+  .pf-rq .policy { margin-top: 20px; font-size: 0.78rem; color: #666; line-height: 1.6; }
+  .pf-rq .policy a { color: #141924; text-decoration: underline; }
+  .honeypot { position: absolute; left: -9999px; width: 1px; height: 1px; }
+</style>
+</head>
+<body>
+<main class="pf-rq">
+  <a href="/pay-forward.html" class="pf-rq__back">← サービス一覧に戻る</a>
+  <h1>個別見積のご依頼</h1>
+  <p class="lead">
+    ご要件をお伺いし、原価と工数に基づいた専用の最低料金 (ご相談後に提示) をお知らせします。<br>
+    依頼を受けてから 2 営業日以内に、お申込み専用リンクをメールでお送りします。
+  </p>
+
+  <div class="pf-rq__svc" id="svc-info" style="display:none;">
+    <b id="svc-name">—</b>
+    <div class="desc" id="svc-desc"></div>
+  </div>
+
+  <form id="rq-form" autocomplete="on">
+    <input type="hidden" id="service_slug" name="service_slug">
+    <input type="hidden" id="source" name="source" value="lp">
+
+    <div class="grid-2">
+      <div>
+        <label for="customer_name">お名前 <span class="req">*</span></label>
+        <input id="customer_name" type="text" required maxlength="100" autocomplete="name">
+      </div>
+      <div>
+        <label for="customer_email">メールアドレス <span class="req">*</span></label>
+        <input id="customer_email" type="email" required maxlength="254" autocomplete="email">
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div>
+        <label for="customer_company">会社名 (任意)</label>
+        <input id="customer_company" type="text" maxlength="100" autocomplete="organization">
+      </div>
+      <div>
+        <label for="customer_phone">電話番号 (任意)</label>
+        <input id="customer_phone" type="tel" maxlength="50" autocomplete="tel">
+      </div>
+    </div>
+
+    <div class="grid-2" id="pages-row" style="display:none;">
+      <div>
+        <label for="desired_pages">希望ページ数 (任意)</label>
+        <input id="desired_pages" type="number" min="1" max="200" step="1" placeholder="例: 5">
+        <div class="hint">HP 制作系サービスの場合にご記入ください</div>
+      </div>
+      <div>
+        <label for="desired_deadline">希望納期 (任意)</label>
+        <input id="desired_deadline" type="text" maxlength="100" placeholder="例: 2027-01-末 / 特になし">
+      </div>
+    </div>
+
+    <label for="budget_feel">予算感 (任意)</label>
+    <select id="budget_feel">
+      <option value="unknown">指定なし / 相談したい</option>
+      <option value="under_5000">月額 5,000 円未満</option>
+      <option value="5000_15000">月額 5,000 〜 15,000 円</option>
+      <option value="15000_30000">月額 15,000 〜 30,000 円</option>
+      <option value="over_30000">月額 30,000 円以上</option>
+    </select>
+    <div class="hint">目安です。最低料金は原価から算出した上で提示します。</div>
+
+    <label for="requirements">ご相談内容・ご要件 <span class="req">*</span></label>
+    <textarea id="requirements" required maxlength="5000" placeholder="例: 既存のサイトをリニューアルしたい。業種は◯◯で、問合せフォーム・ギャラリー・事業紹介・採用情報の4ページ構成を想定。独自ドメインは取得済み。公開希望は◯月中旬。"></textarea>
+    <div class="hint">詳細に書いていただくほど、正確な最低料金とスケジュールを提示できます。</div>
+
+    <div class="honeypot" aria-hidden="true">
+      <label for="_gotcha">空欄のまま</label>
+      <input type="text" id="_gotcha" tabindex="-1" autocomplete="off">
+    </div>
+
+    <div class="error" id="error-box"></div>
+    <button type="submit" class="submit" id="submit-btn">見積を依頼する</button>
+
+    <p class="policy">
+      送信いただいた情報は、見積作成とご連絡のみに利用し、
+      <a href="/compliance.html#privacy" target="_blank">プライバシーポリシー</a>
+      に基づき管理します。第三者には提供しません。
+    </p>
+  </form>
+
+  <div class="success" id="success-box">
+    <h2>✓ ご依頼を受け付けました</h2>
+    <p>
+      担当者が内容を確認し、<strong>2 営業日以内</strong>にお申込み専用リンクをメールでお送りします。<br>
+      受付 ID: <span id="success-id" style="font-family:monospace;"></span>
+    </p>
+    <p style="margin-top:16px;">
+      <a href="/pay-forward.html" class="pf-rq__back">← Pay Forward トップに戻る</a>
+    </p>
+  </div>
+</main>
+
+<script src="/js/pay-forward/request-quote.js?v=2" defer></script>
+</body>
+</html>

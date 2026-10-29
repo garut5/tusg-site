@@ -101,17 +101,53 @@ export async function onRequestPost({ request, env }) {
     )
     .run();
 
+  // 関連する inquiry があればリンクする (body.inquiry_id)
+  const inquiryId = trimStr(body.inquiry_id, 64);
+  if (inquiryId) {
+    try {
+      await env.TUSG_DB
+        .prepare(
+          `UPDATE pay_forward_inquiries
+           SET status = 'quoted', quote_id = ?, updated_at = ?
+           WHERE id = ? AND status IN ('new','in_progress')`
+        )
+        .bind(id, now, inquiryId).run();
+    } catch (e) {
+      console.error("[quote.issue] inquiry link failed:", e?.message || e);
+    }
+  }
+
   await logAudit(env, request, {
     admin_email: auth.email,
     action: "quote.issue",
     target_type: "customer_quote",
     target_id: id,
-    payload: { service_id, customer_email, min_amount },
+    payload: { service_id, customer_email, min_amount, inquiry_id: inquiryId || null },
   });
 
   // 顧客向けアクセス URL (このリンク + token で /pay-forward/apply にアクセス可能)
-  const siteUrl = env.SITE_URL || "https://tusg.co.jp";
-  const customer_url = `${siteUrl.replace(/\/$/, "")}/pay-forward/apply?quote=${id}&token=${access_token}`;
+  const siteUrl = (env.SITE_URL || "https://tusg.co.jp").replace(/\/$/, "");
+  const customer_url = `${siteUrl}/pay-forward/apply?quote=${id}&token=${access_token}`;
+
+  // 顧客に Resend で自動送信 (失敗してもレスポンスは成功で返し、admin が手動送信可能)
+  let email_sent = false;
+  let email_error = null;
+  try {
+    await sendCustomerQuoteEmail(env, {
+      to: customer_email,
+      customer_name: trimStr(body.customer_name, 100),
+      service_name: svc.name,
+      min_amount,
+      recommended_amount,
+      scope_description: trimStr(body.scope_description, 5000),
+      expires_at,
+      customer_url,
+    });
+    email_sent = true;
+  } catch (e) {
+    email_error = e?.message || String(e);
+    console.error("[quote.issue] customer notify failed:", email_error);
+  }
 
   return json({
     ok: true,
@@ -119,8 +155,65 @@ export async function onRequestPost({ request, env }) {
     access_token,
     expires_at,
     customer_url,
-    note: "customer_url と access_token は顧客に別経路で安全に送付してください (Resend 自動送信は Phase 4b で実装)",
+    email_sent,
+    email_error,
+    note: email_sent
+      ? "顧客にお申込み URL をメール送信しました。"
+      : "顧客メール送信に失敗しました。customer_url を手動で送付してください。",
   });
+}
+
+// 顧客向け見積通知メール (Resend)
+async function sendCustomerQuoteEmail(env, data) {
+  const apiKey = env.RESEND_API_KEY;
+  if (!apiKey) throw new Error("RESEND_API_KEY not configured");
+  const from = env.RESEND_FROM_NAME
+    ? `${env.RESEND_FROM_NAME} <${env.RESEND_FROM_EMAIL}>`
+    : env.RESEND_FROM_EMAIL;
+  if (!from || !env.RESEND_FROM_EMAIL) throw new Error("RESEND_FROM_EMAIL not configured");
+
+  const yen = (n) => "¥" + Number(n || 0).toLocaleString("ja-JP");
+  const expiresDate = new Date(data.expires_at).toLocaleString("ja-JP");
+
+  const lines = [
+    `${data.customer_name || "お客様"} 様`,
+    "",
+    "合同会社TUSG です。お申込み専用リンクをお送りします。",
+    "",
+    `サービス: ${data.service_name}`,
+    `最低料金 (この見積専用): ${yen(data.min_amount)} / 月 (税抜)`,
+    data.recommended_amount ? `参考金額: ${yen(data.recommended_amount)} / 月 (税抜)` : null,
+    "",
+    data.scope_description ? "見積範囲:" : null,
+    data.scope_description ? data.scope_description : null,
+    data.scope_description ? "" : null,
+    "お申込みリンク (以下の URL からお手続きください):",
+    data.customer_url,
+    "",
+    `有効期限: ${expiresDate} まで`,
+    "",
+    "月額料金は上記最低料金以上で、お客様ご自身で自由にお決めいただけます。",
+    "ご不明点がございましたら、このメールにご返信ください。",
+    "",
+    "────────────────",
+    "合同会社TUSG",
+    env.SITE_URL || "https://tusg.co.jp",
+  ].filter((l) => l != null).join("\n");
+
+  const resp = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      from, to: [data.to],
+      subject: `【TUSG】${data.service_name} お申込み専用リンクのご案内`,
+      text: lines,
+      reply_to: env.ADMIN_ALERT_EMAIL || env.CONSULTATION_NOTIFICATION_TO || env.CONTACT_TO_EMAIL,
+    }),
+  });
+  if (!resp.ok) {
+    const err = await resp.text().catch(() => "");
+    throw new Error(`Resend ${resp.status}: ${err.slice(0, 300)}`);
+  }
 }
 
 export async function onRequestPatch({ request, env }) {

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>お申込み｜合同会社TUSG</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<link rel="stylesheet" href="/css/style.css?v=1786600000">
+<link rel="stylesheet" href="/css/pay-forward.css?v=2">
+<style>
+  .pf-apply { max-width: 640px; margin: 40px auto; padding: 24px; background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+  .pf-apply__back { display: inline-flex; align-items: center; gap: 6px; color: #141924; text-decoration: none; font-size: 0.9rem; margin-bottom: 16px; padding: 6px 12px; border: 1px solid #ddd; border-radius: 6px; background: #fff; }
+  .pf-apply__back:hover { background: #f5f7fb; }
+  .pf-apply h1 { font-size: 1.6rem; margin-bottom: 8px; }
+  .pf-apply .lead { color: #555; margin-bottom: 24px; font-size: 0.9rem; }
+  .pf-apply label { display: block; margin-top: 16px; font-weight: 600; font-size: 0.9rem; }
+  .pf-apply input, .pf-apply select, .pf-apply textarea { width: 100%; padding: 10px 12px; border: 1px solid #ccc; border-radius: 6px; margin-top: 4px; font-size: 1rem; box-sizing: border-box; font-family: inherit; }
+  .pf-apply input:focus, .pf-apply select:focus { border-color: #141924; outline: none; }
+  .pf-apply .hint { color: #888; font-size: 0.8rem; margin-top: 4px; }
+  .pf-apply .min-amount { background: #f5f7fb; padding: 12px; border-radius: 6px; margin-top: 12px; font-size: 0.9rem; }
+  .pf-apply .min-amount b { color: #c0392b; }
+  .pf-apply .submit { margin-top: 24px; width: 100%; padding: 14px; background: #141924; color: #fff; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+  .pf-apply .submit:disabled { opacity: 0.5; cursor: not-allowed; }
+  .pf-apply .error { background: #fdecea; border: 1px solid #f5c2c0; color: #a0220f; padding: 12px; border-radius: 6px; margin-top: 16px; font-size: 0.9rem; display: none; }
+  .pf-apply .quote-mode { background: #eef5ff; border: 1px solid #c3d9f5; padding: 12px; border-radius: 6px; margin-top: 16px; font-size: 0.9rem; }
+  .pf-apply .policy { margin-top: 24px; font-size: 0.78rem; color: #666; line-height: 1.6; }
+  .pf-apply .policy a { color: #141924; text-decoration: underline; }
+</style>
+</head>
+<body>
+<main class="pf-apply">
+  <a href="/pay-forward.html" class="pf-apply__back">← サービス一覧に戻る</a>
+  <h1>お申込み</h1>
+  <p class="lead">月額料金はあなたが決めます。最低料金は原価と工数に基づいた金額で、下回ることはできません。</p>
+
+  <div id="quote-banner" class="quote-mode" style="display:none;">
+    <strong>個別見積モード</strong><br>
+    管理者から発行された見積リンクでアクセスしています。
+    最低料金・推奨料金はこの見積に基づいて適用されます。
+  </div>
+
+  <form id="apply-form" autocomplete="on">
+    <label for="service">サービス <span style="color:#c0392b">*</span></label>
+    <select id="service" name="service_slug" required>
+      <option value="">読み込み中…</option>
+    </select>
+    <div class="hint" id="service-desc"></div>
+
+    <div class="min-amount" id="min-amount-box" style="display:none;">
+      最低料金: <b id="min-amount">—</b> / 月 (税抜)<br>
+      <span style="color:#555; font-size:0.85em;">※ この金額は原価と工数から算出されています。これ以上の金額をあなたの判断で自由にお決めください。</span>
+      <span id="recommended-amount" hidden></span>
+    </div>
+
+    <label for="amount">あなたが決める月額 (税抜 円) <span style="color:#c0392b">*</span></label>
+    <input id="amount" name="amount" type="number" step="100" min="100" required placeholder="例: 15000">
+    <div class="hint">最低料金以上の整数で入力してください。</div>
+
+    <label for="email">メールアドレス <span style="color:#c0392b">*</span></label>
+    <input id="email" name="customer_email" type="email" required autocomplete="email">
+
+    <label for="name">お名前</label>
+    <input id="name" name="customer_name" type="text" autocomplete="name">
+
+    <label for="company">会社名 (任意)</label>
+    <input id="company" name="customer_company" type="text" autocomplete="organization">
+
+    <label for="promo">プロモーションコード (任意)</label>
+    <input id="promo" name="promotion_code" type="text" autocomplete="off" placeholder="テストクーポンがある場合のみ">
+    <div class="hint">空欄の場合、決済画面でもコードを入力できます。</div>
+
+    <div class="error" id="error-box"></div>
+
+    <button type="submit" class="submit" id="submit-btn">Stripe で決済ページに進む</button>
+  </form>
+
+  <p class="policy">
+    お申込みにより、
+    <a href="/pay-forward/terms.html" target="_blank">利用規約</a>・
+    <a href="/pay-forward/refund.html" target="_blank">キャンセル/返金ポリシー</a>・
+    <a href="/compliance.html#privacy" target="_blank">プライバシーポリシー</a>
+    に同意したものとみなします。
+    決済は Stripe を通じて行われ、カード情報は TUSG に保存されません。
+  </p>
+</main>
+
+<script src="/js/pay-forward/apply.js?v=2" defer></script>
+</body>
+</html>

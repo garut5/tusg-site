@@ -55,6 +55,9 @@
     if (name === "assumptions") loadAssumptions();
     if (name === "pricing") loadPricingSetup();
     if (name === "quotes") loadQuotes();
+    if (name === "inquiries") loadInquiries();
+    if (name === "subscriptions") loadSubscriptions();
+    if (name === "customers") loadCustomers();
   }
   $$(".adm-tabs button").forEach((b) => b.addEventListener("click", () => switchTab(b.dataset.tab)));
 
@@ -286,6 +289,52 @@ npx wrangler pages deploy public --project-name=tusg-site --branch=main</pre>
       const input = form.querySelector(`[name="${key}"]`);
       if (input && obj?.value != null) input.value = obj.value;
     }
+    // インフラ原価の内訳 (notes に JSON で保存されている場合に描画)
+    renderInfraBreakdown(a.infra_monthly_base_jpy);
+  }
+
+  function renderInfraBreakdown(obj) {
+    const body = $("#infraBreakdown .adm-breakdown__body");
+    if (!body) return;
+    while (body.firstChild) body.removeChild(body.firstChild);
+    if (!obj) {
+      body.appendChild(el("div", { class: "muted small" }, "値未設定"));
+      return;
+    }
+    let parsed = null;
+    try { parsed = obj.notes ? JSON.parse(obj.notes) : null; } catch {}
+    if (!parsed || !Array.isArray(parsed.items)) {
+      body.appendChild(el("div", { class: "muted small" },
+        obj.notes || "内訳情報なし (notes に JSON がない)"));
+      return;
+    }
+    const sum = parsed.items.reduce((a, i) => a + Number(i.amount || 0), 0);
+    const surplus = Number(obj.value || 0) - sum;
+    const tbl = el("table", { class: "adm-table" });
+    tbl.appendChild(el("thead", {}, el("tr", {},
+      el("th", {}, "項目"), el("th", {}, "月額"), el("th", {}, "備考"))));
+    const tb = el("tbody");
+    for (const it of parsed.items) {
+      tb.appendChild(el("tr", {},
+        el("td", {}, it.name),
+        el("td", { style: "text-align:right;" }, yen(it.amount)),
+        el("td", { class: "muted small" }, it.note || "")));
+    }
+    if (surplus !== 0) {
+      tb.appendChild(el("tr", {},
+        el("td", { class: "muted" }, surplus > 0 ? "余剰 (将来の値上がり吸収バッファ)" : "⚠ 内訳超過"),
+        el("td", { style: "text-align:right;" + (surplus < 0 ? "color:#c0392b;" : "") }, yen(surplus)),
+        el("td", { class: "muted small" }, "")));
+    }
+    tb.appendChild(el("tr", {},
+      el("td", { style: "font-weight:600;" }, "合計 (入力値)"),
+      el("td", { style: "text-align:right;font-weight:600;" }, yen(obj.value || 0)),
+      el("td", { class: "muted small" }, parsed.as_of ? `as of ${parsed.as_of}` : "")));
+    tbl.appendChild(tb);
+    body.appendChild(tbl);
+    if (parsed.notes) {
+      body.appendChild(el("div", { class: "muted small", style: "margin-top:8px;" }, parsed.notes));
+    }
   }
   $("#assumptionsForm").addEventListener("submit", async (ev) => {
     ev.preventDefault();
@@ -327,6 +376,8 @@ npx wrangler pages deploy public --project-name=tusg-site --branch=main</pre>
       $("#pricingPreview").textContent = id ? "「計算する」で現在の原価から最低料金を算出" : "サービスを選択してください";
       if (id) loadPricingHistory(id);
     };
+    // ブラウザが select の値を復元した場合に備えてボタン状態を同期
+    sel.dispatchEvent(new Event("change"));
   }
   async function loadPricingHistory(serviceId) {
     const el2 = $("#pricingHistory");
@@ -355,7 +406,7 @@ npx wrangler pages deploy public --project-name=tusg-site --branch=main</pre>
   $("#btnPricingCalc").addEventListener("click", async () => {
     const id = $("#pricingServiceSelect").value;
     if (!id) return;
-    const res = await api(`/api/admin/pricing/calculate?service_id=${id}`, { method: "POST" });
+    const res = await api(`/api/admin/pricing?service_id=${id}&action=calculate`, { method: "POST" });
     const prev = $("#pricingPreview");
     if (!res.ok) { prev.textContent = res.data.message; return; }
     lastCalcBreakdown = res.data.breakdown;
@@ -394,7 +445,7 @@ npx wrangler pages deploy public --project-name=tusg-site --branch=main</pre>
   $("#btnPricingPublish").addEventListener("click", async () => {
     if (!lastCalcServiceId || !lastCalcBreakdown) return;
     if (!confirm(`最低料金 ${yen(lastCalcBreakdown.min_price_jpy)} で公開します。よろしいですか？`)) return;
-    const res = await api(`/api/admin/pricing/publish?service_id=${lastCalcServiceId}`, { method: "POST" });
+    const res = await api(`/api/admin/pricing?service_id=${lastCalcServiceId}&action=publish`, { method: "POST" });
     if (res.ok) {
       toast(`公開しました (${yen(res.data.min_amount)})`, "ok");
       loadPricingHistory(lastCalcServiceId);
@@ -492,16 +543,419 @@ npx wrangler pages deploy public --project-name=tusg-site --branch=main</pre>
       scope_description: $("#q_scope_description").value,
       expires_days: Number($("#q_expires_days").value),
     };
+    const inqId = $("#q_inquiry_id").value;
+    if (inqId) body.inquiry_id = inqId;
     const res = await api("/api/admin/quotes", { method: "POST", body });
     if (res.ok) {
       $("#quoteModal").close();
-      toast("発行しました — 一覧から URL をコピーできます", "ok");
+      $("#q_inquiry_id").value = "";
+      $("#q_inquiry_hint").hidden = true;
+      const emailSent = res.data.email_sent;
+      toast(emailSent ? "発行完了 — 顧客にメール送信済み" : "発行完了 — メール送信失敗、customer_url を手動送付", emailSent ? "ok" : "warn");
       loadQuotes();
     } else {
       toast(res.data.message || "発行失敗", "err");
     }
   });
 
+  // -------------------- Inquiries --------------------
+  const BUDGET_LABEL = {
+    unknown: "指定なし",
+    under_5000: "〜5,000円",
+    "5000_15000": "5,000〜15,000円",
+    "15000_30000": "15,000〜30,000円",
+    over_30000: "30,000円〜",
+  };
+  const INQ_STATUS_LABEL = {
+    new: "新着", in_progress: "対応中", quoted: "見積発行済", rejected: "辞退",
+  };
+  let currentInquiry = null;
+
+  async function loadInquiries() {
+    const status = $("#inqStatus").value || "open";
+    const { ok, data } = await api(`/api/admin/inquiries?status=${encodeURIComponent(status)}&limit=200`);
+    const list = $("#inqList");
+    const summaryBox = $("#inqSummary");
+    while (summaryBox.firstChild) summaryBox.removeChild(summaryBox.firstChild);
+    while (list.firstChild) list.removeChild(list.firstChild);
+    if (!ok) {
+      list.appendChild(el("div", { class: "muted" }, data.message || "取得失敗"));
+      return;
+    }
+    const summary = data.summary || [];
+    const by = (st) => summary.find((s) => s.status === st)?.count || 0;
+    summaryBox.appendChild(statCard("新着", by("new") + " 件"));
+    summaryBox.appendChild(statCard("対応中", by("in_progress") + " 件"));
+    summaryBox.appendChild(statCard("見積発行済", by("quoted") + " 件"));
+    summaryBox.appendChild(statCard("辞退", by("rejected") + " 件"));
+
+    const inquiries = data.inquiries || [];
+    if (inquiries.length === 0) {
+      list.appendChild(el("div", { class: "muted" }, "該当なし"));
+      return;
+    }
+    for (const i of inquiries) {
+      const statusTag = el("span", { class: `adm-tag adm-tag--${i.status === "new" ? "warn" : i.status === "quoted" ? "ok" : i.status === "rejected" ? "muted" : "instant"}` }, INQ_STATUS_LABEL[i.status] || i.status);
+      const svcTag = el("span", { class: "adm-tag adm-tag--muted" }, i.service_name || i.service_slug_at_submit || "(サービス未指定)");
+      list.appendChild(el("div", { class: "adm-list__item" },
+        el("div", { class: "adm-list__main" },
+          el("div", { class: "adm-list__title" },
+            i.customer_name || "(無名)", " ", statusTag, " ", svcTag
+          ),
+          el("div", { class: "adm-list__sub" },
+            `${i.customer_email}${i.customer_company ? " / " + i.customer_company : ""} / 予算: ${BUDGET_LABEL[i.budget_feel] || i.budget_feel} / 受信 ${fmtDate(i.created_at)}`
+          ),
+        ),
+        el("div", { class: "adm-list__actions" },
+          el("button", { class: "btn", onClick: () => showInquiryDetail(i.id) }, "詳細")
+        ),
+      ));
+    }
+  }
+  $("#inqStatus").addEventListener("change", loadInquiries);
+
+  async function showInquiryDetail(id) {
+    const body = $("#inqDetailBody");
+    while (body.firstChild) body.removeChild(body.firstChild);
+    body.appendChild(el("div", { class: "muted" }, "loading…"));
+    $("#inqDetailModal").showModal();
+    const { ok, data } = await api(`/api/admin/inquiries?id=${encodeURIComponent(id)}`);
+    while (body.firstChild) body.removeChild(body.firstChild);
+    if (!ok) {
+      body.appendChild(el("div", { class: "muted" }, data.message || "取得失敗"));
+      return;
+    }
+    const i = data.inquiry;
+    currentInquiry = i;
+    body.appendChild(el("h3", {}, `見積依頼 ${INQ_STATUS_LABEL[i.status] || i.status}`));
+    body.appendChild(kv("依頼 ID", i.id));
+    body.appendChild(kv("対象サービス", `${i.service_name || "(未リンク)"} ${i.service_slug_at_submit ? "/ " + i.service_slug_at_submit : ""} ${i.service_type ? "(" + i.service_type + ")" : ""}`));
+    body.appendChild(kv("顧客", `${i.customer_name} <${i.customer_email}>${i.customer_company ? " / " + i.customer_company : ""}`));
+    if (i.customer_phone) body.appendChild(kv("電話", i.customer_phone));
+    if (i.desired_pages) body.appendChild(kv("希望ページ数", i.desired_pages));
+    if (i.desired_deadline) body.appendChild(kv("希望納期", i.desired_deadline));
+    body.appendChild(kv("予算感", BUDGET_LABEL[i.budget_feel] || i.budget_feel));
+    body.appendChild(el("h4", {}, "ご要件"));
+    body.appendChild(el("div", { style: "white-space:pre-wrap;background:#fafafa;padding:12px;border-radius:6px;font-size:13px;" }, i.requirements || "(未入力)"));
+    if (i.admin_notes) {
+      body.appendChild(el("h4", {}, "管理者メモ"));
+      body.appendChild(el("div", { style: "white-space:pre-wrap;background:#fff8e1;padding:12px;border-radius:6px;font-size:13px;" }, i.admin_notes));
+    }
+    body.appendChild(kv("受信", fmtDate(i.created_at)));
+    body.appendChild(kv("最終更新", fmtDate(i.updated_at)));
+    if (i.quote_id) body.appendChild(kv("発行済 Quote ID", i.quote_id));
+    if (i.assigned_to) body.appendChild(kv("担当", i.assigned_to));
+
+    // 「見積発行」ボタンの表示切替
+    $("#inqIssueQuote").disabled = !i.service_id || i.status === "quoted" || i.status === "rejected";
+    $("#inqMarkInProgress").disabled = i.status === "quoted" || i.status === "in_progress" || i.status === "rejected";
+    $("#inqReject").disabled = i.status === "rejected" || i.status === "quoted";
+  }
+  $("#inqDetailClose").addEventListener("click", () => $("#inqDetailModal").close());
+
+  $("#inqIssueQuote").addEventListener("click", async () => {
+    if (!currentInquiry) return;
+    // ステータスを対応中に更新 (まだ new の場合)
+    if (currentInquiry.status === "new") {
+      await api(`/api/admin/inquiries?id=${encodeURIComponent(currentInquiry.id)}`,
+        { method: "PATCH", body: { status: "in_progress" } });
+    }
+    // quote 発行モーダルを prefill して開く
+    $("#inqDetailModal").close();
+    // サービス一覧を quote モーダル用に再ロード (まだ loadQuotes 呼ばれていない可能性)
+    await ensureQuoteServiceOptions();
+    $("#q_service_id").value = String(currentInquiry.service_id || "");
+    $("#q_customer_email").value = currentInquiry.customer_email || "";
+    $("#q_customer_name").value = currentInquiry.customer_name || "";
+    $("#q_customer_company").value = currentInquiry.customer_company || "";
+    $("#q_min_amount").value = "";
+    $("#q_recommended_amount").value = "";
+    $("#q_scope_description").value = [
+      currentInquiry.desired_pages ? `希望ページ数: ${currentInquiry.desired_pages}` : null,
+      currentInquiry.desired_deadline ? `希望納期: ${currentInquiry.desired_deadline}` : null,
+      "", "顧客ご要件:", currentInquiry.requirements,
+    ].filter((l) => l != null).join("\n");
+    $("#q_expires_days").value = "30";
+    $("#q_inquiry_id").value = currentInquiry.id;
+    $("#q_inquiry_hint").hidden = false;
+    $("#quoteModal").showModal();
+  });
+
+  // quote モーダルのサービス select を確実に populate
+  async function ensureQuoteServiceOptions() {
+    const sel = $("#q_service_id");
+    if (sel.options.length > 0) return;
+    const r = await api("/api/admin/services");
+    if (!r.ok) return;
+    const quoteRequired = (r.data.services || []).filter((s) => s.service_type === "quote_required");
+    sel.innerHTML = quoteRequired.map((s) => `<option value="${s.id}">${s.name} (${s.slug})</option>`).join("");
+  }
+
+  $("#inqMarkInProgress").addEventListener("click", async () => {
+    if (!currentInquiry) return;
+    const r = await api(`/api/admin/inquiries?id=${encodeURIComponent(currentInquiry.id)}`,
+      { method: "PATCH", body: { status: "in_progress" } });
+    if (r.ok) {
+      toast("対応中に更新しました", "ok");
+      $("#inqDetailModal").close();
+      loadInquiries();
+    } else {
+      toast(r.data.message || "更新失敗", "err");
+    }
+  });
+
+  $("#inqReject").addEventListener("click", async () => {
+    if (!currentInquiry) return;
+    if (!confirm("この見積依頼を辞退扱いにしますか？")) return;
+    const r = await api(`/api/admin/inquiries?id=${encodeURIComponent(currentInquiry.id)}`,
+      { method: "PATCH", body: { status: "rejected" } });
+    if (r.ok) {
+      toast("辞退に更新しました", "ok");
+      $("#inqDetailModal").close();
+      loadInquiries();
+    } else {
+      toast(r.data.message || "更新失敗", "err");
+    }
+  });
+
+  // -------------------- Subscriptions --------------------
+  async function loadSubscriptions() {
+    const status = $("#subsStatus").value || "active";
+    const { ok, data } = await api(`/api/admin/subscriptions?status=${encodeURIComponent(status)}&limit=200`);
+    const summaryBox = $("#subsSummary");
+    const list = $("#subsList");
+    while (summaryBox.firstChild) summaryBox.removeChild(summaryBox.firstChild);
+    while (list.firstChild) list.removeChild(list.firstChild);
+
+    if (!ok) {
+      list.appendChild(el("div", { class: "muted" }, data.message || "取得失敗"));
+      return;
+    }
+    // サマリ
+    const summary = data.summary || [];
+    const active = summary.find((s) => ["active", "trialing"].includes(s.status));
+    const canceled = summary.find((s) => s.status === "canceled");
+    const total = summary.reduce((a, s) => a + Number(s.total_mrr || 0), 0);
+    const activeMrr = summary
+      .filter((s) => ["active", "trialing"].includes(s.status))
+      .reduce((a, s) => a + Number(s.total_mrr || 0), 0);
+    summaryBox.appendChild(statCard("稼働中契約", (active?.count || 0) + " 件"));
+    summaryBox.appendChild(statCard("解約済", (canceled?.count || 0) + " 件"));
+    summaryBox.appendChild(statCard("月次売上 (MRR)", yen(activeMrr)));
+    summaryBox.appendChild(statCard("累計契約数", summary.reduce((a, s) => a + Number(s.count || 0), 0) + " 件"));
+
+    const subs = data.subscriptions || [];
+    if (subs.length === 0) {
+      list.appendChild(el("div", { class: "muted" }, "該当なし"));
+      return;
+    }
+    for (const s of subs) {
+      const typeTag = el("span", { class: `adm-tag adm-tag--${s.service_type === "instant" ? "instant" : "quote"}` }, s.service_type || "-");
+      const statusTag = el("span", { class: `adm-tag adm-tag--${s.status === "active" ? "ok" : s.status === "canceled" ? "muted" : "warn"}` }, s.status);
+      const card = el("div", { class: "adm-list__item" },
+        el("div", { class: "adm-list__main" },
+          el("div", { class: "adm-list__title" },
+            s.customer_name || s.customer_email || "(顧客不明)", " ",
+            typeTag, " ", statusTag
+          ),
+          el("div", { class: "adm-list__sub" },
+            `${s.service_name || s.service_slug || "-"} / 月額 ${yen(s.current_amount)} (契約時最低 ${yen(s.min_amount_at_contract)}) / 開始 ${s.started_at ? fmtDate(s.started_at) : "-"}`
+          ),
+          el("div", { class: "muted small" }, `sub: ${s.stripe_subscription_id}`)
+        ),
+        el("div", { class: "adm-list__actions" },
+          el("button", { class: "btn", onClick: () => showSubDetail(s.id) }, "詳細")
+        ),
+      );
+      list.appendChild(card);
+    }
+  }
+  $("#subsStatus").addEventListener("change", loadSubscriptions);
+
+  async function showSubDetail(id) {
+    const body = $("#subDetailBody");
+    while (body.firstChild) body.removeChild(body.firstChild);
+    body.appendChild(el("div", { class: "muted" }, "loading…"));
+    $("#subDetailModal").showModal();
+    const { ok, data } = await api(`/api/admin/subscriptions?id=${encodeURIComponent(id)}`);
+    while (body.firstChild) body.removeChild(body.firstChild);
+    if (!ok) {
+      body.appendChild(el("div", { class: "muted" }, data.message || "取得失敗"));
+      return;
+    }
+    const s = data.subscription;
+    body.appendChild(el("h3", {}, `契約 #${s.id}`));
+    body.appendChild(kv("Stripe Subscription", s.stripe_subscription_id));
+    body.appendChild(kv("顧客", `${s.customer_name || "-"} <${s.customer_email || "-"}>${s.customer_company ? " / " + s.customer_company : ""}`));
+    body.appendChild(kv("Stripe Customer", s.stripe_customer_id));
+    body.appendChild(kv("サービス", `${s.service_name || "-"} (${s.service_slug || "-"}, ${s.service_type || "-"})`));
+    body.appendChild(kv("契約時最低額 (snapshot)", yen(s.min_amount_at_contract)));
+    body.appendChild(kv("現在月額", yen(s.current_amount)));
+    body.appendChild(kv("ステータス", s.status));
+    body.appendChild(kv("開始", s.started_at ? fmtDate(s.started_at) : "-"));
+    body.appendChild(kv("次回請求", s.next_billing_at ? fmtDate(s.next_billing_at) : "-"));
+    body.appendChild(kv("期間末解約予約", s.cancel_at_period_end ? "はい" : "いいえ"));
+    body.appendChild(kv("解約日時", s.canceled_at ? fmtDate(s.canceled_at) : "-"));
+    if (data.quote) {
+      body.appendChild(el("h4", {}, "見積 (quote_required)"));
+      body.appendChild(kv("quote.id", data.quote.id));
+      body.appendChild(kv("発行者", data.quote.issued_by));
+      body.appendChild(kv("最低額", yen(data.quote.min_amount)));
+      body.appendChild(kv("ステータス", data.quote.status));
+    }
+    body.appendChild(el("h4", {}, "支払履歴"));
+    if ((data.payments || []).length === 0) {
+      body.appendChild(el("div", { class: "muted small" }, "支払いなし"));
+    } else {
+      const tbl = el("table", { class: "adm-table" });
+      tbl.appendChild(el("thead", {}, el("tr", {},
+        el("th", {}, "日付"), el("th", {}, "金額"), el("th", {}, "ステータス"), el("th", {}, "Invoice"))));
+      const tb = el("tbody");
+      for (const p of data.payments) {
+        tb.appendChild(el("tr", {},
+          el("td", {}, p.paid_at ? fmtDate(p.paid_at) : fmtDate(p.created_at)),
+          el("td", {}, yen(p.amount)),
+          el("td", {}, p.status + (p.failure_reason ? ` (${p.failure_reason})` : "")),
+          el("td", { class: "muted small" }, p.stripe_invoice_id || "-")));
+      }
+      tbl.appendChild(tb);
+      body.appendChild(tbl);
+    }
+    if ((data.pricing_history || []).length > 0) {
+      body.appendChild(el("h4", {}, "料金改定履歴"));
+      const tbl = el("table", { class: "adm-table" });
+      tbl.appendChild(el("thead", {}, el("tr", {},
+        el("th", {}, "日時"), el("th", {}, "旧→新"), el("th", {}, "変更者"), el("th", {}, "理由"))));
+      const tb = el("tbody");
+      for (const h of data.pricing_history) {
+        tb.appendChild(el("tr", {},
+          el("td", {}, fmtDate(h.changed_at)),
+          el("td", {}, `${yen(h.old_amount)} → ${yen(h.new_amount)}`),
+          el("td", {}, h.changed_by || "-"),
+          el("td", { class: "muted small" }, h.reason || "")));
+      }
+      tbl.appendChild(tb);
+      body.appendChild(tbl);
+    }
+  }
+  $("#subDetailClose").addEventListener("click", () => $("#subDetailModal").close());
+
+  function kv(label, value) {
+    return el("div", { class: "adm-kv" },
+      el("div", { class: "adm-kv__k" }, label),
+      el("div", { class: "adm-kv__v" }, value || "-"));
+  }
+  function statCard(label, value) {
+    return el("div", { class: "adm-card" },
+      el("div", { class: "muted small" }, label),
+      el("div", { style: "font-size:1.4rem;font-weight:600;margin-top:4px;" }, value));
+  }
+
+  // -------------------- Customers --------------------
+  let custSearchTimer = null;
+  async function loadCustomers() {
+    const q = $("#custSearch").value.trim();
+    const { ok, data } = await api(`/api/admin/customers${q ? "?q=" + encodeURIComponent(q) : ""}`);
+    const list = $("#customersList");
+    while (list.firstChild) list.removeChild(list.firstChild);
+    if (!ok) {
+      list.appendChild(el("div", { class: "muted" }, data.message || "取得失敗"));
+      return;
+    }
+    const customers = data.customers || [];
+    if (customers.length === 0) {
+      list.appendChild(el("div", { class: "muted" }, "顧客がまだいません"));
+      return;
+    }
+    for (const c of customers) {
+      list.appendChild(el("div", { class: "adm-list__item" },
+        el("div", { class: "adm-list__main" },
+          el("div", { class: "adm-list__title" },
+            c.name || "(無名)", " ",
+            el("span", { class: "muted small" }, `<${c.email}>`),
+            c.company ? el("span", { class: "muted small" }, ` / ${c.company}`) : null,
+          ),
+          el("div", { class: "adm-list__sub" },
+            `契約: 稼働 ${c.active_count} 件 / 累計 ${c.sub_count} 件 / 登録 ${fmtDate(c.created_at)}`
+          ),
+          el("div", { class: "muted small" }, `cus: ${c.stripe_customer_id}`),
+        )));
+    }
+  }
+  $("#custSearch").addEventListener("input", () => {
+    clearTimeout(custSearchTimer);
+    custSearchTimer = setTimeout(loadCustomers, 300);
+  });
+
+  // -------------------- Corner subscription widget (全タブ常駐) --------------------
+  async function loadCornerSummary() {
+    const body = $("#subsCornerBody");
+    const { ok, data } = await api("/api/admin/subscriptions?status=all&limit=5");
+    while (body.firstChild) body.removeChild(body.firstChild);
+    if (!ok) {
+      body.appendChild(el("div", { class: "muted small" }, data.message || "取得失敗"));
+      return;
+    }
+    const summary = data.summary || [];
+    const activeCount = summary
+      .filter((s) => ["active", "trialing"].includes(s.status))
+      .reduce((a, s) => a + Number(s.count || 0), 0);
+    const mrr = summary
+      .filter((s) => ["active", "trialing"].includes(s.status))
+      .reduce((a, s) => a + Number(s.total_mrr || 0), 0);
+    const canceledCount = summary
+      .filter((s) => s.status === "canceled")
+      .reduce((a, s) => a + Number(s.count || 0), 0);
+
+    const sumBox = el("div", { class: "adm-corner__summary" },
+      el("div", { class: "adm-corner__stat" }, "稼働", el("b", {}, activeCount + " 件")),
+      el("div", { class: "adm-corner__stat" }, "MRR", el("b", {}, yen(mrr))),
+      el("div", { class: "adm-corner__stat" }, "解約", el("b", {}, canceledCount + " 件")),
+    );
+    body.appendChild(sumBox);
+
+    const subs = data.subscriptions || [];
+    if (subs.length === 0) {
+      body.appendChild(el("div", { class: "muted small" }, "契約はまだありません"));
+      return;
+    }
+    for (const s of subs.slice(0, 5)) {
+      const stripeUrl = `https://dashboard.stripe.com/customers/${s.stripe_customer_id}`;
+      const statusTag = el("span", { class: `adm-tag adm-tag--${s.status === "active" ? "ok" : s.status === "canceled" ? "muted" : "warn"}` }, s.status);
+      body.appendChild(el("div", { class: "adm-corner__item" },
+        el("div", { class: "adm-corner__item__name" }, s.customer_name || s.customer_email || "(無名)", " ", statusTag),
+        el("div", { class: "adm-corner__item__meta" },
+          `${s.service_name || s.service_slug || "-"} / ${yen(s.current_amount)}/月`
+        ),
+        el("div", {},
+          el("a", { class: "stripe-link", href: `#`, onClick: (ev) => { ev.preventDefault(); showSubDetail(s.id); } },
+            "詳細"
+          ),
+          el("span", { class: "muted small" }, " · "),
+          el("a", { class: "stripe-link", href: stripeUrl, target: "_blank", rel: "noopener" }, "Stripe で管理 / 解約 →"),
+        ),
+      ));
+    }
+  }
+  // 折りたたみトグル (localStorage で状態保持)
+  const cornerBody = $("#subsCornerBody");
+  const cornerToggle = $("#subsCornerToggle");
+  const COLLAPSE_KEY = "tusg_adm_corner_collapsed";
+  try {
+    if (localStorage.getItem(COLLAPSE_KEY) === "1") {
+      cornerBody.classList.add("collapsed");
+      cornerToggle.textContent = "+";
+    }
+  } catch {}
+  cornerToggle.addEventListener("click", () => {
+    const collapsed = cornerBody.classList.toggle("collapsed");
+    cornerToggle.textContent = collapsed ? "+" : "−";
+    try { localStorage.setItem(COLLAPSE_KEY, collapsed ? "1" : "0"); } catch {}
+  });
+  // 60 秒ごとに自動更新
+  setInterval(loadCornerSummary, 60000);
+
   // -------------------- Init --------------------
   loadStatus();
+  loadCornerSummary();
 })();
