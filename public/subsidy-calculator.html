@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>補助金試算ツール｜持続化補助金 自己負担シミュレーター｜合同会社TUSG</title>
+<meta name="description" content="小規模事業者持続化補助金（一般型）の自己負担額と資金繰りを匿名で試算できるツール。希望の自己負担から事業費を逆算するモードと、手元資金から実現可能性を確認するモードを提供。制度仕様に基づく概算で、採択・交付を保証するものではありません。">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="stylesheet" href="/css/style.css?v=1786600000">
+<link rel="stylesheet" href="/css/subsidy-calculator.css?v=1">
+</head>
+<body>
+
+<main class="sc-wrap">
+  <header class="sc-head">
+    <h1>補助金試算ツール</h1>
+    <p>小規模事業者持続化補助金（一般型）の自己負担額と資金繰りを、匿名で試算できます。入力した情報はブラウザ内で計算し、送信するまで外部に送られません。</p>
+  </header>
+
+  <div class="sc-meta" id="sc-meta">
+    <b>制度バージョン:</b> <span id="sc-rules-version">—</span>　<b>最終確認:</b> <span id="sc-rules-verified">—</span>　<b>一次情報:</b> <a id="sc-rules-url" href="#" target="_blank" rel="noopener">公募要領</a>
+  </div>
+
+  <nav class="sc-tabs" role="tablist">
+    <button role="tab" data-tab="reverse" aria-selected="true">補助金受給後の負担額から逆算</button>
+    <button role="tab" data-tab="cash" aria-selected="false">今ある資金から実現可能性を確認</button>
+  </nav>
+
+  <!-- ================= Tab A: 逆算 ================= -->
+  <section id="sc-panel-reverse" class="sc-panel">
+    <form class="sc-form" id="sc-reverse-form" autocomplete="off">
+      <h2>希望する自己負担から事業費を逆算</h2>
+
+      <div class="sc-row">
+        <label for="rv_target">希望する最終自己負担の上限（円）</label>
+        <input id="rv_target" name="target" type="number" min="0" step="1" value="180000">
+        <div class="hint">例: 180,000（補助金交付後に支払う負担の上限）</div>
+      </div>
+
+      <div class="sc-row">
+        <label>その定義 <span style="color:#c0392b">*</span></label>
+        <label class="sc-radio"><input type="radio" name="basis" value="tax_included_cash" checked>税込現金ベース（支払総額 − 補助金）</label>
+        <label class="sc-radio"><input type="radio" name="basis" value="tax_excluded">税抜対象経費ベース（事業費 − 補助金）</label>
+        <div class="hint">デフォルトは「税込現金ベース」。税抜18万 と 税込23.4万 は別の金額です。</div>
+      </div>
+
+      <div class="sc-row">
+        <label>費目構成（相対比率でも金額でも可）</label>
+        <div class="sc-grid3">
+          <div>
+            <label for="rv_web" style="font-weight:400;font-size:0.78rem;">ウェブ関連費 (HP等)</label>
+            <input id="rv_web" name="web" type="number" min="0" step="1" value="5">
+          </div>
+          <div>
+            <label for="rv_pr" style="font-weight:400;font-size:0.78rem;">広報費</label>
+            <input id="rv_pr" name="pr" type="number" min="0" step="1" value="1">
+          </div>
+          <div>
+            <label for="rv_other" style="font-weight:400;font-size:0.78rem;">その他対象経費</label>
+            <input id="rv_other" name="other" type="number" min="0" step="1" value="0">
+          </div>
+        </div>
+        <div class="hint">例: HP 制作が 5、広報が 1 の比率。または実際の金額を入力。<b>ウェブ・広報は単独では申請不可</b>。実在する販路開拓施策に基づく他費目との組合せが必要です。</div>
+      </div>
+
+      <div class="sc-grid2">
+        <div class="sc-row">
+          <label for="rv_rate">補助率</label>
+          <select id="rv_rate" name="rateKey">
+            <option value="general" selected>一般事業者 (2/3)</option>
+            <option value="deficit">赤字事業者 (3/4)（別途厳格判定）</option>
+          </select>
+        </div>
+        <div class="sc-row">
+          <label for="rv_program">補助上限（枠）</label>
+          <select id="rv_program" name="programKey">
+            <option value="normal" selected>通常枠 50万</option>
+            <option value="wage">賃金引上げ枠 100万</option>
+            <option value="business_transition">卒業枠 200万</option>
+            <option value="graduation">卒業枠 250万</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="sc-grid2">
+        <div class="sc-row">
+          <label for="rv_tax">消費税率</label>
+          <select id="rv_tax" name="taxRate">
+            <option value="0.10" selected>10%</option>
+            <option value="0.08">8% (軽減税率)</option>
+          </select>
+        </div>
+        <div class="sc-row">
+          <label for="rv_additional">月額保守 × 対象月数 等の追加現金支出（円、任意）</label>
+          <input id="rv_additional" name="additionalCashCosts" type="number" min="0" step="1" value="0">
+          <div class="hint">補助対象外。無交付時の最大想定負担に加算されます。</div>
+        </div>
+      </div>
+
+      <button type="submit" class="sc-btn">試算する</button>
+    </form>
+
+    <div class="sc-results" id="sc-reverse-results" hidden>
+      <!-- JS が描画 -->
+    </div>
+  </section>
+
+  <!-- ================= Tab B: 資金繰り ================= -->
+  <section id="sc-panel-cash" class="sc-panel" hidden>
+    <form class="sc-form" id="sc-cash-form" autocomplete="off">
+      <h2>手元資金から実行可能性を判定</h2>
+
+      <div class="sc-row">
+        <label>対象経費（税抜、円）<span style="color:#c0392b">*</span></label>
+        <div class="sc-grid3">
+          <div>
+            <label for="cf_web" style="font-weight:400;font-size:0.78rem;">ウェブ関連費</label>
+            <input id="cf_web" type="number" min="0" step="1" value="450000">
+          </div>
+          <div>
+            <label for="cf_pr" style="font-weight:400;font-size:0.78rem;">広報費</label>
+            <input id="cf_pr" type="number" min="0" step="1" value="90000">
+          </div>
+          <div>
+            <label for="cf_other" style="font-weight:400;font-size:0.78rem;">その他</label>
+            <input id="cf_other" type="number" min="0" step="1" value="0">
+          </div>
+        </div>
+      </div>
+
+      <div class="sc-grid2">
+        <div class="sc-row">
+          <label for="cf_rate">補助率</label>
+          <select id="cf_rate">
+            <option value="general" selected>一般事業者 (2/3)</option>
+            <option value="deficit">赤字事業者 (3/4)</option>
+          </select>
+        </div>
+        <div class="sc-row">
+          <label for="cf_program">補助上限（枠）</label>
+          <select id="cf_program">
+            <option value="normal" selected>通常枠 50万</option>
+            <option value="wage">賃金引上げ枠 100万</option>
+            <option value="business_transition">卒業枠 200万</option>
+            <option value="graduation">卒業枠 250万</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="sc-grid2">
+        <div class="sc-row">
+          <label for="cf_cash">手元で使える現金（円）</label>
+          <input id="cf_cash" type="number" min="0" step="1" value="180000">
+        </div>
+        <div class="sc-row">
+          <label for="cf_tax">消費税率</label>
+          <select id="cf_tax">
+            <option value="0.10" selected>10%</option>
+            <option value="0.08">8% (軽減税率)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="sc-grid3">
+        <div class="sc-row">
+          <label for="cf_loan_amount">融資額（円）</label>
+          <input id="cf_loan_amount" type="number" min="0" step="1" value="0">
+        </div>
+        <div class="sc-row">
+          <label for="cf_loan_status">融資ステータス</label>
+          <select id="cf_loan_status">
+            <option value="none" selected>なし</option>
+            <option value="applying">申請中</option>
+            <option value="approved">承認済（未入金）</option>
+            <option value="received">入金済</option>
+          </select>
+        </div>
+        <div class="sc-row">
+          <label for="cf_scenario">補助金交付シナリオ</label>
+          <select id="cf_scenario">
+            <option value="full" selected>満額交付（想定）</option>
+            <option value="half">50% 減額</option>
+            <option value="zero">0 円（不採択・取下げ等）</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="sc-row">
+        <label for="cf_additional">追加現金支出（利息・月額保守・既発注分 等、円）</label>
+        <input id="cf_additional" type="number" min="0" step="1" value="0">
+        <div class="hint">補助対象外の支出。無交付時の最大想定負担に加算されます。</div>
+      </div>
+
+      <button type="submit" class="sc-btn">試算する</button>
+    </form>
+
+    <div class="sc-results" id="sc-cash-results" hidden>
+      <!-- JS が描画 -->
+    </div>
+  </section>
+
+  <div class="sc-disclaimer">
+    <strong>重要な前提と注意</strong>
+    <ul id="sc-disclaimers">
+      <!-- JS が描画 -->
+    </ul>
+    <p style="margin-top:12px;">
+      本試算は制度仕様に基づく概算です。<strong>キャッシュバック・自己負担還元・名義貸し・資金循環は補助金制度の禁止事項</strong>であり、
+      当社はそのような便宜を一切提供しません。実際の申請者名義で発注・支払・記録を行う必要があります。
+      詳細は <a id="sc-info-link" href="#" target="_blank" rel="noopener">公募要領（最新版）</a> および
+      <a href="https://mirasapo-plus.go.jp/hint/25788/" target="_blank" rel="noopener">ミラサポplus（補助金の後払い）</a> をご参照ください。
+    </p>
+  </div>
+
+  <div class="sc-contact">
+    <a href="/contact.html?inquiry=subsidy">個別のご相談はこちら（無料）</a>
+  </div>
+</main>
+
+<script type="module" src="/js/subsidy-calculator/app.js?v=1" defer></script>
+</body>
+</html>
