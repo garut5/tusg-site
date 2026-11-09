@@ -69,13 +69,13 @@ export async function onRequestPost({ request, env }) {
         await handleSubscriptionUpdated(db, event);
         break;
       case "customer.subscription.deleted":
-        await handleSubscriptionDeleted(db, event);
+        await handleSubscriptionDeleted(db, event, env);
         break;
       case "invoice.payment_succeeded":
-        await handleInvoicePaid(db, event, "succeeded");
+        await handleInvoicePaid(db, event, "succeeded", env);
         break;
       case "invoice.payment_failed":
-        await handleInvoicePaid(db, event, "failed");
+        await handleInvoicePaid(db, event, "failed", env);
         break;
       default:
         // 対象外イベントも event id を記録して重複処理を避ける
@@ -303,6 +303,39 @@ async function handleCheckoutCompleted(db, event, env) {
       .bind(now, now, quote_id)
       .run();
   }
+
+  // ── 通知 ──
+  // サービス情報と顧客情報を取得して admin と顧客にメール
+  const svcRow = service_id
+    ? await db.prepare("SELECT name, slug FROM services WHERE id = ?").bind(service_id).first()
+    : null;
+  const svcName = svcRow?.name || "(サービス未リンク)";
+  const custName = session.customer_details?.name || "";
+
+  // 失敗しても webhook 自体は成功させる (Stripe の retry を発生させない)
+  try {
+    await sendAdminNewContractNotice(env, {
+      customer_name: custName,
+      customer_email,
+      service_name: svcName,
+      amount_monthly: unitAmount,
+      min_amount_at_contract: min_amount_at_contract || unitAmount,
+      stripe_subscription_id: sub.id,
+      stripe_customer_id: extractIdOrString(session.customer),
+    });
+  } catch (e) {
+    console.error("[webhook] admin notify (new contract) failed:", e?.message || e);
+  }
+  try {
+    await sendCustomerWelcomeNotice(env, {
+      to: customer_email,
+      customer_name: custName,
+      service_name: svcName,
+      amount_monthly: unitAmount,
+    });
+  } catch (e) {
+    console.error("[webhook] customer welcome failed:", e?.message || e);
+  }
 }
 
 async function handleSubscriptionUpdated(db, event) {
@@ -335,7 +368,7 @@ async function handleSubscriptionUpdated(db, event) {
     .run();
 }
 
-async function handleSubscriptionDeleted(db, event) {
+async function handleSubscriptionDeleted(db, event, env) {
   const sub = event.data.object;
   const now = Date.now();
   await db
@@ -346,9 +379,38 @@ async function handleSubscriptionDeleted(db, event) {
     )
     .bind(now, now, sub.id)
     .run();
+
+  // 解約を admin に通知 (累計収益も算出して添える)
+  const row = await db
+    .prepare(
+      `SELECT s.id, s.current_amount, s.min_amount_at_contract, s.started_at,
+              c.email, c.name AS customer_name, c.company,
+              sv.name AS service_name,
+              (SELECT COALESCE(SUM(amount), 0) FROM payments WHERE subscription_id = s.id AND status = 'succeeded') AS total_revenue
+       FROM subscriptions s
+       LEFT JOIN customers c ON c.id = s.customer_id
+       LEFT JOIN services sv ON sv.id = s.service_id
+       WHERE s.stripe_subscription_id = ? LIMIT 1`
+    )
+    .bind(sub.id).first();
+  if (row) {
+    try {
+      await sendAdminCancellationNotice(env, {
+        customer_name: row.customer_name,
+        customer_email: row.email,
+        service_name: row.service_name,
+        amount_monthly: row.current_amount,
+        duration_days: Math.max(0, Math.floor((now - Number(row.started_at)) / 86400000)),
+        total_revenue: Number(row.total_revenue || 0),
+        stripe_subscription_id: sub.id,
+      });
+    } catch (e) {
+      console.error("[webhook] admin notify (cancellation) failed:", e?.message || e);
+    }
+  }
 }
 
-async function handleInvoicePaid(db, event, status) {
+async function handleInvoicePaid(db, event, status, env) {
   const inv = event.data.object;
   const now = Date.now();
   const stripeSubId = invoiceSubscriptionId(inv);
@@ -394,6 +456,39 @@ async function handleInvoicePaid(db, event, status) {
       .bind(status, failureReason, paidAt, event.id, inv.id)
       .run();
   }
+
+  // 失敗時は必ず admin 通知 (見逃すとビジネス直撃)
+  // 成功時も通知する (運用の可視化。頻度が多すぎれば将来フィルタ可)
+  if (subLocalId) {
+    const info = await db
+      .prepare(
+        `SELECT c.email, c.name AS customer_name, c.company, sv.name AS service_name,
+                s.current_amount, s.stripe_subscription_id
+         FROM subscriptions s
+         LEFT JOIN customers c ON c.id = s.customer_id
+         LEFT JOIN services sv ON sv.id = s.service_id
+         WHERE s.id = ? LIMIT 1`
+      )
+      .bind(subLocalId).first();
+    if (info) {
+      try {
+        await sendAdminPaymentNotice(env, {
+          status,
+          customer_name: info.customer_name,
+          customer_email: info.email,
+          service_name: info.service_name,
+          amount,
+          current_monthly: info.current_amount,
+          failure_reason: failureReason,
+          stripe_invoice_id: inv.id,
+          stripe_subscription_id: info.stripe_subscription_id,
+          hosted_invoice_url: inv.hosted_invoice_url || null,
+        });
+      } catch (e) {
+        console.error("[webhook] admin notify (payment " + status + ") failed:", e?.message || e);
+      }
+    }
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -411,4 +506,158 @@ async function fetchStripeSubscription(env, subId) {
     throw new Error(`Stripe subscription fetch failed (${resp.status}): ${body.slice(0, 500)}`);
   }
   return resp.json();
+}
+
+// -----------------------------------------------------------------------------
+// Resend 通知 (admin / 顧客)
+//
+// 「お客様が課金しても気づかないリスク」を排除するため、以下を必ず飛ばす:
+//   - 新規契約成立 → admin + 顧客 welcome
+//   - 月次決済 (成功/失敗) → admin
+//   - 解約 → admin
+//
+// RESEND_API_KEY / RESEND_FROM_EMAIL が未設定の場合は no-op (エラーログのみ)
+// 送信失敗は webhook 自体の再送を防ぐため throw せず warn で握る (呼び出し側で try/catch)
+// -----------------------------------------------------------------------------
+function yen(n) { return "¥" + Number(n || 0).toLocaleString("ja-JP"); }
+function adminEmail(env) {
+  return env.ADMIN_ALERT_EMAIL || env.CONSULTATION_NOTIFICATION_TO || env.CONTACT_TO_EMAIL;
+}
+function senderFrom(env) {
+  if (!env.RESEND_FROM_EMAIL) return null;
+  return env.RESEND_FROM_NAME
+    ? `${env.RESEND_FROM_NAME} <${env.RESEND_FROM_EMAIL}>`
+    : env.RESEND_FROM_EMAIL;
+}
+async function sendResend(env, { to, subject, text, replyTo }) {
+  const apiKey = env.RESEND_API_KEY;
+  const from = senderFrom(env);
+  if (!apiKey || !from || !to) {
+    console.warn("[webhook] resend skipped (missing config or recipient)",
+      { has_apiKey: Boolean(apiKey), has_from: Boolean(from), has_to: Boolean(to) });
+    return;
+  }
+  const body = { from, to: Array.isArray(to) ? to : [to], subject, text };
+  if (replyTo) body.reply_to = replyTo;
+  const resp = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!resp.ok) {
+    const err = await resp.text().catch(() => "");
+    throw new Error(`Resend ${resp.status}: ${err.slice(0, 300)}`);
+  }
+}
+
+async function sendAdminNewContractNotice(env, d) {
+  const to = adminEmail(env);
+  const siteUrl = (env.SITE_URL || "https://tusg.co.jp").replace(/\/$/, "");
+  const lines = [
+    "🎉 Pay Forward 新規契約が成立しました。",
+    "",
+    `顧客:   ${d.customer_name || "(氏名未入力)"} <${d.customer_email}>`,
+    `サービス: ${d.service_name}`,
+    `月額:    ${yen(d.amount_monthly)} / 月 (税抜)`,
+    `契約時最低額: ${yen(d.min_amount_at_contract)} (snapshot — 下振れ赤字防止ガード)`,
+    "",
+    `Stripe Subscription: ${d.stripe_subscription_id}`,
+    `Stripe Customer:     ${d.stripe_customer_id || "(不明)"}`,
+    "",
+    "────────────────",
+    `管理画面で契約詳細: ${siteUrl}/admin/#subscriptions`,
+    `Stripe で管理:        https://dashboard.stripe.com/customers/${d.stripe_customer_id || ""}`,
+  ].join("\n");
+  await sendResend(env, {
+    to,
+    subject: `【Pay Forward 新規契約】${d.service_name}｜${d.customer_name || d.customer_email}｜${yen(d.amount_monthly)}/月`,
+    text: lines,
+    replyTo: d.customer_email,
+  });
+}
+
+async function sendCustomerWelcomeNotice(env, d) {
+  const siteUrl = (env.SITE_URL || "https://tusg.co.jp").replace(/\/$/, "");
+  const lines = [
+    `${d.customer_name || "お客様"} 様`,
+    "",
+    "合同会社TUSG です。この度は Pay Forward のご契約、誠にありがとうございます。",
+    "",
+    `サービス: ${d.service_name}`,
+    `月額: ${yen(d.amount_monthly)} / 月 (税抜)`,
+    "",
+    "決済は Stripe を通じて自動で行われ、レシートが別途 Stripe から送信されます。",
+    "月額料金はお客様ご自身でいつでも変更・解約いただけます (別途ご案内予定)。",
+    "",
+    "ご不明点がございましたら、このメールにご返信ください。",
+    "",
+    "────────────────",
+    "合同会社TUSG",
+    siteUrl,
+  ].join("\n");
+  await sendResend(env, {
+    to: d.to,
+    subject: `【TUSG】ご契約ありがとうございます (${d.service_name})`,
+    text: lines,
+    replyTo: adminEmail(env),
+  });
+}
+
+async function sendAdminPaymentNotice(env, d) {
+  const to = adminEmail(env);
+  const siteUrl = (env.SITE_URL || "https://tusg.co.jp").replace(/\/$/, "");
+  const isFailed = d.status === "failed";
+  const emoji = isFailed ? "⚠️" : "💴";
+  const label = isFailed ? "決済失敗" : "決済成功";
+  const lines = [
+    `${emoji} Pay Forward ${label}`,
+    "",
+    `顧客:   ${d.customer_name || "(氏名未入力)"} <${d.customer_email}>`,
+    `サービス: ${d.service_name}`,
+    `請求額:  ${yen(d.amount)}`,
+    `現在月額: ${yen(d.current_monthly)}`,
+    isFailed ? `失敗理由: ${d.failure_reason || "(詳細は Stripe ダッシュボードで確認)"}` : null,
+    "",
+    `Stripe Invoice: ${d.stripe_invoice_id}`,
+    `Stripe Subscription: ${d.stripe_subscription_id}`,
+    d.hosted_invoice_url ? `Invoice URL: ${d.hosted_invoice_url}` : null,
+    "",
+    "────────────────",
+    isFailed
+      ? "対応: Stripe はしばらく自動で再試行します。顧客に連絡して決済手段の確認を依頼してください。"
+      : "D1 の payments テーブルに記録済み。",
+    `管理画面: ${siteUrl}/admin/#subscriptions`,
+  ].filter((l) => l != null).join("\n");
+  await sendResend(env, {
+    to,
+    subject: `${emoji}【Pay Forward ${label}】${d.customer_name || d.customer_email}｜${yen(d.amount)}`,
+    text: lines,
+    replyTo: d.customer_email,
+  });
+}
+
+async function sendAdminCancellationNotice(env, d) {
+  const to = adminEmail(env);
+  const siteUrl = (env.SITE_URL || "https://tusg.co.jp").replace(/\/$/, "");
+  const lines = [
+    "📉 Pay Forward 契約が解約されました。",
+    "",
+    `顧客:   ${d.customer_name || "(氏名未入力)"} <${d.customer_email}>`,
+    `サービス: ${d.service_name}`,
+    `契約時月額: ${yen(d.amount_monthly)}`,
+    `契約期間:  ${d.duration_days} 日`,
+    `累計収益:  ${yen(d.total_revenue)}`,
+    "",
+    `Stripe Subscription: ${d.stripe_subscription_id}`,
+    "",
+    "────────────────",
+    "対応: 必要に応じて解約理由のヒアリング・改善施策を検討してください。",
+    `管理画面: ${siteUrl}/admin/#subscriptions`,
+  ].join("\n");
+  await sendResend(env, {
+    to,
+    subject: `📉【Pay Forward 解約】${d.customer_name || d.customer_email}｜${d.service_name}`,
+    text: lines,
+    replyTo: d.customer_email,
+  });
 }
